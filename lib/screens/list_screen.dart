@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
+import 'package:microlearning/models/drawer_item.dart';
 
 class ListScreen extends StatelessWidget {
 
@@ -15,6 +16,7 @@ class ListScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.grey[900],
       ),
+      drawer: DrawerItem(),
       body: FutureBuilder<List<Event>>(
         future: getAllEvents(),
         builder: (context, snapshot) {

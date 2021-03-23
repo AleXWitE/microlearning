@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:microlearning/models/drawer_item.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -18,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         backgroundColor: Colors.grey[900],
       ),
-
+      drawer: DrawerItem(),
       body: Container(
         decoration: BoxDecoration(
             image: DecorationImage(

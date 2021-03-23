@@ -20,9 +20,9 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Example",
-        initialRoute: '/',
+        initialRoute: '/home',
         routes: {
-          '/': (BuildContext context) => HomeScreen(),
+          '/home': (BuildContext context) => HomeScreen(),
           '/list_events': (BuildContext context) => ListScreen(),
           '/event': (BuildContext context) => EventScreen(),
           '/about': (BuildContext context) => AboutScreen(),

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
+import 'package:microlearning/models/drawer_item.dart';
 
 class EventScreen extends StatelessWidget {
   String _id;
@@ -17,6 +18,7 @@ class EventScreen extends StatelessWidget {
         titleTextStyle: TextStyle(color: Colors.indigo),
         backgroundColor: Colors.grey[500],
       ),
+      drawer: DrawerItem(),
       body: Stack(children: [
         FutureBuilder<Event>(
           future: getEvent(_id),
