@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/models/drawer_item.dart';
+import 'package:microlearning/screens/list_screen.dart';
 
 class AddScreen extends StatefulWidget {
   @override
@@ -13,7 +14,6 @@ class _AddScreenState extends State<AddScreen> {
   void initState() {
     super.initState();
   }
-
   var _finalDate;
 
   void _pickDateDialog() {
@@ -39,9 +39,9 @@ class _AddScreenState extends State<AddScreen> {
   final _formKey = GlobalKey<FormState>();
   String _name;
   String _location;
-  // DateTime _date;
 
   callAPI() {
+    if (_finalDate == null) _finalDate = DateTime.now().toString();
     Event event = Event(
         name: '$_name', location: '$_location', date: '$_finalDate');
     createEvent(event).then((response) {
@@ -99,7 +99,7 @@ class _AddScreenState extends State<AddScreen> {
                   new SizedBox(
                     height: 15,
                   ),
-                  new Text(_finalDate == null ? "Picked date: ${DateTime.now().toString()}" : "Picked date: $_finalDate" ),
+                  new Text(_finalDate == null ? "Picked date: not assigned" : "Picked date: $_finalDate" ),
                   new RaisedButton(
                     onPressed: _pickDateDialog,
                     color: Colors.blueAccent,
@@ -112,16 +112,10 @@ class _AddScreenState extends State<AddScreen> {
                     onPressed: () {
                       if (_formKey.currentState.validate()) {
                         callAPI();
-
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text("Success"),
-                          backgroundColor: Colors.green,
-                        ));
-                      } else {
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text("Something wrong"),
-                          backgroundColor: Colors.red,
-                        ));
+                        setState(() {
+                          // getEventsBuilderState().getAllEventsState = getAllEvents();
+                        });
+                        Navigator.pushNamed(context, '/list_events');
                       }
                     },
                     child: Text('Send'),

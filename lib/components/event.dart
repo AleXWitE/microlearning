@@ -29,13 +29,57 @@ class Event {
   }
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "location": location,
-    "date": date,
-  };
+        "id": id,
+        "name": name,
+        "location": location,
+        "date": date,
+      };
 }
 
+class Answers {
+  int id;
+  String answer1;
+  String answer2;
+  String answer3;
+  String title;
+  String description;
+  String url;
 
+  Answers({this.id, this.answer1, this.answer2, this.answer3, this.title, this.description, this.url});
 
-// var e = Event(name: "name", location: "l1", date: DateTime.now());
+  factory Answers.fromJson(Map<String, dynamic> json) {
+    return new Answers(
+      id: json['id'],
+      answer1: json['answer1'],
+      answer2: json['answer2'],
+      answer3: json['answer3'],
+      title: json['title'],
+      description: json['description'],
+      url: json['url'],
+    );
+  }
+}
+
+/*
+class Questions {
+  int id;
+  // String question;
+  String title;
+  String description;
+  String url;
+
+  Questions({this.id,*/
+/* this.question,*//*
+ this.title, this.description, this.url});
+
+  factory Questions.fromJson(Map<String, dynamic> json) {
+    return new Questions(
+      id: json['id'],
+      // question: json['question'],
+      title: json['title'],
+      description: json['description'],
+      url: json['url'],
+    );
+  }
+}
+*/
