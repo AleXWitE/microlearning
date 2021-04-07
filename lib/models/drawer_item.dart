@@ -6,11 +6,11 @@ class DrawerItem extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
 
-    return Drawer(
+    return Drawer( //модель дравера, боковой панельки
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          DrawerHeader(
+          DrawerHeader( //имеет в себе заголовок
               decoration: BoxDecoration(
                 color: Colors.tealAccent[200],
               ),
@@ -28,7 +28,7 @@ class DrawerItem extends StatelessWidget{
                   )
                 ],
           )),
-          ListTile(
+          ListTile( //и остальное тело элементов, использовать листтайл, т.к обернуты в обычный список
             leading: Icon(Icons.wysiwyg),
             title: Text("To list"),
             onTap: () => Navigator.pushNamed(context, '/list_events'),

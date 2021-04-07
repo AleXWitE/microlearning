@@ -40,11 +40,11 @@ class _AddScreenState extends State<AddScreen> {
   String _name;
   String _location;
 
-  callAPI() {
+  callAPI() { //функция вызова работы с апи, в данном варианте - добавление элемента в джсон
     if (_finalDate == null) _finalDate = DateTime.now().toString();
-    Event event = Event(
+    Event event = Event( //определение элемента
         name: '$_name', location: '$_location', date: '$_finalDate');
-    createEvent(event).then((response) {
+    createEvent(event).then((response) { //сборка элемента, по готовности отправка запроса
       if (response.statusCode > 200)
         print(response.body);
       else
@@ -70,51 +70,48 @@ class _AddScreenState extends State<AddScreen> {
               key: _formKey,
               child: Column(
                 children: <Widget>[
-                  new Text(
+                  Text(
                     'Enter the Name of event:',
                     style: TextStyle(fontSize: 20.0),
                   ),
-                  new TextFormField(validator: (value) {
-                    if (value.isNotEmpty){
+                  TextFormField(validator: (value) {
+                    if (value.isNotEmpty){ //проверка текстинпута на пустую строку, если не пустая - присваиваем имя, если пустая - ошибка
                       _name = value;
                     } else return 'Please, entry a name of event';
                   }),
-                  new SizedBox(height: 20.0),
-                  new Text(
+                  SizedBox(height: 20.0),
+                  Text(
                     'Entry location of event:',
                     style: TextStyle(fontSize: 20.0),
                   ),
-                  new TextFormField(validator: (value) {
+                  TextFormField(validator: (value) {
                     if (value.isNotEmpty){
                       _location = value;
                     } else return 'Please, entry location of event';
                   }),
-                  new SizedBox(
+                  SizedBox(
                     height: 15,
                   ),
-                  new Text(
+                  Text(
                     'Entry date of event:',
                     style: TextStyle(fontSize: 20.0),
                   ),
-                  new SizedBox(
+                  SizedBox(
                     height: 15,
                   ),
-                  new Text(_finalDate == null ? "Picked date: not assigned" : "Picked date: $_finalDate" ),
-                  new RaisedButton(
+                  Text(_finalDate == null ? "Picked date: not assigned" : "Picked date: $_finalDate" ),
+                  RaisedButton(
                     onPressed: _pickDateDialog,
                     color: Colors.blueAccent,
-                    child: new Text('Choose date',
+                    child: Text('Choose date',
                         style: TextStyle(color: Colors.white)),
                   ),
 
-                  new SizedBox(height: 20.0),
-                  new RaisedButton(
+                  SizedBox(height: 20.0),
+                  RaisedButton(
                     onPressed: () {
-                      if (_formKey.currentState.validate()) {
+                      if (_formKey.currentState.validate()) { //если валидация прошла - вызываем апи, и отправляемся в весь список
                         callAPI();
-                        setState(() {
-                          // getEventsBuilderState().getAllEventsState = getAllEvents();
-                        });
                         Navigator.pushNamed(context, '/list_events');
                       }
                     },

@@ -7,7 +7,7 @@ import 'package:microlearning/models/drawer_item.dart';
 class EventScreen extends StatelessWidget {
   String _id;
 
-  EventScreen({String id}) : _id = id;
+  EventScreen({String id}) : _id = id; //здесь мы получаем отправленный нам id элемента из списка, в следствии с ним и работаем при обращении к апи
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +20,9 @@ class EventScreen extends StatelessWidget {
       ),
       drawer: DrawerItem(),
       body: Stack(children: [
-        FutureBuilder<Event>(
-          future: getEvent(_id),
-          builder: (context, snapshot) {
+        FutureBuilder<Event>( //при работе с джсон мы получаем класс элементов Future, т.е будут когда в будущем, асинхронный метод, который требует отложенного билда
+          future: getEvent(_id), // что мы должны получить в будущем
+          builder: (context, snapshot) { //получаем контекст и элемент джсона
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
                 return Text('${snapshot.error}');

@@ -1,9 +1,9 @@
-class EventList {
+class EventList { //модель данных для списка всех событий, состоит из элементов вложенного списка
   final List<Event> events;
 
   EventList({this.events});
 
-  factory EventList.fromJson(List<dynamic> json) {
+  factory EventList.fromJson(List<dynamic> json) { //при работе с джсон, без фабрики не будет срабатывать подстановка полученных элементов карты с апи
     List<Event> events = new List<Event>();
     events = json.map((i) => Event.fromJson(i)).toList();
 
@@ -19,7 +19,7 @@ class Event {
 
   Event({this.id, this.name, this.location, this.date});
 
-  factory Event.fromJson(Map<String, dynamic> json) {
+  factory Event.fromJson(Map<String, dynamic> json) { // расшифровка и распределение полученных элементов джсона в элемент списка
     return new Event(
       id: json['id'].toString(),
       name: json['name'],
@@ -44,8 +44,9 @@ class Answers {
   String title;
   String description;
   String url;
+  String type;
 
-  Answers({this.id, this.answer1, this.answer2, this.answer3, this.title, this.description, this.url});
+  Answers({this.id, this.answer1, this.answer2, this.answer3, this.title, this.description, this.url, this.type});
 
   factory Answers.fromJson(Map<String, dynamic> json) {
     return new Answers(
@@ -56,30 +57,42 @@ class Answers {
       title: json['title'],
       description: json['description'],
       url: json['url'],
+      type: json['type'],
     );
   }
 }
 
-/*
-class Questions {
-  int id;
-  // String question;
-  String title;
-  String description;
-  String url;
-
-  Questions({this.id,*/
-/* this.question,*//*
- this.title, this.description, this.url});
-
-  factory Questions.fromJson(Map<String, dynamic> json) {
-    return new Questions(
-      id: json['id'],
-      // question: json['question'],
-      title: json['title'],
-      description: json['description'],
-      url: json['url'],
-    );
-  }
-}
-*/
+List<Answers> answers = [ //тестовое добавление вопросов локально, без интернета
+  Answers(
+      answer1: "answer1",
+      answer2: "answer2",
+      answer3: "answer3",
+      title: "Title 1",
+      description: "Short description 1",
+      url: "https://picsum.photos/250?image=10",
+      type: "radio"),
+  Answers(
+      answer1: "answer4",
+      answer2: "answer5",
+      answer3: "answer6",
+      title: "Title 2",
+      description: "Short description 2",
+      url: "https://picsum.photos/250?image=11",
+      type: "checkbox"),
+  Answers(
+      answer1: "answer7",
+      answer2: "answer8",
+      answer3: "answer9",
+      title: "Title 3",
+      description: "Short description 3",
+      url: "https://picsum.photos/250?image=12",
+      type: "lecture"),
+  Answers(
+      answer1: "answer10",
+      answer2: "answer11",
+      answer3: "answer12",
+      title: "Title 4",
+      description: "Short description 4",
+      url: "https://picsum.photos/250?image=13",
+      type: "radio"),
+];

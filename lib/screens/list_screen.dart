@@ -14,16 +14,16 @@ class ListScreen extends StatefulWidget {
 
 class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   GlobalKey<RefreshIndicatorState> refreshKey;
-  Future getAllEventsState;
+  Future getAllEventsState;//определяем переменную под будущий список элементов из интернета
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    refreshKey = GlobalKey<RefreshIndicatorState>();
+    WidgetsBinding.instance.addObserver(this);//попытка добавления слушателя состояния, для работы с жизненным циклом виджетов
+    refreshKey = GlobalKey<RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
   }
 
-  Future<Null> refreshList() async {
+  Future<Null> refreshList() async { //функция обновления списка
     await Future.delayed(Duration(milliseconds: 200));
     setState(() {
       getAllEventsState = getAllEvents();
@@ -38,7 +38,7 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) { //не работает(((
     if (state == AppLifecycleState.resumed) {
       setState(() {
         getAllEventsState = getAllEvents();
@@ -48,7 +48,7 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if (getAllEventsState == null) {
+    if (getAllEventsState == null) { //если мы первый раз запустили экран - получаем в первый раз данные из интернета
       getAllEventsState = getAllEvents();
     }
 
@@ -59,7 +59,7 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
         backgroundColor: Colors.grey[900],
       ),
       drawer: DrawerItem(),
-      body: RefreshIndicator(
+      body: RefreshIndicator(//обновление списка
           key: refreshKey,
           onRefresh: () async {
             await refreshList();
@@ -72,14 +72,14 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
                 if (snapshot.hasError) {
                   return Text('${snapshot.error}');
                 }
-                return ListView.builder(
+                return ListView.builder( //возвращаем билд списка
                     physics: PageScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 40),
                     itemCount: snapshot.data.length,
-                    itemBuilder: (_, index) =>
+                    itemBuilder: (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
                         EventCard(events: snapshot.data, i: index));
               } else {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator()); //если данные еще не получены, то мы возвращаем значек загрузки
               }
             },
           )),
@@ -87,7 +87,7 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
         child: Text("Add"),
         backgroundColor: Colors.grey[900],
         onPressed: () {
-          Navigator.pushNamed(context, '/add');
+          Navigator.pushNamed(context, '/add'); //переход на экран добавления элемента
         },
       ),
     );
