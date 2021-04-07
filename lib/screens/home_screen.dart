@@ -2,7 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/svg.dart';//полезный импорт, без него не получится вставить svg картинку. Вставлять только с помощью assert
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/models/drawer_item.dart';
 
