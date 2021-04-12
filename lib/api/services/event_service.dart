@@ -8,7 +8,12 @@ String url = "http://autoinvitro.std-271.ist.mospolytech.ru/api/event";
 String urlQue = "http://autoinvitro.std-271.ist.mospolytech.ru/api/question";
 
 Future<List<Event>> getAllEvents() async { //функция вызова всех элементов джсона
-  final response = await http.get(Uri.parse(url));
+  final response = await http.get(Uri.parse(url),
+  headers: {
+    "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+    "Access-Control-Allow-Headers": "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+    "Access-Control-Allow-Methods": "GET, HEAD"
+  });
   // print(response.body);
   return allEventsFromJson(response.body);
 }

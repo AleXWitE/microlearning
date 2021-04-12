@@ -34,9 +34,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   double startPos = 0.0;
   double endPos = 0.0;
   Curve curve = Curves.elasticOut;
-
   //старт и эндпоз месте с курвой нужны для работы анимации перехода
-
   AnswerList answerCheck;
   bool answ1check = false;
   bool answ2check = false;
@@ -106,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           SizedBox(
             height: 100,
             child: Image.network(question.url),
-            // child: SvgPicture.asset(
+            // child: SvgPicture.asset( // для svg картинок необходимо прописывать ссылку на asset в pubspec.yaml
             //     "assets/images/LoneWolf.svg"),
           ),
           SizedBox(

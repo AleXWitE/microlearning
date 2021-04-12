@@ -15,6 +15,8 @@ class ListScreen extends StatefulWidget {
 class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   GlobalKey<RefreshIndicatorState> refreshKey;
   Future getAllEventsState;//определяем переменную под будущий список элементов из интернета
+  int count;
+  int asyncCount;
 
   @override
   void initState() {
@@ -46,15 +48,18 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     if (getAllEventsState == null) { //если мы первый раз запустили экран - получаем в первый раз данные из интернета
       getAllEventsState = getAllEvents();
     }
 
+    count = asyncCount;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("List Title cards"),
+        title: Text("List Title $count cards"),
         centerTitle: true,
         backgroundColor: Colors.grey[900],
       ),
@@ -69,6 +74,7 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
             builder: (context, snapshot) {
               // AppLifecycleState state;
               if (snapshot.connectionState == ConnectionState.done) {
+                asyncCount = snapshot.data.length;
                 if (snapshot.hasError) {
                   return Text('${snapshot.error}');
                 }
@@ -76,7 +82,7 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
                     physics: PageScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 40),
                     itemCount: snapshot.data.length,
-                    itemBuilder: (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
+                    itemBuilder: (_, index) =>  //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
                         EventCard(events: snapshot.data, i: index));
               } else {
                 return Center(child: CircularProgressIndicator()); //если данные еще не получены, то мы возвращаем значек загрузки
