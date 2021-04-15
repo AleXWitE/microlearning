@@ -230,6 +230,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               });
                             }),
                         RadioListTile(
+                            title: Text(question.answer1),
+                            value: AnswerList.answer1,
+                            groupValue: answerCheck,
+                            activeColor: Colors.white,
+                            onChanged: (AnswerList value) {
+                              setState(() {
+                                answerCheck = value;
+                              });
+                            }),
+                        RadioListTile(
+                            title: Text(question.answer1),
+                            value: AnswerList.answer1,
+                            groupValue: answerCheck,
+                            activeColor: Colors.white,
+                            onChanged: (AnswerList value) {
+                              setState(() {
+                                answerCheck = value;
+                              });
+                            }),
+                        RadioListTile(
                             title: Text(question.answer2),
                             value: AnswerList.answer2,
                             groupValue: answerCheck,
@@ -373,21 +393,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           break;
       }
     }
-
-    return Scaffold( //скаффолд один из самых главных виджетов материал дизайна
-      appBar: AppBar(
-        title: Text("Flutter tutorial $count taps"),
-        centerTitle: true,
-        backgroundColor: Colors.grey[900],
-      ),
-      drawer: DrawerItem(), //боковая менюшка
-      body: Container(
-        alignment: Alignment.topCenter,
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-            image: DecorationImage( //задание заднего фона
-                image: AssetImage("assets/images/1.png"), fit: BoxFit.fill)),
+    Widget ScrollElement(){
+      return SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -425,7 +432,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ],
         ),
+      );
+    }
+
+    return Scaffold( //скаффолд один из самых главных виджетов материал дизайна
+      appBar: AppBar(
+        title: Text("Flutter tutorial $count taps"),
+        centerTitle: true,
+        backgroundColor: Colors.grey[900],
       ),
+      drawer: MediaQuery.of(context).size.width > 600 ? null : Drawer(child: DrawerItem(),), //боковая менюшка
+      body: SafeArea(
+        child: Container(
+            alignment: Alignment.topCenter,
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                image: DecorationImage( //задание заднего фона
+                    image: AssetImage("assets/images/1.png"), fit: BoxFit.fill)),
+            child: MediaQuery.of(context).size.width < 600 ? ScrollElement() : Row(
+              children: [
+                Container(child: DrawerItem(), width: 200,),
+                Container(child: ScrollElement(), width: MediaQuery.of(context).size.width - 200,),
+              ],
+            )
+            ),
+          ),
+
+
 
       floatingActionButton: FloatingActionButton( //активная интерактивная кнопка справа внизу
         child: Icon(

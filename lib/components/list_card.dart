@@ -86,6 +86,7 @@ class _EventCardState extends State<EventCard> {
                     date: event.date,
                     favorite: _isFavorite));
               _isFavorite = !_isFavorite;
+              initFav();
             });
             print('${favorites.length} - id = ${event.id}');
           },

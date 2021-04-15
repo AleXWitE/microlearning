@@ -14,18 +14,22 @@ class ListScreen extends StatefulWidget {
 
 class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   GlobalKey<RefreshIndicatorState> refreshKey;
-  Future getAllEventsState;//определяем переменную под будущий список элементов из интернета
+  Future
+      getAllEventsState; //определяем переменную под будущий список элементов из интернета
   int count;
   int asyncCount;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);//попытка добавления слушателя состояния, для работы с жизненным циклом виджетов
-    refreshKey = GlobalKey<RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
+    WidgetsBinding.instance.addObserver(
+        this); //попытка добавления слушателя состояния, для работы с жизненным циклом виджетов
+    refreshKey = GlobalKey<
+        RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
   }
 
-  Future<Null> refreshList() async { //функция обновления списка
+  Future<Null> refreshList() async {
+    //функция обновления списка
     await Future.delayed(Duration(milliseconds: 200));
     setState(() {
       getAllEventsState = getAllEvents();
@@ -40,7 +44,8 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) { //не работает(((
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    //не работает(((
     if (state == AppLifecycleState.resumed) {
       setState(() {
         getAllEventsState = getAllEvents();
@@ -48,9 +53,43 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     }
   }
 
+  Widget RefreshInd() {
+    return RefreshIndicator(
+        //обновление списка
+        key: refreshKey,
+        onRefresh: () async {
+          await refreshList();
+        },
+        child: FutureBuilder<List<Event>>(
+          future: getAllEventsState,
+          builder: (context, snapshot) {
+            // AppLifecycleState state;
+            if (snapshot.connectionState == ConnectionState.done) {
+              asyncCount = snapshot.data.length;
+              if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+              return ListView.builder(
+                  //возвращаем билд списка
+                  physics: PageScrollPhysics(),
+                  padding: EdgeInsets.symmetric(horizontal: 40),
+                  itemCount: snapshot.data.length,
+                  itemBuilder:
+                      (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
+                          EventCard(events: snapshot.data, i: index));
+            } else {
+              return Center(
+                  child:
+                      CircularProgressIndicator()); //если данные еще не получены, то мы возвращаем значек загрузки
+            }
+          },
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (getAllEventsState == null) { //если мы первый раз запустили экран - получаем в первый раз данные из интернета
+    if (getAllEventsState == null) {
+      //если мы первый раз запустили экран - получаем в первый раз данные из интернета
       getAllEventsState = getAllEvents();
     }
 
@@ -62,37 +101,33 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
         centerTitle: true,
         backgroundColor: Colors.grey[900],
       ),
-      drawer: DrawerItem(),
-      body: RefreshIndicator(//обновление списка
-          key: refreshKey,
-          onRefresh: () async {
-            await refreshList();
-          },
-          child: FutureBuilder<List<Event>>(
-            future: getAllEventsState,
-            builder: (context, snapshot) {
-              // AppLifecycleState state;
-              if (snapshot.connectionState == ConnectionState.done) {
-                asyncCount = snapshot.data.length;
-                if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
-                }
-                return ListView.builder( //возвращаем билд списка
-                    physics: PageScrollPhysics(),
-                    padding: EdgeInsets.symmetric(horizontal: 40),
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (_, index) =>  //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
-                        EventCard(events: snapshot.data, i: index));
-              } else {
-                return Center(child: CircularProgressIndicator()); //если данные еще не получены, то мы возвращаем значек загрузки
-              }
-            },
-          )),
+      drawer: MediaQuery.of(context).size.width > 600
+          ? null
+          : Drawer(
+              child: DrawerItem(),
+            ), //боковая менюшка
+      body: SafeArea(
+        child: MediaQuery.of(context).size.width < 600 //обратить внимание на эту строку когдавсе починю
+            ? RefreshInd()
+            : Row(
+                children: [
+                  Container(
+                    width: 200,
+                    child: DrawerItem(),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width - 200,
+                    child: RefreshInd(),
+                  )
+                ],
+              ),
+      ),
       floatingActionButton: FloatingActionButton(
         child: Text("Add"),
         backgroundColor: Colors.grey[900],
         onPressed: () {
-          Navigator.pushNamed(context, '/add'); //переход на экран добавления элемента
+          Navigator.pushNamed(
+              context, '/add'); //переход на экран добавления элемента
         },
       ),
     );
