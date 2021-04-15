@@ -28,6 +28,11 @@ class DrawerItem extends StatelessWidget{
                   )
                 ],
           )),
+          ListTile(
+            leading: Icon(Icons.home),
+            title: Text("Home"),
+            onTap: () => Navigator.pushNamed(context, '/home'),
+          ),
           ListTile( //и остальное тело элементов, использовать листтайл, т.к обернуты в обычный список
             leading: Icon(Icons.wysiwyg),
             title: Text("To list"),
@@ -39,9 +44,9 @@ class DrawerItem extends StatelessWidget{
             onTap: () => Navigator.pushNamed(context, '/add'),
           ),
           ListTile(
-            leading: Icon(Icons.home),
-            title: Text("To home"),
-            onTap: () => Navigator.pushNamed(context, '/home'),
+            leading: Icon(Icons.favorite),
+            title: Text("Favorite"),
+            onTap: () => Navigator.pushNamed(context, '/favorite'),
           ),
           ListTile(
             leading: Icon(Icons.info_outline),

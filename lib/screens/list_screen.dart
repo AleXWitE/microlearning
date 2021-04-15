@@ -48,7 +48,6 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (getAllEventsState == null) { //если мы первый раз запустили экран - получаем в первый раз данные из интернета

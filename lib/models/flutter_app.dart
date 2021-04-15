@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:microlearning/screens/about_screen.dart';
 import 'package:microlearning/screens/add_screen.dart';
 import 'package:microlearning/screens/event_screen.dart';
+import 'package:microlearning/screens/favorites_screen.dart';
 import 'package:microlearning/screens/home_screen.dart';
 import 'package:microlearning/screens/list_screen.dart';
 
@@ -19,13 +20,14 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
     return MaterialApp(
         debugShowCheckedModeBanner: false, //отключает бесячий "дебаг" в верхнем углу экрана
         title: "Example",
-        initialRoute: '/home',
+        initialRoute: '/list_events',
         routes: { //пути определения классов, переходя по этим ссылкам, будут вызывать эти классы
           '/home': (BuildContext context) => HomeScreen(),
           '/list_events': (BuildContext context) => ListScreen(),
           '/event': (BuildContext context) => EventScreen(),
           '/about': (BuildContext context) => AboutScreen(),
           '/add': (BuildContext context) => AddScreen(),
+          '/favorite': (BuildContext context) => FavoritesScreen(),
 
         },
       onGenerateRoute: (routeSettings){ //генерация путей второго порядка

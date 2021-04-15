@@ -16,8 +16,9 @@ class Event {
   String name;
   String location;
   String date;
+  bool favorite = false;
 
-  Event({this.id, this.name, this.location, this.date});
+  Event({this.id, this.name, this.location, this.date, this.favorite});
 
   factory Event.fromJson(Map<String, dynamic> json) { // расшифровка и распределение полученных элементов джсона в элемент списка
     return new Event(
@@ -96,3 +97,14 @@ List<Answers> answers = [ //тестовое добавление вопросо
       url: "https://picsum.photos/250?image=13",
       type: "radio"),
 ];
+
+/*class Favorite {
+  int id;
+
+  Favorite({this.id});
+}
+
+Map<Favorite, Event> favoritesEvents = new Map();*/
+
+List<Event> favorites = [];
+

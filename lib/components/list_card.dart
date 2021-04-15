@@ -1,12 +1,13 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:microlearning/api/services/event_service.dart';
+import 'package:microlearning/screens/favorites_screen.dart';
 import 'package:microlearning/screens/list_screen.dart';
 
 import 'event.dart';
 
-class EventCard extends StatefulWidget { //здесь мы получаем элемент списка чтобы нарисовать карточку для конкретнного элемента
+class EventCard extends StatefulWidget {
+  //здесь мы получаем элемент списка чтобы нарисовать карточку для конкретнного элемента
   final List<Event> events;
   final int i;
 
@@ -16,9 +17,7 @@ class EventCard extends StatefulWidget { //здесь мы получаем эл
   _EventCardState createState() => _EventCardState();
 }
 
-
 class _EventCardState extends State<EventCard> {
-
   @override
   void initState() {
     super.initState();
@@ -26,17 +25,30 @@ class _EventCardState extends State<EventCard> {
   }
 
   bool _isEnabled = true;
+  bool _isFavorite;
 
   @override
   Widget build(BuildContext context) {
     var event = widget.events[widget.i]; //определение элемента по id
+
+    var _favItem = favorites.where((item) => item.id == event.id); //определяем элемент с сердечком
+
+    switch(_favItem.isEmpty){
+      case true:
+        _isFavorite = false;
+        break;
+      case false:
+        _isFavorite = true;
+        break;
+      default:
+        _isFavorite = false;
+    }
 
     return Card(
       color: Colors.indigo[200],
       elevation: 10,
       shadowColor: Colors.indigo,
       margin: EdgeInsets.symmetric(vertical: 20),
-
       child: ListTile(
         onTap: () {
           Navigator.pushNamed(
@@ -47,30 +59,39 @@ class _EventCardState extends State<EventCard> {
         // generate route for item card
         enabled: _isEnabled,
         title: Text(
-          // widget.events.events,
           event.name,
           style: TextStyle(fontSize: 20),
         ),
-        subtitle: Text(
-            "${event.location} \n${event.date.toString()}"),
+        subtitle: Text("${event.location} \n${event.date.toString()}"),
         leading: IconButton(
           icon: _isEnabled ? Icon(Icons.lock_outlined) : Icon(Icons.lock_open),
           onPressed: () => setState(
-                () => _isEnabled = !_isEnabled,
+            () => _isEnabled = !_isEnabled,
           ),
         ),
         trailing: IconButton(
-          icon: Icon(Icons.delete_forever,
-          size: 40,
-          color: Colors.indigo,),
-          /*onPressed: () {
-            onDelete(widget.events[widget.i].id);
+          icon: Icon(
+            _isFavorite ? Icons.favorite : Icons.favorite_border, //задаем смену сердечек от параметра _isFavorite
+            size: 40,
+            color: Colors.indigo,
+          ),
+          onPressed: () {
             setState(() {
-              getEventsBuilderState().getAllEventsState = getAllEvents();
+             _isFavorite
+                ? favorites.removeAt(favorites.indexWhere((item) => item.id == event.id )) //удаление из списка избранного элемента
+                : favorites.add(Event( //добавление в список элемента избранного
+                    id: event.id,
+                    name: event.name,
+                    location: event.location,
+                    date: event.date,
+                    favorite: _isFavorite));
+              _isFavorite = !_isFavorite;
             });
-          },*/
+            print('${favorites.length} - id = ${event.id}');
+          },
         ),
       ),
     );
   }
 }
+// }
