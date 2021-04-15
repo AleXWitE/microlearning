@@ -21,6 +21,8 @@ class FavoriteScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
 
+    didUpdateWidget(FavoritesScreen());
+
     return Scaffold(
       appBar: AppBar(
         title: Text("In favorite ${count == null ? count = 0 : count} cards"),
@@ -38,7 +40,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
               padding: EdgeInsets.symmetric(horizontal: 40),
               itemCount: len,
               itemBuilder:
-                  (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
+                  (BuildContext context, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
                       EventCard(events: favorites, i: index)),
     );
   }
