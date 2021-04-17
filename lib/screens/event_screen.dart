@@ -22,24 +22,21 @@ class EventScreen extends StatelessWidget {
             if (snapshot.hasError) {
               return Text('${snapshot.error}');
             }
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("The name of event: ${snapshot.data.name}"),
-                Text("It will happen there: ${snapshot.data.location}"),
-                Text("In this moment: ${snapshot.data.date}"),
-              ],
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("The name of event: ${snapshot.data.name}"),
+                  Text("It will happen there: ${snapshot.data.location}"),
+                  Text("In this moment: ${snapshot.data.date}"),
+                ],
+              ),
             );
           } else {
             return Center(child: CircularProgressIndicator());
           }
         },
       ),
-/*      Positioned(
-        bottom: 15,
-        left: 20,
-        child:
-      )*/
     ]);
   }
 
@@ -59,7 +56,7 @@ class EventScreen extends StatelessWidget {
               ),
         //боковая менюшка
         body: SafeArea(
-          child: MediaQuery.of(context).size.width > 600
+          child: MediaQuery.of(context).size.width < 600
               ? StackWid()
               : Row(
                   children: [

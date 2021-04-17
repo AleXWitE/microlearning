@@ -62,70 +62,72 @@ class _AddScreenState extends State<AddScreen> {
   }
 
   Widget FormChild() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: Center(
-        child: Form(
-            key: _formKey,
-            child: Column(
-              children: <Widget>[
-                Text(
-                  'Enter the Name of event:',
-                  style: TextStyle(fontSize: 20.0),
-                ),
-                TextFormField(validator: (value) {
-                  if (value.isNotEmpty) {
-                    //проверка текстинпута на пустую строку, если не пустая - присваиваем имя, если пустая - ошибка
-                    _name = value;
-                  } else
-                    return 'Please, entry a name of event';
-                }),
-                SizedBox(height: 20.0),
-                Text(
-                  'Entry location of event:',
-                  style: TextStyle(fontSize: 20.0),
-                ),
-                TextFormField(validator: (value) {
-                  if (value.isNotEmpty) {
-                    _location = value;
-                  } else
-                    return 'Please, entry location of event';
-                }),
-                SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  'Entry date of event:',
-                  style: TextStyle(fontSize: 20.0),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Text(_finalDate == null
-                    ? "Picked date: not assigned"
-                    : "Picked date: $_finalDate"),
-                RaisedButton(
-                  onPressed: _pickDateDialog,
-                  color: Colors.blueAccent,
-                  child:
-                  Text('Choose date', style: TextStyle(color: Colors.white)),
-                ),
-                SizedBox(height: 20.0),
-                RaisedButton(
-                  onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      //если валидация прошла - вызываем апи, и отправляемся в весь список
-                      callAPI();
-                      Navigator.pushNamed(context, '/list_events');
-                    }
-                  },
-                  child: Text('Send'),
-                  color: Colors.blue,
-                  textColor: Colors.white,
-                ),
-              ],
-            )),
-      ),);
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(20),
+        child: Center(
+          child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    'Enter the Name of event:',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  TextFormField(validator: (value) {
+                    if (value.isNotEmpty) {
+                      //проверка текстинпута на пустую строку, если не пустая - присваиваем имя, если пустая - ошибка
+                      _name = value;
+                    } else
+                      return 'Please, entry a name of event';
+                  }),
+                  SizedBox(height: 20.0),
+                  Text(
+                    'Entry location of event:',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  TextFormField(validator: (value) {
+                    if (value.isNotEmpty) {
+                      _location = value;
+                    } else
+                      return 'Please, entry location of event';
+                  }),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Text(
+                    'Entry date of event:',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Text(_finalDate == null
+                      ? "Picked date: not assigned"
+                      : "Picked date: $_finalDate"),
+                  RaisedButton(
+                    onPressed: _pickDateDialog,
+                    color: Colors.blueAccent,
+                    child:
+                    Text('Choose date', style: TextStyle(color: Colors.white)),
+                  ),
+                  SizedBox(height: 20.0),
+                  RaisedButton(
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        //если валидация прошла - вызываем апи, и отправляемся в весь список
+                        callAPI();
+                        Navigator.pushNamed(context, '/list_events');
+                      }
+                    },
+                    child: Text('Send'),
+                    color: Colors.blue,
+                    textColor: Colors.white,
+                  ),
+                ],
+              )),
+        ),),
+    );
   }
 
   @override
