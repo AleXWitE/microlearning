@@ -19,7 +19,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
 
     return MaterialApp(
         debugShowCheckedModeBanner: false, //отключает бесячий "дебаг" в верхнем углу экрана
-        title: "Example",
+        title: "Microlearning",
         initialRoute: '/list_events',
         routes: { //пути определения классов, переходя по этим ссылкам, будут вызывать эти классы
           '/home': (BuildContext context) => HomeScreen(),

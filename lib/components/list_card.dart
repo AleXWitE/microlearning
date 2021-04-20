@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/screens/favorites_screen.dart';
 import 'package:microlearning/screens/list_screen.dart';
+import 'package:microlearning/db/shared_preferences.dart';
+
 
 import 'event.dart';
 
@@ -86,6 +88,7 @@ class _EventCardState extends State<EventCard> {
                     date: event.date,
                     favorite: _isFavorite));
               _isFavorite = !_isFavorite;
+              SharedPreferencesFavState().addFaforite(event.id);
               initFav();
             });
             print('${favorites.length} - id = ${event.id}');

@@ -1,16 +1,16 @@
-// import 'dart:html';
+import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';//полезный импорт, без него не получится вставить svg картинку. Вставлять только с помощью assert
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart'; //полезный импорт, без него не получится вставить svg картинку. Вставлять только с помощью assert
+import 'package:microlearning/api/youtube.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/models/drawer_item.dart';
 
-enum AnswerList {
-  answer1,
-  answer2,
-  answer3
-}
+// import 'package:flutter_youtube/flutter_youtube.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+
+enum AnswerList { answer1, answer2, answer3 }
 //созданперечень вариантов ответов и значений для радио кнопок
 
 class HomeScreen extends StatefulWidget {
@@ -19,7 +19,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>(); // УНИКАЛЬНЫЙ КЛЮЧ СОСТОЯНИЯ ФОРМЫ, БЕЗ НЕГО ФОРМА НЕ РАБОТАЕТ
+  final _formKey = GlobalKey<
+      FormState>(); // УНИКАЛЬНЫЙ КЛЮЧ СОСТОЯНИЯ ФОРМЫ, БЕЗ НЕГО ФОРМА НЕ РАБОТАЕТ
 
   String textAnsw1;
   String textAnsw2;
@@ -34,11 +35,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   double startPos = 0.0;
   double endPos = 0.0;
   Curve curve = Curves.elasticOut;
+
   //старт и эндпоз месте с курвой нужны для работы анимации перехода
   AnswerList answerCheck;
   bool answ1check = false;
   bool answ2check = false;
   bool answ3check = false;
+
   //проверка на валидацию значений чекбоксов и радио
 
   @override
@@ -47,12 +50,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   onEndAnimation(double ePos) {
-    Future.delayed(Duration(milliseconds: 250), () { //задается отложенное время срабатывания анимации с заменой значений
+    Future.delayed(Duration(milliseconds: 250), () {
+      //задается отложенное время срабатывания анимации с заменой значений
       curve = curve == Curves.easeOut ? Curves.easeIn : Curves.easeOut;
       double _startPos;
       double _endPos;
 
-      switch (ePos.toString()) { //свич позволяет определить сценарий работы анимации
+      switch (ePos.toString()) {
+        //свич позволяет определить сценарий работы анимации
         case '-1.5':
           _startPos = -1.5;
           _endPos = 0.0;
@@ -71,13 +76,48 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       });
     });
   }
+
   int count = 0;
+
+  // YoutubePlayerController _controller;
+
+  // YouTubePlay(String url) {
+    // return FlutterYoutube.playYoutubeVideoById(
+    //     apiKey: apiKey, videoId: url, autoPlay: false);
+    // _controller = YoutubePlayerController(
+    //   initialVideoId: url,
+    //   params: const YoutubePlayerParams(
+    //     showControls: true,
+    //     autoPlay: false,
+    //     showFullscreenButton: true,
+    //     desktopMode: true,
+    //   ),
+    // );
+  //   setState(() {
+  //     _controller.onEnterFullscreen = () {
+  //       log('Entered Fullscreen');
+  //     };
+  //     _controller.onExitFullscreen = () {
+  //       log('Exited Fullscreen');
+  //     };
+  //   });
+  //
+  //   const player = YoutubePlayerIFrame();
+  //
+  //   return YoutubePlayerControllerProvider(
+  //         // Passing controller to widgets below.
+  //         controller: _controller,
+  //       child: player,
+  //   );
+  // }
+
 
   @override
   Widget build(BuildContext context) {
     Answers question = answers[answId];
 
-    chooseQuestion(int answId) { // функция по замене значений в вопросе
+    chooseQuestion(int answId) {
+      // функция по замене значений в вопросе
       String _answ1 = question.answer1;
       String _answ2 = question.answer2;
       String _answ3 = question.answer3;
@@ -85,7 +125,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       String _desc = question.description;
       String _url = question.url;
       String _type = question.type;
-      Future.delayed(Duration(milliseconds: 250), () { // отложенная подмена текста чтобы вопрос сменялся за пределами экрана
+      Future.delayed(Duration(milliseconds: 250), () {
+        // отложенная подмена текста чтобы вопрос сменялся за пределами экрана
         setState(() {
           textAnsw1 = _answ1;
           textAnsw2 = _answ2;
@@ -98,18 +139,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       });
     }
 
-    QuestionBody(Answers question) { //вынесена повторяющаяся группа виджетов, чтобыне загромождать код
-      return Column(
-        children: [
-          SizedBox(
+    Widget QuestionBody(Answers question) {
+      //вынесена повторяющаяся группа виджетов, чтобыне загромождать код
+      return Column(children: [
+        /* SizedBox(
             height: 100,
             child: Image.network(question.url),
             // child: SvgPicture.asset( // для svg картинок необходимо прописывать ссылку на asset в pubspec.yaml
             //     "assets/images/LoneWolf.svg"),
           ),
-          SizedBox(
-            height: 1,
-          ),
+          // SizedBox(
+          //   height: 1,
+          // ),
           Wrap(
             children: [
               RichText(
@@ -135,34 +176,63 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ),
             ],
-          ),
-        ],
-      );
+          ),*/
+        Text("${question.title}\n",
+            style: TextStyle(
+                fontFamily: "Redressed",
+                fontSize: 30.0,
+                fontStyle: FontStyle.italic,
+                color: Colors.black,
+                decoration: TextDecoration.underline)),
+        question.type == "video"
+              // ? MaterialButton(
+              //     elevation: 10.0,
+              //     color: Colors.green,
+              //     hoverColor: Colors.green[200],
+              //     hoverElevation: 20.0,
+              //
+              //     child: Icon(Icons.play_arrow, size: 90,),
+              //     onPressed: () => YouTubePlay(question.url))
+      ? YouTubePlay(url: question.url)
+              : Image.network(question.url),
+          // child: SvgPicture.asset( // для svg картинок необходимо прописывать ссылку на asset в pubspec.yaml
+          //     "assets/images/LoneWolf.svg"),
+        Text(
+          "\n${question.description}",
+          style: TextStyle(
+              color: question.type == "video" ? Colors.white : Colors.red,
+              fontSize: 25.0),
+        )
+      ]);
+      //   ],
+      // );
     }
 
-    ValidateCheckbox(String type) { // проверка на валидацию заполненных значений формы
-      switch(type) {
+    ValidateCheckbox(String type) {
+      // проверка на валидацию заполненных значений формы
+      switch (type) {
         case 'radio':
-          if (answerCheck == null){
+          if (answerCheck == null) {
             return true;
           } else {
             return false;
           }
           break;
         case 'checkbox':
-          if (answ1check == false && answ2check == false && answ3check == false) {
+          if (answ1check == false && answ2check == false && answ3check == false)
             return true;
-          } else {
+          else
             return false;
-          }
+
           break;
         default:
           return false;
       }
     }
 
-    ChooseType(String type) { //функция подстановки необходимого типа вопроса (радио, чекбокс, лекция)
-      switch(type) {
+    ChooseType(String type) {
+      //функция подстановки необходимого типа вопроса (радио, чекбокс, лекция)
+      switch (type) {
         case 'radio':
           return Container(
             // height: MediaQuery.of(context).size.height,
@@ -189,8 +259,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                       ],
                     ),
-                    child: QuestionBody(question) //подстановка повторяющейся группы виджетов
-                ),
+                    child: QuestionBody(
+                        question) //подстановка повторяющейся группы виджетов
+                    ),
                 SizedBox(
                   height: 1,
                 ),
@@ -276,7 +347,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
           );
-          break;// при выполнении этого кэйса, при его завершении прекращаем выполнение всего остального свича
+          break; // при выполнении этого кэйса, при его завершении прекращаем выполнение всего остального свича
         case 'checkbox':
           return Container(
             // height: MediaQuery.of(context).size.height,
@@ -303,8 +374,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                       ],
                     ),
-                    child: QuestionBody(question)
-                ),
+                    child: QuestionBody(question)),
                 SizedBox(
                   height: 1,
                 ),
@@ -383,6 +453,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: QuestionBody(question),
           );
           break;
+        case 'video':
+          return Container(
+            width: double.infinity,
+            padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
+            margin: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.red[300],
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                width: 3,
+                color: Colors.indigo[300],
+                style: BorderStyle.solid,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white,
+                  blurRadius: 10,
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+            child: QuestionBody(question),
+          );
+          break;
         default:
           return Container(
             child: Align(
@@ -393,7 +487,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           break;
       }
     }
-    Widget ScrollElement(){
+
+    Widget ScrollElement() {
       return SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -402,13 +497,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 Container(
                   alignment: Alignment.topCenter,
-                  child: TweenAnimationBuilder( // анимация которая вынесла весь мозг, работает через твины передвижения, без билдера не сработает
+                  child: TweenAnimationBuilder(
+                    // анимация которая вынесла весь мозг, работает через твины передвижения, без билдера не сработает
                     tween: Tween<Offset>(
                         begin: Offset(startPos, 0), end: Offset(endPos, 0)),
                     duration: Duration(milliseconds: 250),
                     curve: curve,
                     builder: (context, offset, child) {
-                      return FractionalTranslation( // добавление виджета, который оборачивает в себя анимированные объекты
+                      return FractionalTranslation(
+                        // добавление виджета, который оборачивает в себя анимированные объекты
                         translation: offset,
                         child: Container(
                           width: double.infinity,
@@ -421,13 +518,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     onEnd: () {
                       onEndAnimation(endPos);
                     },
-                    child: ChooseType(question.type), // объект который анимируется
+                    child:
+                        ChooseType(question.type), // объект который анимируется
                   ),
                 ),
                 SizedBox(
                   height: 1,
                 ),
-
               ],
             ),
           ],
@@ -435,33 +532,47 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
     }
 
-    return Scaffold( //скаффолд один из самых главных виджетов материал дизайна
+    return Scaffold(
+      //скаффолд один из самых главных виджетов материал дизайна
       appBar: AppBar(
         title: Text("Flutter tutorial $count taps"),
         centerTitle: true,
         backgroundColor: Colors.grey[900],
       ),
-      drawer: MediaQuery.of(context).size.width > 600 ? null : Drawer(child: DrawerItem(),), //боковая менюшка
+      drawer: MediaQuery.of(context).size.width > 600
+          ? null
+          : Drawer(
+              child: DrawerItem(),
+            ),
+      //боковая менюшка
       body: SafeArea(
         child: Container(
             alignment: Alignment.topCenter,
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-                image: DecorationImage( //задание заднего фона
-                    image: AssetImage("assets/images/1.png"), fit: BoxFit.fill)),
-            child: MediaQuery.of(context).size.width < 600 ? ScrollElement() : Row(
-              children: [
-                Container(child: DrawerItem(), width: 200,),
-                Container(child: ScrollElement(), width: MediaQuery.of(context).size.width - 200,),
-              ],
-            )
-            ),
-          ),
+                image: DecorationImage(
+                    //задание заднего фона
+                    image: AssetImage("assets/images/1.png"),
+                    fit: BoxFit.fill)),
+            child: MediaQuery.of(context).size.width < 600
+                ? ScrollElement()
+                : Row(
+                    children: [
+                      Container(
+                        child: DrawerItem(),
+                        width: 200,
+                      ),
+                      Container(
+                        child: ScrollElement(),
+                        width: MediaQuery.of(context).size.width - 200,
+                      ),
+                    ],
+                  )),
+      ),
 
-
-
-      floatingActionButton: FloatingActionButton( //активная интерактивная кнопка справа внизу
+      floatingActionButton: FloatingActionButton(
+        //активная интерактивная кнопка справа внизу
         child: Icon(
           Icons.search,
           size: 40.0,
@@ -473,51 +584,58 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           setState(() => count++);
         },
       ),
-      bottomNavigationBar: BottomAppBar( //наиболее лучшая реализация кнопок вперед назад чтобы они были прифлочены к нижней границе
+      bottomNavigationBar: BottomAppBar(
+        //наиболее лучшая реализация кнопок вперед назад чтобы они были прифлочены к нижней границе
         color: Colors.blueGrey[900],
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            RaisedButton(
+            MaterialButton(
+              elevation: 5.0,
               color: Colors.blue,
               padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
-              onPressed: answId == 0 || ValidateCheckbox(question.type) //теренарные операторы наше все, позволяют задавать элс иф внутри виджетов
+              onPressed: answId == 0 ||
+                      ValidateCheckbox(question
+                          .type) //теренарные операторы наше все, позволяют задавать элс иф внутри виджетов
                   ? null
                   : () => {
-                setState(() { // при нажатии кнопки определяем в какую сторону сдвигается анимация, меняем id элемента списка и обнуляем все значения, в будущем, надо будет сначала сохранять значения, а потом обнулять
-                  endPos = -1.5;
-                  answId--;
-                  answerCheck = null;
-                  answ1check = false;
-                  answ2check = false;
-                  answ3check = false;
-                }),
-                chooseQuestion(answId) //вызываем смену вопроса
-              },
+                        setState(() {
+                          // при нажатии кнопки определяем в какую сторону сдвигается анимация, меняем id элемента списка и обнуляем все значения, в будущем, надо будет сначала сохранять значения, а потом обнулять
+                          endPos = -1.5;
+                          answId--;
+                          answerCheck = null;
+                          answ1check = false;
+                          answ2check = false;
+                          answ3check = false;
+                          // _videoController.pause();
+                        }),
+                        chooseQuestion(answId) //вызываем смену вопроса
+                      },
               child: RichText(
-                text: TextSpan(
-                    style: TextStyle(fontSize: 20.0), text: "Back"),
+                text: TextSpan(style: TextStyle(fontSize: 20.0), text: "Back"),
               ),
             ),
-            RaisedButton(
+            MaterialButton(
+              elevation: 5.0,
               color: Colors.blue,
               padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
-              onPressed: answId == answers.length - 1 || ValidateCheckbox(question.type)
+              onPressed: answId == answers.length - 1 ||
+                      ValidateCheckbox(question.type)
                   ? null
                   : () => {
-                setState(() {
-                  endPos = 1.5;
-                  answId++;
-                  answerCheck = null;
-                  answ1check = false;
-                  answ2check = false;
-                  answ3check = false;
-                }),
-                chooseQuestion(answId)
-              },
+                        setState(() {
+                          endPos = 1.5;
+                          answId++;
+                          answerCheck = null;
+                          answ1check = false;
+                          answ2check = false;
+                          answ3check = false;
+                          // _videoController.pause();
+                        }),
+                        chooseQuestion(answId)
+                      },
               child: RichText(
-                text: TextSpan(
-                    style: TextStyle(fontSize: 20.0), text: "Next"),
+                text: TextSpan(style: TextStyle(fontSize: 20.0), text: "Next"),
               ),
             )
           ],

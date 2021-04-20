@@ -65,6 +65,14 @@ class Answers {
 
 List<Answers> answers = [ //тестовое добавление вопросов локально, без интернета
   Answers(
+      answer1: "answer10",
+      answer2: "answer11",
+      answer3: "answer12",
+      title: "Title 45",
+      description: "Short description 4",
+      url: "F4Q6lEhmwCY",
+      type: "video"),
+  Answers(
       answer1: "answer1",
       answer2: "answer2",
       answer3: "answer3",
@@ -94,8 +102,10 @@ List<Answers> answers = [ //тестовое добавление вопросо
       answer3: "answer12",
       title: "Title 4",
       description: "Short description 4",
-      url: "https://picsum.photos/250?image=13",
-      type: "radio"),
+      // url: "https://picsum.photos/250?image=13",
+      // url: "https://youtu.be/TmDetBtk5rw",
+      url: "TmDetBtk5rw",
+      type: "video"),
 ];
 
 /*class Favorite {
@@ -107,4 +117,5 @@ List<Answers> answers = [ //тестовое добавление вопросо
 Map<Favorite, Event> favoritesEvents = new Map();*/
 
 List<Event> favorites = [];
+
 

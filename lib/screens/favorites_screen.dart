@@ -3,6 +3,8 @@ import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
 import 'package:microlearning/models/drawer_item.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:microlearning/db/shared_preferences.dart';
 
 class FavoritesScreen extends StatefulWidget {
   @override
@@ -20,6 +22,9 @@ class FavoriteScreenState extends State<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
+    // _favorites = _prefs.then((SharedPreferences prefs) {
+    //   return (prefs.getStringList('favorites') ?? 0);
+  // });
   }
 
   Widget _builtFav(BuildContext context, AsyncSnapshot snapshot) {
@@ -50,14 +55,45 @@ class FavoriteScreenState extends State<FavoritesScreen> {
     );
   }
 
+  Future<void> _showDelDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Do you want delete all favorites?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                // await prefs.clear();
+                Navigator.of(context).pop();
+                print('delete');
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // didUpdateWidget(FavoritesScreen());
-
     return Scaffold(
         appBar: AppBar(
           title: Text("In favorite ${count == null ? count = 0 : count} cards"),
           centerTitle: true,
+          actions: [
+            IconButton(
+                onPressed: () => _showDelDialog(),
+                icon: Icon(Icons.delete_forever))
+          ],
           backgroundColor: Colors.grey[700],
         ),
         drawer: MediaQuery.of(context).size.width > 600
@@ -67,15 +103,23 @@ class FavoriteScreenState extends State<FavoritesScreen> {
               ),
         //боковая менюшка
         body: MediaQuery.of(context).size.width < 600
-                ? favorites.isEmpty
-                    ? Center(
-                        child: Text("There is no favorite data!"),
-                      )
-                    : ListBuilder()
-         : favorites.isEmpty
-            ? Row(
-          children: [Container(width: 200,child: DrawerItem()), Container(width: MediaQuery.of(context).size.width - 200, child: Center(child: Text("There is no favorite data!"),))],
-        ) : Row(
+            ? favorites.isEmpty
+                ? Center(
+                    child: Text("There is no favorite data!"),
+                  )
+                : ListBuilder()
+            : favorites.isEmpty
+                ? Row(
+                    children: [
+                      Container(width: 200, child: DrawerItem()),
+                      Container(
+                          width: MediaQuery.of(context).size.width - 200,
+                          child: Center(
+                            child: Text("There is no favorite data!"),
+                          ))
+                    ],
+                  )
+                : Row(
                     children: [
                       Container(
                         child: DrawerItem(),

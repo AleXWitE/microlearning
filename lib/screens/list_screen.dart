@@ -14,6 +14,7 @@ class ListScreen extends StatefulWidget {
 
 class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   GlobalKey<RefreshIndicatorState> refreshKey;
+  GlobalKey<RefreshIndicatorState> refreshKey2;
   Future
       getAllEventsState; //определяем переменную под будущий список элементов из интернета
   int count;
@@ -26,15 +27,27 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
         this); //попытка добавления слушателя состояния, для работы с жизненным циклом виджетов
     refreshKey = GlobalKey<
         RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
+    refreshKey2 = GlobalKey<
+        RefreshIndicatorState>();
   }
 
   Future<Null> refreshList() async {
     //функция обновления списка
-    await Future.delayed(Duration(milliseconds: 200));
+    await Future.delayed(Duration(milliseconds: 1000));
     setState(() {
       getAllEventsState = getAllEvents();
+      ifNoData();
     });
     return null;
+  }
+
+  Widget _ifNoData = CircularProgressIndicator();
+
+  Future<Null> ifNoData() async{
+    await Future.delayed(Duration(seconds: 5));
+    setState(() {
+      _ifNoData = Center(child: Text("Something wrong! Try check connection!"),);
+    });
   }
 
   @override
@@ -64,8 +77,9 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
           future: getAllEventsState,
           builder: (context, snapshot) {
             // AppLifecycleState state;
-            if (snapshot.connectionState == ConnectionState.done) {
-              asyncCount = snapshot.data.length;
+            print(snapshot.hasData);
+            if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+              count = snapshot.data.length;
               if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               }
@@ -73,17 +87,26 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
                   //возвращаем билд списка
                   physics: PageScrollPhysics(),
                   padding: EdgeInsets.symmetric(horizontal: 40),
-                  itemCount: snapshot.data.length,
+                  itemCount: count,
                   itemBuilder:
                       (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
                           EventCard(events: snapshot.data, i: index));
             } else {
-              return Center(
+              ifNoData();
+              return RefreshIndicator(
+                //обновление списка
+                  key: refreshKey2,
+                  onRefresh: () async {
+                    await refreshList();
+                  },
+              child: Center(
                   child:
-                      CircularProgressIndicator()); //если данные еще не получены, то мы возвращаем значек загрузки
-            }
+                      _ifNoData //если данные еще не получены, то мы возвращаем значек загрузки
+              )
+              );}
           },
-        ));
+        )
+    );
   }
 
   @override
@@ -92,9 +115,6 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
       //если мы первый раз запустили экран - получаем в первый раз данные из интернета
       getAllEventsState = getAllEvents();
     }
-
-    count = asyncCount;
-
     return Scaffold(
       appBar: AppBar(
         title: Text("List Title $count cards"),
