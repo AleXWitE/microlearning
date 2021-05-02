@@ -36,6 +36,7 @@ class _YouTubePlayState extends State<YouTubePlay>{
     };*/
   }
 
+
   @override
   Widget build(BuildContext context) {
     const player = YoutubePlayerIFrame(); //определяем под переменную сам iframe
@@ -43,6 +44,7 @@ class _YouTubePlayState extends State<YouTubePlay>{
       controller: _controller,
       child: player,
     );
+
   }
 
   @override

@@ -134,9 +134,8 @@ class _AddScreenState extends State<AddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add 1 more event"),
+        title: Text("Add 1 more event", style: TextStyle(fontSize: 25.0,)),
         centerTitle: true,
-        backgroundColor: Colors.grey[900],
       ),
       drawer: MediaQuery
           .of(context)

@@ -82,17 +82,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // YoutubePlayerController _controller;
 
   // YouTubePlay(String url) {
-    // return FlutterYoutube.playYoutubeVideoById(
-    //     apiKey: apiKey, videoId: url, autoPlay: false);
-    // _controller = YoutubePlayerController(
-    //   initialVideoId: url,
-    //   params: const YoutubePlayerParams(
-    //     showControls: true,
-    //     autoPlay: false,
-    //     showFullscreenButton: true,
-    //     desktopMode: true,
-    //   ),
-    // );
+  // return FlutterYoutube.playYoutubeVideoById(
+  //     apiKey: apiKey, videoId: url, autoPlay: false);
+  // _controller = YoutubePlayerController(
+  //   initialVideoId: url,
+  //   params: const YoutubePlayerParams(
+  //     showControls: true,
+  //     autoPlay: false,
+  //     showFullscreenButton: true,
+  //     desktopMode: true,
+  //   ),
+  // );
   //   setState(() {
   //     _controller.onEnterFullscreen = () {
   //       log('Entered Fullscreen');
@@ -110,7 +110,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //       child: player,
   //   );
   // }
-
 
   @override
   Widget build(BuildContext context) {
@@ -142,70 +141,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     Widget QuestionBody(Answers question) {
       //вынесена повторяющаяся группа виджетов, чтобыне загромождать код
       return Column(children: [
-        /* SizedBox(
-            height: 100,
-            child: Image.network(question.url),
-            // child: SvgPicture.asset( // для svg картинок необходимо прописывать ссылку на asset в pubspec.yaml
-            //     "assets/images/LoneWolf.svg"),
-          ),
-          // SizedBox(
-          //   height: 1,
-          // ),
-          Wrap(
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    fontFamily: "Redressed",
-                    fontSize: 30.0,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.black,
-                  ),
-                  children: <TextSpan>[
-                    TextSpan(
-                        text: question.title,
-                        style: TextStyle(
-                            decoration:
-                            TextDecoration.underline)),
-                    TextSpan(
-                      style: TextStyle(
-                          color: Colors.red, fontSize: 25.0),
-                      text: "\n${question.description}",
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),*/
         Text("${question.title}\n",
             style: TextStyle(
                 fontFamily: "Redressed",
                 fontSize: 30.0,
                 fontStyle: FontStyle.italic,
-                color: Colors.black,
+                color: Theme.of(context).accentColor,
                 decoration: TextDecoration.underline)),
-        question.type == "video"
-              // ? MaterialButton(
-              //     elevation: 10.0,
-              //     color: Colors.green,
-              //     hoverColor: Colors.green[200],
-              //     hoverElevation: 20.0,
-              //
-              //     child: Icon(Icons.play_arrow, size: 90,),
-              //     onPressed: () => YouTubePlay(question.url))
-      ? YouTubePlay(url: question.url)
-              : Image.network(question.url),
-          // child: SvgPicture.asset( // для svg картинок необходимо прописывать ссылку на asset в pubspec.yaml
-          //     "assets/images/LoneWolf.svg"),
-        Text(
-          "\n${question.description}",
-          style: TextStyle(
-              color: question.type == "video" ? Colors.white : Colors.red,
-              fontSize: 25.0),
+
+        Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 1,
+                color: Theme.of(context).primaryColor,
+              ),
+              boxShadow: [
+                BoxShadow(
+                    color: Theme.of(context).accentColor,
+                    blurRadius: 15,
+                    spreadRadius: 3)
+              ],
+            ),
+            child: question.type == "video"
+                ? YouTubePlay(url: question.url)
+                : Image.network(question.url)),
+        // child: SvgPicture.asset( // для svg картинок необходимо прописывать ссылку на asset в pubspec.yaml
+        //     "assets/images/LoneWolf.svg"),
+        SizedBox(
+          height: 25.0,
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width - 60.0,
+          padding: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+              color: Theme.of(context).accentColor,
+              borderRadius: BorderRadius.circular(15)),
+          child: Text(
+            "${question.description}",
+            style: TextStyle(
+                // color: question.type == "video" ? Colors.white : Colors.red,
+                color: Theme.of(context).primaryColor,
+                fontSize: 25.0),
+          ),
         )
       ]);
-      //   ],
-      // );
     }
 
     ValidateCheckbox(String type) {
@@ -242,18 +221,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     width: double.infinity,
                     alignment: Alignment.topCenter,
                     padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
-                    margin: EdgeInsets.all(20),
+                    margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
                     decoration: BoxDecoration(
-                      color: Colors.indigo[100],
+                      color: Theme.of(context).primaryColor,
                       borderRadius: BorderRadius.circular(25),
                       border: Border.all(
-                        width: 3,
-                        color: Colors.indigo[300],
+                        width: 1,
+                        color: Theme.of(context).accentColor,
                         style: BorderStyle.solid,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.white,
+                          color: Theme.of(context).primaryColor,
                           blurRadius: 10,
                           spreadRadius: 5,
                         ),
@@ -262,25 +241,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     child: QuestionBody(
                         question) //подстановка повторяющейся группы виджетов
                     ),
-                SizedBox(
-                  height: 1,
-                ),
                 Container(
                   padding: EdgeInsets.all(30),
                   margin: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.teal, Colors.tealAccent[100]],
-                    ),
+                    color: Theme.of(context).accentColor,
                     borderRadius: BorderRadius.circular(50),
                     border: Border.all(
-                      width: 5,
-                      color: Colors.teal[100],
+                      width: 3,
+                      color: Theme.of(context).primaryColor,
                       style: BorderStyle.solid,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.amber,
                         blurRadius: 10,
                         spreadRadius: 5,
                       ),
@@ -294,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             title: Text(question.answer1),
                             value: AnswerList.answer1,
                             groupValue: answerCheck,
-                            activeColor: Colors.white,
+                            activeColor: Theme.of(context).primaryColor,
                             onChanged: (AnswerList value) {
                               setState(() {
                                 answerCheck = value;
@@ -304,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             title: Text(question.answer1),
                             value: AnswerList.answer1,
                             groupValue: answerCheck,
-                            activeColor: Colors.white,
+                            activeColor: Theme.of(context).primaryColor,
                             onChanged: (AnswerList value) {
                               setState(() {
                                 answerCheck = value;
@@ -314,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             title: Text(question.answer1),
                             value: AnswerList.answer1,
                             groupValue: answerCheck,
-                            activeColor: Colors.white,
+                            activeColor: Theme.of(context).primaryColor,
                             onChanged: (AnswerList value) {
                               setState(() {
                                 answerCheck = value;
@@ -324,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             title: Text(question.answer2),
                             value: AnswerList.answer2,
                             groupValue: answerCheck,
-                            activeColor: Colors.white,
+                            activeColor: Theme.of(context).primaryColor,
                             onChanged: (AnswerList value) {
                               setState(() {
                                 answerCheck = value;
@@ -334,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             title: Text(question.answer3),
                             value: AnswerList.answer3,
                             groupValue: answerCheck,
-                            activeColor: Colors.white,
+                            activeColor: Theme.of(context).primaryColor,
                             onChanged: (AnswerList value) {
                               setState(() {
                                 answerCheck = value;
@@ -357,18 +330,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     width: double.infinity,
                     alignment: Alignment.topCenter,
                     padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
-                    margin: EdgeInsets.all(20),
+                    margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
                     decoration: BoxDecoration(
-                      color: Colors.greenAccent[100],
+                      color: Theme.of(context).primaryColor,
                       borderRadius: BorderRadius.circular(25),
                       border: Border.all(
-                        width: 3,
-                        color: Colors.indigo[300],
+                        width: 1,
+                        color: Theme.of(context).accentColor,
                         style: BorderStyle.solid,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.white,
+                          color: Theme.of(context).primaryColor,
                           blurRadius: 10,
                           spreadRadius: 5,
                         ),
@@ -382,18 +355,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   padding: EdgeInsets.all(30),
                   margin: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.teal, Colors.tealAccent[100]],
-                    ),
+                    color: Theme.of(context).accentColor,
                     borderRadius: BorderRadius.circular(50),
                     border: Border.all(
-                      width: 5,
-                      color: Colors.teal[100],
+                      width: 3,
+                      color: Theme.of(context).primaryColor,
                       style: BorderStyle.solid,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.amber,
                         blurRadius: 10,
                         spreadRadius: 5,
                       ),
@@ -405,17 +375,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       children: [
                         CheckboxListTile(
                             value: answ1check,
+                            activeColor: Theme.of(context).primaryColor,
                             title: Text(question.answer1),
+                            controlAffinity: ListTileControlAffinity.leading,
                             onChanged: (bool value) =>
                                 setState(() => answ1check = value)),
                         CheckboxListTile(
                             value: answ2check,
+                            activeColor: Theme.of(context).primaryColor,
                             title: Text(question.answer2),
+                            controlAffinity: ListTileControlAffinity.leading,
                             onChanged: (bool value) =>
                                 setState(() => answ2check = value)),
                         CheckboxListTile(
                             value: answ3check,
+                            activeColor: Theme.of(context).primaryColor,
                             title: Text(question.answer3),
+                            controlAffinity: ListTileControlAffinity.leading,
                             onChanged: (bool value) =>
                                 setState(() => answ3check = value)),
                       ],
@@ -428,23 +404,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           break;
         case 'lecture':
           return Container(
-            // height: MediaQuery.of(context).size.height,
-            // height: double.infinity,
             width: double.infinity,
-            // alignment: Alignment.topCenter,
+            alignment: Alignment.topCenter,
             padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
-            margin: EdgeInsets.all(20),
+            margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
             decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent[100],
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(25),
               border: Border.all(
-                width: 3,
-                color: Colors.indigo[300],
+                width: 1,
+                color: Theme.of(context).accentColor,
                 style: BorderStyle.solid,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.white,
+                  color: Theme.of(context).primaryColor,
                   blurRadius: 10,
                   spreadRadius: 5,
                 ),
@@ -456,19 +430,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         case 'video':
           return Container(
             width: double.infinity,
+            alignment: Alignment.topCenter,
             padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
-            margin: EdgeInsets.all(20),
+            margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
             decoration: BoxDecoration(
-              color: Colors.red[300],
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(25),
               border: Border.all(
-                width: 3,
-                color: Colors.indigo[300],
+                width: 1,
+                color: Theme.of(context).accentColor,
                 style: BorderStyle.solid,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.white,
+                  color: Theme.of(context).primaryColor,
                   blurRadius: 10,
                   spreadRadius: 5,
                 ),
@@ -535,9 +510,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       //скаффолд один из самых главных виджетов материал дизайна
       appBar: AppBar(
-        title: Text("Flutter tutorial $count taps"),
+        title: Text("Flutter tutorial $count taps", style: TextStyle(fontSize: 25.0,)),
         centerTitle: true,
-        backgroundColor: Colors.grey[900],
       ),
       drawer: MediaQuery.of(context).size.width > 600
           ? null
@@ -553,8 +527,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             decoration: BoxDecoration(
                 image: DecorationImage(
                     //задание заднего фона
-                    image: AssetImage("assets/images/1.png"),
-                    fit: BoxFit.fill)),
+                    image: AssetImage("assets/images/polytech_logo.png"),
+                    // alignment: Alignment.center
+                )),
             child: MediaQuery.of(context).size.width < 600
                 ? ScrollElement()
                 : Row(
@@ -576,9 +551,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Icon(
           Icons.search,
           size: 40.0,
-          color: Colors.white,
         ),
-        backgroundColor: Colors.grey[900],
         onPressed: () {
           print("tap");
           setState(() => count++);
@@ -586,13 +559,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
       bottomNavigationBar: BottomAppBar(
         //наиболее лучшая реализация кнопок вперед назад чтобы они были прифлочены к нижней границе
-        color: Colors.blueGrey[900],
+        color: Theme.of(context).primaryColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             MaterialButton(
               elevation: 5.0,
-              color: Colors.blue,
+              color: Theme.of(context).accentColor,
               padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
               onPressed: answId == 0 ||
                       ValidateCheckbox(question
@@ -612,12 +585,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         chooseQuestion(answId) //вызываем смену вопроса
                       },
               child: RichText(
-                text: TextSpan(style: TextStyle(fontSize: 20.0), text: "Back"),
+                text: TextSpan(
+                    style: TextStyle(
+                        fontSize: 20.0, color: Theme.of(context).primaryColor),
+                    text: "Back"),
               ),
             ),
             MaterialButton(
               elevation: 5.0,
-              color: Colors.blue,
+              color: Theme.of(context).accentColor,
               padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
               onPressed: answId == answers.length - 1 ||
                       ValidateCheckbox(question.type)
@@ -635,7 +611,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         chooseQuestion(answId)
                       },
               child: RichText(
-                text: TextSpan(style: TextStyle(fontSize: 20.0), text: "Next"),
+                text: TextSpan(
+                    style: TextStyle(
+                        fontSize: 20.0, color: Theme.of(context).primaryColor),
+                    text: "Next"),
               ),
             )
           ],

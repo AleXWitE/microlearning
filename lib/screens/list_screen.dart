@@ -9,13 +9,13 @@ import 'package:microlearning/models/drawer_item.dart';
 
 class ListScreen extends StatefulWidget {
   @override
-  ListScreenState createState() => ListScreenState();
+  _ListScreenState createState() => _ListScreenState();
 }
 
-class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
+class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   GlobalKey<RefreshIndicatorState> refreshKey;
-  GlobalKey<RefreshIndicatorState> refreshKey2;
-  Future
+  // GlobalKey<RefreshIndicatorState> refreshKey2;
+  Stream
       getAllEventsState; //определяем переменную под будущий список элементов из интернета
   int count;
   int asyncCount;
@@ -27,27 +27,32 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
         this); //попытка добавления слушателя состояния, для работы с жизненным циклом виджетов
     refreshKey = GlobalKey<
         RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
-    refreshKey2 = GlobalKey<
-        RefreshIndicatorState>();
+    // refreshKey2 = GlobalKey<RefreshIndicatorState>();
   }
 
   Future<Null> refreshList() async {
     //функция обновления списка
     await Future.delayed(Duration(milliseconds: 1000));
     setState(() {
-      getAllEventsState = getAllEvents();
-      ifNoData();
+      getAllEventsState = getAllEvents().asStream();
+      _hasData = true;
+      ifNoData(_hasData);
     });
     return null;
   }
 
-  Widget _ifNoData = CircularProgressIndicator();
+  Widget _ifNoData = Center(child: CircularProgressIndicator());
+  bool _hasData;
 
-  Future<Null> ifNoData() async{
-    await Future.delayed(Duration(seconds: 5));
-    setState(() {
-      _ifNoData = Center(child: Text("Something wrong! Try check connection!"),);
-    });
+  Future<Null> ifNoData(bool snapdata) async {
+    if(snapdata == false){
+      await Future.delayed(Duration(seconds: 5));
+      setState(() {
+        _ifNoData = Center(
+          child: Text("Something wrong! Try check connection!"),
+        );
+      });
+    }
   }
 
   @override
@@ -61,7 +66,7 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     //не работает(((
     if (state == AppLifecycleState.resumed) {
       setState(() {
-        getAllEventsState = getAllEvents();
+        getAllEventsState = getAllEvents().asStream();
       });
     }
   }
@@ -73,16 +78,19 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
         onRefresh: () async {
           await refreshList();
         },
-        child: FutureBuilder<List<Event>>(
-          future: getAllEventsState,
+        child: StreamBuilder<List<Event>>(
+          stream: getAllEventsState,
           builder: (context, snapshot) {
             // AppLifecycleState state;
             print(snapshot.hasData);
-            if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.hasData) {
+              _hasData = true;
               count = snapshot.data.length;
               if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               }
+
               return ListView.builder(
                   //возвращаем билд списка
                   physics: PageScrollPhysics(),
@@ -90,36 +98,28 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
                   itemCount: count,
                   itemBuilder:
                       (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
-                          EventCard(events: snapshot.data, i: index));
+                          EventCard(events: snapshot.data, i: index, favs: [],));
             } else {
-              ifNoData();
-              return RefreshIndicator(
-                //обновление списка
-                  key: refreshKey2,
-                  onRefresh: () async {
-                    await refreshList();
-                  },
-              child: Center(
-                  child:
-                      _ifNoData //если данные еще не получены, то мы возвращаем значек загрузки
-              )
-              );}
+              _hasData = false;
+              ifNoData(_hasData);
+              return _ifNoData;
+            }
           },
-        )
-    );
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
     if (getAllEventsState == null) {
       //если мы первый раз запустили экран - получаем в первый раз данные из интернета
-      getAllEventsState = getAllEvents();
+      getAllEventsState = getAllEvents().asStream();
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text("List Title $count cards"),
+        title: Text("List Title ${count == null ? count = 0 : count} cards", style: TextStyle(fontSize: 25.0,)),
         centerTitle: true,
-        backgroundColor: Colors.grey[900],
+        // backgroundColor: Theme.of(context).accentColor,
+
       ),
       drawer: MediaQuery.of(context).size.width > 600
           ? null
@@ -127,7 +127,8 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
               child: DrawerItem(),
             ), //боковая менюшка
       body: SafeArea(
-        child: MediaQuery.of(context).size.width < 600 //обратить внимание на эту строку когдавсе починю
+        child: MediaQuery.of(context).size.width <
+                600 //обратить внимание на эту строку когдавсе починю
             ? RefreshInd()
             : Row(
                 children: [
@@ -142,14 +143,25 @@ class ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
                 ],
               ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Text("Add"),
-        backgroundColor: Colors.grey[900],
-        onPressed: () {
-          Navigator.pushNamed(
-              context, '/add'); //переход на экран добавления элемента
-        },
-      ),
+      floatingActionButton: _hasData == false
+          ? FloatingActionButton(
+              onPressed: () async {
+                setState(() {
+                  _ifNoData = Center(child: CircularProgressIndicator(),);
+                });
+
+                await refreshList();
+                },
+              child: Icon(Icons.refresh),
+              backgroundColor: Colors.grey[900],
+            )
+          : FloatingActionButton(
+              child: Icon(Icons.add),
+              onPressed: () {
+                Navigator.pushNamed(
+                    context, '/add'); //переход на экран добавления элемента
+              },
+            ),
     );
   }
 }

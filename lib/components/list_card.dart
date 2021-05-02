@@ -1,29 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:microlearning/api/services/event_service.dart';
-import 'package:microlearning/screens/favorites_screen.dart';
-import 'package:microlearning/screens/list_screen.dart';
-import 'package:microlearning/db/shared_preferences.dart';
-
+import 'package:microlearning/db/moor_db.dart';
+import 'package:provider/provider.dart';
 
 import 'event.dart';
 
 class EventCard extends StatefulWidget {
   //здесь мы получаем элемент списка чтобы нарисовать карточку для конкретнного элемента
   final List<Event> events;
+  final List<Favor> favs;
   final int i;
 
-  EventCard({Key key, this.events, this.i}) : super(key: key);
+  EventCard({Key key, this.events, this.i, this.favs}) : super(key: key);
 
   @override
   _EventCardState createState() => _EventCardState();
 }
 
 class _EventCardState extends State<EventCard> {
+
   @override
   void initState() {
     super.initState();
-    print("${widget.events.length}"); //вывод в консоли количество элементов
+    print("${widget.events.length}\n"); //вывод в консоли количество элементов
+    print("${widget.favs.length}"); //вывод в консоли количество элементов
   }
 
   bool _isEnabled = true;
@@ -31,71 +31,97 @@ class _EventCardState extends State<EventCard> {
 
   @override
   Widget build(BuildContext context) {
-    var event = widget.events[widget.i]; //определение элемента по id
+    final _dao = Provider.of<FavorDao>(context);
 
-    var _favItem = favorites.where((item) => item.id == event.id); //определяем элемент с сердечком
-
-    switch(_favItem.isEmpty){
-      case true:
-        _isFavorite = false;
-        break;
-      case false:
-        _isFavorite = true;
-        break;
-      default:
-        _isFavorite = false;
+    var element;
+    var elId;
+    if(widget.events.isEmpty && widget.favs.isNotEmpty) {
+      element = widget.favs[widget.i];
+      elId = int.parse(element.eventId);
+    }
+    else {
+      element = widget.events[widget.i];
+      elId = int.parse(element.id);
     }
 
-    return Card(
-      color: Colors.indigo[200],
-      elevation: 10,
-      shadowColor: Colors.indigo,
-      margin: EdgeInsets.symmetric(vertical: 20),
-      child: ListTile(
-        onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/event/${event.id}',
-          );
-        },
-        // generate route for item card
-        enabled: _isEnabled,
-        title: Text(
-          event.name,
-          style: TextStyle(fontSize: 20),
-        ),
-        subtitle: Text("${event.location} \n${event.date.toString()}"),
-        leading: IconButton(
-          icon: _isEnabled ? Icon(Icons.lock_outlined) : Icon(Icons.lock_open),
-          onPressed: () => setState(
-            () => _isEnabled = !_isEnabled,
-          ),
-        ),
-        trailing: IconButton(
-          icon: Icon(
-            _isFavorite ? Icons.favorite : Icons.favorite_border, //задаем смену сердечек от параметра _isFavorite
-            size: 40,
-            color: Colors.indigo,
-          ),
-          onPressed: () {
-            setState(() {
-             _isFavorite
-                ? favorites.removeAt(favorites.indexWhere((item) => item.id == event.id )) //удаление из списка избранного элемента
-                : favorites.add(Event( //добавление в список элемента избранного
-                    id: event.id,
-                    name: event.name,
-                    location: event.location,
-                    date: event.date,
-                    favorite: _isFavorite));
-              _isFavorite = !_isFavorite;
-              SharedPreferencesFavState().addFaforite(event.id);
-              initFav();
-            });
-            print('${favorites.length} - id = ${event.id}');
+      Stream<List<Favor>> eventFav = _dao.watchAllFavorites();
+
+      eventFav.listen((event) {
+        setState(() {
+        for(int i = 0; i < event.length-1; i++){
+          favorItem.add(FavorItem(eventId: event[i].eventId, favorite: true));
+        }
+        });
+      });
+
+      var _favItem = favorItem.where((item) => item.eventId == element.id || item.id == elId || element.favorite == true);
+
+      setState(() {
+        switch(_favItem.isEmpty){
+          case true:
+            _isFavorite = false;
+            break;
+          case false:
+            _isFavorite = true;
+            break;
+          default:
+            _isFavorite = false;
+        }
+      });
+
+      insertData(Event ev) {
+        _dao.insertNewFavorite(Favor(eventId: ev.id, name: ev.name, location: ev.location, date: ev.date, favorite: true));
+        favorItem.add(FavorItem(eventId: element.id, favorite: true));
+        _isFavorite = true;
+      }
+
+      deleteData(int _id) async {
+        Favor checkFavorite = await _dao.getFavorite(_id);
+        if(checkFavorite != null) _dao.deleteFavorite(checkFavorite);
+        favorItem.removeAt(favorItem.indexWhere((el) => el.eventId == element.id));
+      }
+
+      return Card(
+        elevation: 15.0,
+        margin: EdgeInsets.symmetric(vertical: 20),
+        child: ListTile(
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              widget.events.isEmpty
+                  ? '/event/${element.eventId}'
+                  : '/event/${element.id}',
+            );
           },
+          // generate route for item card
+          enabled: _isEnabled,
+          title: Text(
+            element.name,
+            style: TextStyle(fontSize: 20),
+          ),
+          subtitle: Text("${element.location} \n${element.date.toString()}"),
+          leading: IconButton(
+            icon: _isEnabled ? Icon(Icons.lock_outlined) : Icon(Icons.lock_open),
+            onPressed: () => setState(
+                  () => _isEnabled = !_isEnabled,
+            ),
+          ),
+          trailing: IconButton(
+            icon: Icon(
+              _isFavorite ? Icons.favorite : Icons.favorite_border, //задаем смену сердечек от параметра _isFavorite
+              size: 40,
+              // color: Colors.indigo,
+            ),
+            onPressed: () {
+              setState(() {
+                _isFavorite
+                    ? deleteData(elId)
+                    : insertData(element);
+                _isFavorite = !_isFavorite;
+              });
+            },
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
-}
-// }

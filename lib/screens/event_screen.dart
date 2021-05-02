@@ -44,10 +44,8 @@ class EventScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Flutter event card №$_id"),
+          title: Text("Flutter event card №$_id", style: TextStyle(fontSize: 25.0,)),
           centerTitle: true,
-          titleTextStyle: TextStyle(color: Colors.indigo),
-          backgroundColor: Colors.grey[500],
         ),
         drawer: MediaQuery.of(context).size.width > 600
             ? null
@@ -72,7 +70,7 @@ class EventScreen extends StatelessWidget {
                 ),
         ),
     bottomNavigationBar: BottomAppBar(
-      child: RaisedButton(
+      child: MaterialButton(
           onPressed: () {
             Navigator.pop(context);
           },

@@ -1,3 +1,5 @@
+import 'package:microlearning/db/moor_db.dart';
+
 class EventList { //модель данных для списка всех событий, состоит из элементов вложенного списка
   final List<Event> events;
 
@@ -118,4 +120,26 @@ Map<Favorite, Event> favoritesEvents = new Map();*/
 
 List<Event> favorites = [];
 
+// Stream<List<Favor>> eventFav = FavorDao(AppDatabase()).watchAllFavorites();
+// fromDbToList() async {
+//   Stream<List<Favor>> eventFav = FavorDao(AppDatabase()).watchAllFavorites();
+//   eventFav.listen((event) {
+//     for(int i = 0; i < event.length-1; i++){
+//       favorItem.add(FavorItem(eventId: event[i].eventId, name: event[i].name, location: event[i].location, date: event[i].date, favorite: event[i].favorite));
+//     }
+//   });
+//   return favorItem;
+// }
 
+List<FavorItem> favorItem = [];
+
+class FavorItem{
+  int id;
+  String eventId;
+  // String name;
+  // String location;
+  // String date;
+  bool favorite;
+
+  FavorItem({ this.id, this.eventId/*, this.name, this.location, this.date*/, this.favorite });
+  }

@@ -14,8 +14,7 @@ class AboutScreen extends StatelessWidget{
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("About app"),
-
+        title: Text("About app", style: TextStyle(fontSize: 25.0,)),
       ),
       drawer: MediaQuery.of(context).size.width > 600 ? null : Drawer(child: DrawerItem(),), //боковая менюшка
       body: SafeArea(
