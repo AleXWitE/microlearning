@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/models/drawer_item.dart';
-import 'package:microlearning/screens/list_screen.dart';
 
 class AddScreen extends StatefulWidget {
   @override
@@ -19,13 +18,13 @@ class _AddScreenState extends State<AddScreen> {
 
   void _pickDateDialog() {
     showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        //which date will display when user open the picker
-        firstDate: DateTime(1950),
-        //what will be the previous supported year in picker
-        lastDate: DateTime(
-            2030)) //what will be the up to supported date in picker
+            context: context,
+            initialDate: DateTime.now(),
+            //which date will display when user open the picker
+            firstDate: DateTime(1950),
+            //what will be the previous supported year in picker
+            lastDate: DateTime(
+                2030)) //what will be the up to supported date in picker
         .then((pickedDate) {
       //then usually do the future job
       if (pickedDate == null) {
@@ -46,7 +45,7 @@ class _AddScreenState extends State<AddScreen> {
     //функция вызова работы с апи, в данном варианте - добавление элемента в джсон
     if (_finalDate == null) _finalDate = DateTime.now().toString();
     Event event = Event(
-      //определение элемента
+        //определение элемента
         name: '$_name',
         location: '$_location',
         date: '$_finalDate');
@@ -108,8 +107,8 @@ class _AddScreenState extends State<AddScreen> {
                   RaisedButton(
                     onPressed: _pickDateDialog,
                     color: Colors.blueAccent,
-                    child:
-                    Text('Choose date', style: TextStyle(color: Colors.white)),
+                    child: Text('Choose date',
+                        style: TextStyle(color: Colors.white)),
                   ),
                   SizedBox(height: 20.0),
                   RaisedButton(
@@ -126,7 +125,8 @@ class _AddScreenState extends State<AddScreen> {
                   ),
                 ],
               )),
-        ),),
+        ),
+      ),
     );
   }
 
@@ -134,38 +134,32 @@ class _AddScreenState extends State<AddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add 1 more event", style: TextStyle(fontSize: 25.0,)),
+        title: Text("Add 1 more event",
+            style: TextStyle(
+              fontSize: 25.0,
+            )),
         centerTitle: true,
       ),
-      drawer: MediaQuery
-          .of(context)
-          .size
-          .width > 600
+      drawer: MediaQuery.of(context).size.width > 600
           ? null
           : Drawer(
-        child: DrawerItem(),
-      ), //боковая менюшка
+              child: DrawerItem(),
+            ), //боковая менюшка
       body: SafeArea(
-          child: MediaQuery
-              .of(context)
-              .size
-              .width < 600
+          child: MediaQuery.of(context).size.width < 600
               ? FormChild()
               : Row(
-            children: [
-              Container(
-                width: 200,
-                child: DrawerItem(),
-              ),
-              Container(
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width - 200,
-                child: FormChild(),
-              )
-            ],
-          )),
+                  children: [
+                    Container(
+                      width: 200,
+                      child: DrawerItem(),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width - 200,
+                      child: FormChild(),
+                    )
+                  ],
+                )),
     );
   }
 }

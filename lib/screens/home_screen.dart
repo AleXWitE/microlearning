@@ -1,14 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart'; //полезный импорт, без него не получится вставить svg картинку. Вставлять только с помощью assert
 import 'package:microlearning/api/youtube.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/models/drawer_item.dart';
-
-// import 'package:flutter_youtube/flutter_youtube.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 enum AnswerList { answer1, answer2, answer3 }
 //созданперечень вариантов ответов и значений для радио кнопок

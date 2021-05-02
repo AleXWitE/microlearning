@@ -149,11 +149,9 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
                 setState(() {
                   _ifNoData = Center(child: CircularProgressIndicator(),);
                 });
-
                 await refreshList();
                 },
               child: Icon(Icons.refresh),
-              backgroundColor: Colors.grey[900],
             )
           : FloatingActionButton(
               child: Icon(Icons.add),
