@@ -8,5 +8,6 @@ AppDatabase database;
 
 void main() {
   database = AppDatabase();
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(FlutterTutorialApp());
 }

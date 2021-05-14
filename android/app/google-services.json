@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "411240573430",
+    "firebase_url": "https://microlearning-lms-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "microlearning-lms",
+    "storage_bucket": "microlearning-lms.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411240573430:android:1950d48512035dd6d23fd7",
+        "android_client_info": {
+          "package_name": "com.alex.microlearning"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "411240573430-mfsvklrhei9sdro0g0igq2te4if9mgte.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZPwZRei_vTrGq7LbPjiBDvR1e8YRsF4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "411240573430-mfsvklrhei9sdro0g0igq2te4if9mgte.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:microlearning/db/moor_db.dart';
@@ -16,21 +17,54 @@ class FlutterTutorialApp extends StatefulWidget {
 }
 
 class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
+
+  bool _initialized = false;
+  bool _error = false;
+
+  // Define an async function to initialize FlutterFire
+  void initializeFlutterFire() async {
+    try {
+      // Wait for Firebase to initialize and set `_initialized` state to true
+      await Firebase.initializeApp();
+      setState(() {
+        _initialized = true;
+      });
+    } catch(e) {
+      // Set `_error` state to true if Firebase initialization fails
+      setState(() {
+        _error = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initializeFlutterFire();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     //здесь определяется логика роутов и переходов по экранам, ну и с какого экрана начинать
+
+    if(_error){
+      return Text("Something wrong with Firebase!");
+    }
+
+    if(!_initialized){
+      return Center(child: CircularProgressIndicator(),);
+    }
 
     return MultiProvider(
       providers: [
         Provider<FavorDao>(
           create: (_) => AppDatabase().favorDao,
-          // builder: (_),
         )
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         //отключает бесячий "дебаг" в верхнем углу экрана
-        title: "Microlearning",
+        title: "Microlearning-LMS",
         initialRoute: '/auth',
         theme: ThemeData(
             fontFamily: 'Gilroy',
