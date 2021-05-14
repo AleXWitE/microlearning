@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:microlearning/db/moor_db.dart';
 import 'package:microlearning/screens/about_screen.dart';
 import 'package:microlearning/screens/add_screen.dart';
+import 'package:microlearning/screens/auth_screen.dart';
 import 'package:microlearning/screens/event_screen.dart';
 import 'package:microlearning/screens/favorites_screen.dart';
 import 'package:microlearning/screens/home_screen.dart';
@@ -30,7 +31,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
         debugShowCheckedModeBanner: false,
         //отключает бесячий "дебаг" в верхнем углу экрана
         title: "Microlearning",
-        initialRoute: '/list_events',
+        initialRoute: '/auth',
         theme: ThemeData(
             fontFamily: 'Gilroy',
             primaryColor: Colors.black,
@@ -44,6 +45,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
           '/about': (BuildContext context) => AboutScreen(),
           '/add': (BuildContext context) => AddScreen(),
           '/favorite': (BuildContext context) => FavoritesScreen(),
+          '/auth': (BuildContext context) => AuthScreen(),
         },
         onGenerateRoute: (routeSettings) {
           //генерация путей второго порядка

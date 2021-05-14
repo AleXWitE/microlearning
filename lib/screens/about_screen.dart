@@ -25,7 +25,11 @@ class _AboutScreenState extends State<AboutScreen> {
     }
   }
 
-  String developer_avatar = "https://picsum.photos/250?image=11";
+  String developer_avatar = "https://sun9-5.userapi.com/impf/c841428/v841428940/297d1/r5qztY5XwSI.jpg?size=604x604&quality=96&sign=3cf8d663ef233c727b73c909c9ea86f3&type=album";
+
+  loadImage(String _url) async {
+    return await Image.network(_url);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +43,6 @@ class _AboutScreenState extends State<AboutScreen> {
               Container(
                 width: MediaQuery.of(context).size.width - 15,
                 height: 100.0,
-                // margin: EdgeInsets.all(7.0),
                 child: Image.asset('assets/images/Logo_Polytech.png'),
               ),
 
@@ -71,10 +74,10 @@ class _AboutScreenState extends State<AboutScreen> {
                   ],
                 ),
                 width: MediaQuery.of(context).size.width - 15,
-                // padding: EdgeInsets.all(7.0),
                 child: Row(
                   children: [
                     Expanded(
+                      // child: loadImage(developer_avatar),
                       child: Image.network(developer_avatar),
                       flex: 4,
                     ),
@@ -82,14 +85,13 @@ class _AboutScreenState extends State<AboutScreen> {
                         flex: 6,
                         child: Container(
                           margin: EdgeInsets.symmetric(horizontal: 15.0),
-                          alignment: Alignment.bottomLeft,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Container(
                                 margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                                 alignment: Alignment.centerLeft,
-                                child: Text("Name\n", style: TextStyle(
+                                child: Text("Sasha\n", style: TextStyle(
                                   fontSize: 20.0,
                                   color: Theme.of(context).accentColor,
                                   fontFamily: 'Redressed',
@@ -97,7 +99,7 @@ class _AboutScreenState extends State<AboutScreen> {
                               ),
                           Container(
                             alignment: Alignment.centerLeft,
-                              child: Text("LastName\n", style: TextStyle(
+                              child: Text("Watt\n", style: TextStyle(
                                 fontSize: 20.0,
                                 color: Theme.of(context).accentColor,
                                 fontFamily: 'Redressed',

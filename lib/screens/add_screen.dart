@@ -19,6 +19,7 @@ class _AddScreenState extends State<AddScreen> {
   void _pickDateDialog() {
     showDatePicker(
             context: context,
+
             initialDate: DateTime.now(),
             //which date will display when user open the picker
             firstDate: DateTime(1950),
@@ -104,19 +105,19 @@ class _AddScreenState extends State<AddScreen> {
                   Text(_finalDate == null
                       ? "Picked date: not assigned"
                       : "Picked date: $_finalDate"),
-                  RaisedButton(
+                  MaterialButton(
                     onPressed: _pickDateDialog,
                     color: Colors.blueAccent,
                     child: Text('Choose date',
                         style: TextStyle(color: Colors.white)),
                   ),
                   SizedBox(height: 20.0),
-                  RaisedButton(
+                  MaterialButton(
                     onPressed: () {
                       if (_formKey.currentState.validate()) {
                         //если валидация прошла - вызываем апи, и отправляемся в весь список
                         callAPI();
-                        Navigator.pushNamed(context, '/list_events');
+                        Navigator.pushNamedAndRemoveUntil(context, '/list_events', ModalRoute.withName('/list_events'));
                       }
                     },
                     child: Text('Send'),

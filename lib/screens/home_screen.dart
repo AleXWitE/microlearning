@@ -75,38 +75,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   int count = 0;
 
-  // YoutubePlayerController _controller;
-
-  // YouTubePlay(String url) {
-  // return FlutterYoutube.playYoutubeVideoById(
-  //     apiKey: apiKey, videoId: url, autoPlay: false);
-  // _controller = YoutubePlayerController(
-  //   initialVideoId: url,
-  //   params: const YoutubePlayerParams(
-  //     showControls: true,
-  //     autoPlay: false,
-  //     showFullscreenButton: true,
-  //     desktopMode: true,
-  //   ),
-  // );
-  //   setState(() {
-  //     _controller.onEnterFullscreen = () {
-  //       log('Entered Fullscreen');
-  //     };
-  //     _controller.onExitFullscreen = () {
-  //       log('Exited Fullscreen');
-  //     };
-  //   });
-  //
-  //   const player = YoutubePlayerIFrame();
-  //
-  //   return YoutubePlayerControllerProvider(
-  //         // Passing controller to widgets below.
-  //         controller: _controller,
-  //       child: player,
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     Answers question = answers[answId];
@@ -136,51 +104,74 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     Widget QuestionBody(Answers question) {
       //вынесена повторяющаяся группа виджетов, чтобыне загромождать код
-      return Column(children: [
-        Text("${question.title}\n",
-            style: TextStyle(
-                fontFamily: "Redressed",
-                fontSize: 30.0,
-                fontStyle: FontStyle.italic,
-                color: Theme.of(context).accentColor,
-                decoration: TextDecoration.underline)),
-
+      return
         Container(
+            width: double.infinity,
+            alignment: Alignment.topCenter,
+            padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
+            margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
             decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(25),
               border: Border.all(
                 width: 1,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).accentColor,
+                style: BorderStyle.solid,
               ),
               boxShadow: [
                 BoxShadow(
-                    color: Theme.of(context).accentColor,
-                    blurRadius: 15,
-                    spreadRadius: 3)
+                  color: Theme.of(context).primaryColor,
+                  blurRadius: 10,
+                  spreadRadius: 5,
+                ),
               ],
             ),
-            child: question.type == "video"
-                ? YouTubePlay(url: question.url)
-                : Image.network(question.url)),
-        // child: SvgPicture.asset( // для svg картинок необходимо прописывать ссылку на asset в pubspec.yaml
-        //     "assets/images/LoneWolf.svg"),
-        SizedBox(
-          height: 25.0,
-        ),
-        Container(
-          width: MediaQuery.of(context).size.width - 60.0,
-          padding: EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-              color: Theme.of(context).accentColor,
-              borderRadius: BorderRadius.circular(15)),
-          child: Text(
-            "${question.description}",
-            style: TextStyle(
-                // color: question.type == "video" ? Colors.white : Colors.red,
-                color: Theme.of(context).primaryColor,
-                fontSize: 25.0),
-          ),
-        )
-      ]);
+            child: Column(children: [
+              Text("${question.title}\n",
+                  style: TextStyle(
+                      fontFamily: "Redressed",
+                      fontSize: 30.0,
+                      fontStyle: FontStyle.italic,
+                      color: Theme.of(context).accentColor,
+                      decoration: TextDecoration.underline)),
+
+              Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Theme.of(context).accentColor,
+                          blurRadius: 15,
+                          spreadRadius: 3)
+                    ],
+                  ),
+                  child: question.type == "video"
+                      ? YouTubePlay(url: question.url)
+                      : Image.network(question.url)),
+              // child: SvgPicture.asset( // для svg картинок необходимо прописывать ссылку на asset в pubspec.yaml
+              //     "assets/images/LoneWolf.svg"),
+              SizedBox(
+                height: 25.0,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width - 60.0,
+                padding: EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).accentColor,
+                    borderRadius: BorderRadius.circular(15)),
+                child: Text(
+                  "${question.description}",
+                  style: TextStyle(
+                      // color: question.type == "video" ? Colors.white : Colors.red,
+                      color: Theme.of(context).primaryColor,
+                      fontSize: 25.0),
+                ),
+              )
+            ]))
+      ;
     }
 
     ValidateCheckbox(String type) {
@@ -213,30 +204,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             // height: MediaQuery.of(context).size.height,
             child: Column(
               children: [
-                Container(
-                    width: double.infinity,
-                    alignment: Alignment.topCenter,
-                    padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
-                    margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        width: 1,
-                        color: Theme.of(context).accentColor,
-                        style: BorderStyle.solid,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).primaryColor,
-                          blurRadius: 10,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: QuestionBody(
+                QuestionBody(
                         question) //подстановка повторяющейся группы виджетов
-                    ),
+                ,
                 Container(
                   padding: EdgeInsets.all(30),
                   margin: EdgeInsets.all(20),
@@ -322,31 +292,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             // height: MediaQuery.of(context).size.height,
             child: Column(
               children: [
-                Container(
-                    width: double.infinity,
-                    alignment: Alignment.topCenter,
-                    padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
-                    margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        width: 1,
-                        color: Theme.of(context).accentColor,
-                        style: BorderStyle.solid,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).primaryColor,
-                          blurRadius: 10,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: QuestionBody(question)),
-                SizedBox(
-                  height: 1,
-                ),
+                QuestionBody(question),
                 Container(
                   padding: EdgeInsets.all(30),
                   margin: EdgeInsets.all(20),
@@ -399,54 +345,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           );
           break;
         case 'lecture':
-          return Container(
-            width: double.infinity,
-            alignment: Alignment.topCenter,
-            padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
-            margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                width: 1,
-                color: Theme.of(context).accentColor,
-                style: BorderStyle.solid,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).primaryColor,
-                  blurRadius: 10,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: QuestionBody(question),
-          );
+          return QuestionBody(question);
           break;
         case 'video':
-          return Container(
-            width: double.infinity,
-            alignment: Alignment.topCenter,
-            padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
-            margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                width: 1,
-                color: Theme.of(context).accentColor,
-                style: BorderStyle.solid,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).primaryColor,
-                  blurRadius: 10,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: QuestionBody(question),
-          );
+          return QuestionBody(question);
           break;
         default:
           return Container(
@@ -506,7 +408,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       //скаффолд один из самых главных виджетов материал дизайна
       appBar: AppBar(
-        title: Text("Flutter tutorial $count taps", style: TextStyle(fontSize: 25.0,)),
+        title: Text("Flutter tutorial $count taps",
+            style: TextStyle(
+              fontSize: 25.0,
+            )),
         centerTitle: true,
       ),
       drawer: MediaQuery.of(context).size.width > 600
@@ -522,10 +427,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
                 image: DecorationImage(
-                    //задание заднего фона
-                    image: AssetImage("assets/images/polytech_logo.png"),
-                    // alignment: Alignment.center
-                )),
+              //задание заднего фона
+              image: AssetImage("assets/images/polytech_logo.png"),
+              // alignment: Alignment.center
+            )),
             child: MediaQuery.of(context).size.width < 600
                 ? ScrollElement()
                 : Row(

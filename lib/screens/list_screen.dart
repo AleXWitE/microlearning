@@ -23,8 +23,8 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(
-        this); //попытка добавления слушателя состояния, для работы с жизненным циклом виджетов
+    // WidgetsBinding.instance.addObserver(
+    //     this); //попытка добавления слушателя состояния, для работы с жизненным циклом виджетов
     refreshKey = GlobalKey<
         RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
     // refreshKey2 = GlobalKey<RefreshIndicatorState>();
@@ -55,11 +55,11 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     }
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   WidgetsBinding.instance.removeObserver(this);
+  //   super.dispose();
+  // }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -156,8 +156,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
           : FloatingActionButton(
               child: Icon(Icons.add),
               onPressed: () {
-                Navigator.pushNamed(
-                    context, '/add'); //переход на экран добавления элемента
+                Navigator.pushNamedAndRemoveUntil(context, '/add', ModalRoute.withName('/list_events')); //переход на экран добавления элемента
               },
             ),
     );

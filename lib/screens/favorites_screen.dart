@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
 import 'package:microlearning/db/moor_db.dart';
 import 'package:microlearning/models/drawer_item.dart';
@@ -14,10 +14,10 @@ class FavoriteScreenState extends State<FavoritesScreen> {
   int count;
   Stream<List<Favor>> _favoritesList;
 
-
   @override
   void initState() {
     super.initState();
+    getFavStream();
     // print(favEvent.length);
   }
 
@@ -35,9 +35,16 @@ class FavoriteScreenState extends State<FavoritesScreen> {
     }
   }
 
-  Widget ListBuilder(Stream<List<Favor>> _check) {
-    final _dao = Provider.of<FavorDao>(context);
+  _getFavStream() async {
+    final _dao = Provider.of<FavorDao>(context, listen: false);
+    return _favoritesList = _dao.watchAllFavorites();
+  }
 
+  getFavStream() async{
+    await compute<dynamic, Stream<List<Favor>>>(_getFavStream(), null);
+  }
+
+  ListBuilder(Stream<List<Favor>> _check) {
     return StreamBuilder<List<Favor>>(
       stream: _check,
       builder: (context, snapshot) {
@@ -45,7 +52,6 @@ class FavoriteScreenState extends State<FavoritesScreen> {
           if (snapshot.hasError) {
             return Text('${snapshot.error}');
           }
-          // return _builtFav(context, snapshot.data);
           return ListView.builder(
             //возвращаем билд списка
               physics: PageScrollPhysics(),
@@ -58,7 +64,6 @@ class FavoriteScreenState extends State<FavoritesScreen> {
           _hasFav = false;
           ifNoFavorite(_hasFav);
           return _ifNoFavorite;
-
         }
       },
     );
@@ -70,15 +75,13 @@ class FavoriteScreenState extends State<FavoritesScreen> {
     delFunc() {
       setState(() {
       _favoritesList.listen((event) async {
-        for(int i = 0; i < event.length-1; i++){
-          Favor checkFavorite = await _dao.getFavorite(event[i].id);
-          if(checkFavorite != null) await _dao.deleteFavorite(checkFavorite);
+        for(int i = 0; i < event.length; i++){
+          await _dao.deleteFavorite(event[i]);
         }
       });
-      // favorItem.clear();
       });
+      getFavStream();
     }
-
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -101,8 +104,6 @@ class FavoriteScreenState extends State<FavoritesScreen> {
                   count = 0;
                   // favorItem.clear();
                 });
-
-
                 print('delete');
               },
             ),
@@ -119,12 +120,9 @@ class FavoriteScreenState extends State<FavoritesScreen> {
     bool _notNull;
 
     setState(() {
-      _favoritesList = _dao.watchAllFavorites();
       if (_favoritesList.isBroadcast) _notNull = true;
       else _notNull = false;
     });
-
-
 
     return Scaffold(
         appBar: AppBar(
