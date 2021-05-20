@@ -1,0 +1,43 @@
+{
+    "title": "Microlearning-LMS",
+    "back": "Back",
+    "or": "Or",
+    "next": "Next",
+    "startApp": "Enter the App!",
+    "loginApp": "Please, sign in!",
+    "registerApp": "Don`t have account? Sign up!",
+    "errorFirebase": "Something wrong with Firebase!",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "infoAfterReg": "Now you need sign in!",
+    "@startApp": {
+        "description": "Something text"
+    },
+
+    "password": "Password",
+    "passwordErr": "Please, enter the password",
+    "passwordRepeat": "Repeat password",
+    "passwordRepeatErr": "Please, repeat your password correctly",
+    "createAcc": "Create account",
+    "email": "Your e-mail",
+    "emailErr": "Please, enter your e-mail",
+
+    "googleSignInInfo": "Sign in with Google",
+
+    "drawerNav": "Navigation",
+    "drawerHome": "Home",
+    "drawerToList": "To list",
+    "drawerAdd": "Add event",
+    "drawerFavorite": "Favorites",
+    "drawerAbout": "About app",
+    "drawerExit": "Exit",
+
+    "favWarning": "There is no favorite data!",
+    "favAlertInfo": "Do you really want delete all favorites?",
+    "favAlertCancel": "Cancel",
+    "favAlertDel": "Delete",
+
+    "aboutGithub": "This project code on",
+    "aboutVk": "VK Profile"
+
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:microlearning/models/drawer_item.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AboutScreen extends StatefulWidget {
 
@@ -111,7 +112,7 @@ class _AboutScreenState extends State<AboutScreen> {
                                   color: Theme.of(context).accentColor,
                                   minWidth: 200.0,
                                   height: 30.0,
-                                  child: Text("VK profile", style: TextStyle(
+                                  child: Text(AppLocalizations.of(context).aboutVk, style: TextStyle(
                                     fontSize: 20.0,
                                     color: Theme.of(context).primaryColor,
                                     fontFamily: 'Redressed',
@@ -139,7 +140,7 @@ class _AboutScreenState extends State<AboutScreen> {
                         minWidth: 250.0,
                         color: Theme.of(context).primaryColor,
                         onPressed:() => setState(() => _launched = _launchInWebViewOrVC(_url)),
-                      child: Text("This project code on GitHub.com", style: TextStyle(color: Theme.of(context).accentColor),),
+                      child: Text("${AppLocalizations.of(context).aboutGithub} GitHub.com", style: TextStyle(color: Theme.of(context).accentColor),),
                     )
 
                   ],

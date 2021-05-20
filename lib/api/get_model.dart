@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:microlearning/components/event.dart';
-import 'package:microlearning/db/moor_db.dart';
 
 Event eventFromJson(String str) { //возвращаем элемент джсона элементом списка
   final jsonData = jsonDecode(str);

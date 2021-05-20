@@ -1,13 +1,8 @@
 class Users{
-  String name;
+  String uid;
+  String email;
 
-  Users({this.name});
+  Users({this.uid, this.email});
 }
 
-List<Users> users = [
-  Users(name: 'user1'),
-  Users(name: 'user2'),
-  Users(name: 'user3'),
-];
-
-Users user = users.first;
+Users savedUser;

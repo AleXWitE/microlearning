@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart'; //полезный импорт, без него не получится вставить svg картинку. Вставлять только с помощью assert
 import 'package:microlearning/api/youtube.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/models/drawer_item.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum AnswerList { answer1, answer2, answer3 }
 //созданперечень вариантов ответов и значений для радио кнопок
@@ -489,7 +488,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 text: TextSpan(
                     style: TextStyle(
                         fontSize: 20.0, color: Theme.of(context).primaryColor),
-                    text: "Back"),
+                    text: AppLocalizations.of(context).back),
               ),
             ),
             MaterialButton(
@@ -515,7 +514,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 text: TextSpan(
                     style: TextStyle(
                         fontSize: 20.0, color: Theme.of(context).primaryColor),
-                    text: "Next"),
+                    text: AppLocalizations.of(context).next),
               ),
             )
           ],

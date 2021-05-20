@@ -1,0 +1,40 @@
+{
+    "title": "Микрообучение-LMS",
+    "back": "Назад",
+    "or": "Или",
+    "next": "Следующий",
+    "startApp": "Войдите или зарегестрируйтесь в приложении!",
+    "loginApp": "Залогинься в приложении!",
+    "registerApp": "Нет аккаунта? Зарегестрируйся!",
+    "errorFirebase": "Нет подключения к Firebase!",
+    "signIn": "Войти",
+    "signUp": "Зарегистрироваться",
+    "infoAfterReg": "А теперь залогинься!",
+
+    "password": "Пароль",
+    "passwordErr": "Пожалуйста, введите пароль",
+    "passwordRepeat": "Повторите пароль",
+    "passwordRepeatErr": "Пожалуйста, повторите пароль корректно",
+    "createAcc": "Создать аккаунт",
+    "email": "Ваш e-mail",
+    "emailErr": "Пожалуйста, введите ваш e-mail",
+
+    "googleSignInInfo": "Войти с помощью Google",
+
+
+    "drawerNav": "Навигация",
+    "drawerHome": "Главная",
+    "drawerToList": "К списку собыий",
+    "drawerAdd": "Добавить событие на сервер",
+    "drawerFavorite": "Избранное",
+    "drawerAbout": "О приложении",
+    "drawerExit": "Выход",
+
+    "favWarning": "В избранное ничего не добавлено!",
+    "favAlertInfo": "Вы действительно хотите удалить всё избранное?",
+    "favAlertCancel": "Отмена",
+    "favAlertDel": "Удалить",
+
+    "aboutGithub": "Исходный код приложения на",
+    "aboutVk": "Профиль Вк"
+}

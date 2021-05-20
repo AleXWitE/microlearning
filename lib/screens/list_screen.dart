@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
@@ -14,7 +13,6 @@ class ListScreen extends StatefulWidget {
 
 class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   GlobalKey<RefreshIndicatorState> refreshKey;
-  // GlobalKey<RefreshIndicatorState> refreshKey2;
   Stream
       getAllEventsState; //определяем переменную под будущий список элементов из интернета
   int count;
@@ -23,11 +21,8 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    // WidgetsBinding.instance.addObserver(
-    //     this); //попытка добавления слушателя состояния, для работы с жизненным циклом виджетов
     refreshKey = GlobalKey<
         RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
-    // refreshKey2 = GlobalKey<RefreshIndicatorState>();
   }
 
   Future<Null> refreshList() async {

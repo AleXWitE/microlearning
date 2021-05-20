@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:microlearning/api/services/google_sign_in.dart';
+import 'package:microlearning/components/users.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -9,7 +13,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  String appBarTitle = "Login screen";
+  String appBarTitle = "";
   int _selectedIndex = 0;
   int _initPage = 0;
   final _formKeyLogin = GlobalKey<FormState>();
@@ -43,7 +47,7 @@ class _AuthScreenState extends State<AuthScreen> {
             email: _authEmail, password: _authPass);
         controller.animateToPage(0,
             duration: Duration(milliseconds: 800), curve: curve);
-        _errMsg = "Now you need sign in!";
+        _errMsg = AppLocalizations.of(context).infoAfterReg;
       } catch (e) {
         print('Error: $e');
         _errMsg = e;
@@ -55,11 +59,22 @@ class _AuthScreenState extends State<AuthScreen> {
       });
     }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: Duration(seconds: 5),
+        elevation: 5.0,
+        backgroundColor: Theme.of(context).primaryColor,
+        width: 400.0, // Width of the SnackBar.
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8.0, // Inner padding for SnackBar content.
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
         content: Text(
-          _errMsg,
-          style:
-          TextStyle(fontSize: 25.0, color: Theme.of(context).accentColor),
-        )));  }
+      _errMsg,
+      style: TextStyle(fontSize: 25.0, color: Theme.of(context).accentColor),
+    )));
+  }
 
   bool _loginValidate() {
     final form = _formKeyLogin.currentState;
@@ -76,15 +91,16 @@ class _AuthScreenState extends State<AuthScreen> {
         auth.UserCredential user = await FirebaseAuth.instance
             .signInWithEmailAndPassword(
                 email: _loginEmail, password: _loginPass);
+        savedUser = Users(uid: user.user.uid, email: user.user.email);
         print("User: ${user.user.uid}");
         Navigator.pushNamedAndRemoveUntil(
             context, '/list_events', (route) => false);
       } catch (e) {
         print("Error: $e");
         switch ("$e") {
-          case "[ERROR:flutter/lib/ui/ui_dart_state.cc(199)] Unhandled Exception: 'package:flutter/src/widgets/text.dart': Failed assertion: line 378 pos 10: 'data != null': A non-null String must be provided to a Text widget.":
-            _errMsg = "Invalid email type";
-            break;
+          // case "[lutter/lib/ui/ui_dart_state.cc(199)] Unhandled Exception: 'package:flutter/src/widgets/text.dart': Failed assertion: line 378 pos 10: 'data != null': A non-null String must be provided to a Text widget.":
+          //   _errMsg = "Invalid email type";
+          //   break;
           case "[firebase_auth/wrong-password] The password is invalid or the user does not have a password.":
             _errMsg = "Wrong password!";
             break;
@@ -93,6 +109,17 @@ class _AuthScreenState extends State<AuthScreen> {
             break;
         }
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          duration: Duration(seconds: 5),
+            elevation: 5.0,
+            backgroundColor: Theme.of(context).primaryColor,
+            width: 400.0, // Width of the SnackBar.
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0, // Inner padding for SnackBar content.
+            ),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+            ),
             content: Text(
           _errMsg,
           style:
@@ -101,6 +128,14 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     }
     // setState(() {});
+  }
+
+  OrWidget() {
+    return Column(children: [
+      Padding(padding: EdgeInsets.all(15.0), child: Divider(thickness: 3.0, height: 2.0,)),
+      Text(AppLocalizations.of(context).or, textAlign: TextAlign.center, style: TextStyle(fontSize: 28.0),),
+      Padding(padding: EdgeInsets.all(15.0), child: Divider(thickness: 3.0, height: 2.0,)),
+      GoogleSignIn(),],);
   }
 
   LoginWidget() {
@@ -114,11 +149,11 @@ class _AuthScreenState extends State<AuthScreen> {
           children: [
             TextFormField(
               validator: (value) {
-                if (value.isEmpty) return 'Please, entry a login';
+                if (value.isEmpty) return AppLocalizations.of(context).emailErr;
               },
               onSaved: (value) => _loginEmail = value,
               decoration: InputDecoration(
-                labelText: "Login",
+                labelText: AppLocalizations.of(context).email,
                 focusColor: Theme.of(context).primaryColor,
               ),
               keyboardType: TextInputType.emailAddress,
@@ -126,12 +161,12 @@ class _AuthScreenState extends State<AuthScreen> {
             SizedBox(height: 20.0),
             TextFormField(
               validator: (value) {
-                if (value.isEmpty) return 'Please, entry a password';
+                if (value.isEmpty) return AppLocalizations.of(context).passwordErr;
               },
               onSaved: (value) => _loginPass = value,
               obscureText: true,
               decoration: InputDecoration(
-                labelText: "Password",
+                labelText: AppLocalizations.of(context).password,
                 focusColor: Theme.of(context).primaryColor,
               ),
               keyboardType: TextInputType.visiblePassword,
@@ -140,13 +175,14 @@ class _AuthScreenState extends State<AuthScreen> {
             MaterialButton(
               onPressed: () => _loginButton(),
               child: Text(
-                "Sign in",
+                AppLocalizations.of(context).signIn,
                 style: TextStyle(
                     fontSize: 25.0, color: Theme.of(context).accentColor),
               ),
               padding: EdgeInsets.all(15.0),
               color: Theme.of(context).primaryColor,
             ),
+            OrWidget(),
           ],
         ),
       ),
@@ -164,24 +200,24 @@ class _AuthScreenState extends State<AuthScreen> {
           children: [
             TextFormField(
               validator: (value) {
-                if (value.isEmpty) return 'Please, entry login';
+                if (value.isEmpty) return AppLocalizations.of(context).emailErr;
               },
               onSaved: (value) => _authEmail = value,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                labelText: "Login",
+                labelText: AppLocalizations.of(context).email,
                 focusColor: Theme.of(context).primaryColor,
               ),
             ),
             SizedBox(height: 20.0),
             TextFormField(
               validator: (value) {
-                if (value.isEmpty) return 'Please, entry your password';
+                if (value.isEmpty) return AppLocalizations.of(context).passwordErr;
               },
               onSaved: (value) => _authPass = value,
               obscureText: true,
               decoration: InputDecoration(
-                labelText: "Password",
+                labelText: AppLocalizations.of(context).password,
                 focusColor: Theme.of(context).primaryColor,
               ),
             ),
@@ -189,12 +225,12 @@ class _AuthScreenState extends State<AuthScreen> {
             TextFormField(
               validator: (value) {
                 if (value.isEmpty && value == _authPass)
-                  return 'Please, repeat your password';
+                  return AppLocalizations.of(context).passwordRepeatErr;
               },
               onSaved: (value) => _authRepeat = value,
               obscureText: true,
               decoration: InputDecoration(
-                labelText: "Repeat password",
+                labelText: AppLocalizations.of(context).passwordRepeat,
                 focusColor: Theme.of(context).primaryColor,
               ),
             ),
@@ -202,13 +238,14 @@ class _AuthScreenState extends State<AuthScreen> {
             MaterialButton(
               onPressed: () => _authButton(),
               child: Text(
-                "Create account",
+                AppLocalizations.of(context).createAcc,
                 style: TextStyle(
                     fontSize: 25.0, color: Theme.of(context).accentColor),
               ),
               padding: EdgeInsets.all(15.0),
               color: Theme.of(context).primaryColor,
             ),
+            OrWidget(),
           ],
         ),
       ),
@@ -222,11 +259,11 @@ class _AuthScreenState extends State<AuthScreen> {
         _selectedIndex = index;
         _initPage = index;
         if (_selectedIndex == 0) {
-          appBarTitle = "Login screen";
+          appBarTitle = AppLocalizations.of(context).loginApp;
           controller.animateToPage(0,
               duration: Duration(milliseconds: 800), curve: curve);
         } else {
-          appBarTitle = "Auth screen";
+          appBarTitle = AppLocalizations.of(context).registerApp;
           controller.animateToPage(1,
               duration: Duration(milliseconds: 800), curve: curve);
         }
@@ -237,8 +274,9 @@ class _AuthScreenState extends State<AuthScreen> {
       appBar: AppBar(
         title: Text(
             MediaQuery.of(context).size.width > 600
-                ? "Enter in app"
-                : appBarTitle,
+                // ? "Enter in app"
+                ? AppLocalizations.of(context).startApp
+                : appBarTitle == "" ? AppLocalizations.of(context).loginApp : appBarTitle,
             style: TextStyle(
               fontSize: 25.0,
             )),
@@ -284,13 +322,13 @@ class _AuthScreenState extends State<AuthScreen> {
                   color: Colors.grey[500], opacity: 0.5, size: 25),
               items: [
                 BottomNavigationBarItem(
-                    label: "Sign in",
+                    label: AppLocalizations.of(context).signIn,
                     icon: Icon(Icons.account_circle),
-                    tooltip: "Sign in"),
+                    tooltip: AppLocalizations.of(context).signIn),
                 BottomNavigationBarItem(
-                    label: "Sign up",
+                    label: AppLocalizations.of(context).signUp,
                     icon: Icon(Icons.person_add),
-                    tooltip: "Sign up"),
+                    tooltip:AppLocalizations.of(context).signUp),
               ],
               currentIndex: _selectedIndex,
               backgroundColor: Theme.of(context).primaryColor,

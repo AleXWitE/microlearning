@@ -4,6 +4,7 @@ import 'package:microlearning/components/list_card.dart';
 import 'package:microlearning/db/moor_db.dart';
 import 'package:microlearning/models/drawer_item.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FavoritesScreen extends StatefulWidget {
   @override
@@ -29,7 +30,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
       await Future.delayed(Duration(seconds: 1));
       setState(() {
         _ifNoFavorite = Center(
-          child: Text("There is no favorite data!"),
+          child: Text(AppLocalizations.of(context).favWarning),
         );
       });
     }
@@ -87,16 +88,16 @@ class FavoriteScreenState extends State<FavoritesScreen> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Do you want delete all favorites?'),
+          title: Text(AppLocalizations.of(context).favAlertInfo),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: Text(AppLocalizations.of(context).favAlertCancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Delete'),
+              child: Text(AppLocalizations.of(context).favAlertDel),
               onPressed: () {
                 Navigator.of(context).pop();
                 delFunc();
@@ -143,7 +144,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
         body: MediaQuery.of(context).size.width < 600
             ? !_notNull
                 ? Center(
-                    child: Text("There is no favorite data!"),
+                    child: Text(AppLocalizations.of(context).favWarning),
                   )
                 : ListBuilder(_favoritesList)
             : !_notNull
@@ -153,7 +154,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
                       Container(
                           width: MediaQuery.of(context).size.width - 200,
                           child: Center(
-                            child: Text("There is no favorite data!"),
+                            child: Text(AppLocalizations.of(context).favWarning),
                           ))
                     ],
                   )

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:microlearning/components/users.dart';
 
 class DrawerItem extends StatelessWidget {
   @override
@@ -22,11 +24,10 @@ class DrawerItem extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    "Navigation",
+                    AppLocalizations.of(context).drawerNav,
                     style: TextStyle(
                         color: Colors.black,
-                        fontSize: 34.0,
-                        fontFamily: "Redressed"),
+                        fontSize: 33.0,),
                   ),
                   SizedBox(
                     height: 80,
@@ -38,7 +39,7 @@ class DrawerItem extends StatelessWidget {
             leading: Icon(Icons.home, color: Theme
                 .of(context)
                 .accentColor,),
-            title: Text("Home", style: TextStyle(fontSize: 20.0, color: Theme
+            title: Text(AppLocalizations.of(context).drawerHome, style: TextStyle(fontSize: 20.0, color: Theme
                 .of(context)
                 .accentColor,)),
             onTap: () =>
@@ -50,7 +51,7 @@ class DrawerItem extends StatelessWidget {
             leading: Icon(Icons.wysiwyg, color: Theme
                 .of(context)
                 .accentColor,),
-            title: Text("To list", style: TextStyle(fontSize: 20.0, color: Theme
+            title: Text(AppLocalizations.of(context).drawerToList, style: TextStyle(fontSize: 20.0, color: Theme
                 .of(context)
                 .accentColor,)),
             onTap: () =>
@@ -62,7 +63,7 @@ class DrawerItem extends StatelessWidget {
                 .of(context)
                 .accentColor,),
             title: Text(
-                "Add event", style: TextStyle(fontSize: 20.0, color: Theme
+                AppLocalizations.of(context).drawerAdd, style: TextStyle(fontSize: 20.0, color: Theme
                 .of(context)
                 .accentColor,)),
             onTap: () =>
@@ -74,7 +75,7 @@ class DrawerItem extends StatelessWidget {
                 .of(context)
                 .accentColor,),
             title: Text(
-                "Favorite", style: TextStyle(fontSize: 20.0, color: Theme
+                AppLocalizations.of(context).drawerFavorite, style: TextStyle(fontSize: 20.0, color: Theme
                 .of(context)
                 .accentColor,)),
             onTap: () =>
@@ -86,7 +87,7 @@ class DrawerItem extends StatelessWidget {
                 .of(context)
                 .accentColor,),
             title: Text(
-                "About app", style: TextStyle(fontSize: 20.0, color: Theme
+                AppLocalizations.of(context).drawerAbout, style: TextStyle(fontSize: 20.0, color: Theme
                 .of(context)
                 .accentColor,)),
             onTap: () =>
@@ -98,12 +99,14 @@ class DrawerItem extends StatelessWidget {
                 .of(context)
                 .accentColor,),
             title: Text(
-                "Exit", style: TextStyle(fontSize: 20.0, color: Theme
+                AppLocalizations.of(context).drawerExit, style: TextStyle(fontSize: 20.0, color: Theme
                 .of(context)
                 .accentColor,)),
-            onTap: () =>
+            onTap: () {
                 Navigator.pushNamedAndRemoveUntil(
-                    context, '/auth', (route) => false),
+                    context, '/auth', (route) => false);
+                savedUser = null;
+            }
           ),
         ],
       ),

@@ -10,6 +10,7 @@ import 'package:microlearning/screens/favorites_screen.dart';
 import 'package:microlearning/screens/home_screen.dart';
 import 'package:microlearning/screens/list_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FlutterTutorialApp extends StatefulWidget {
   @override
@@ -47,9 +48,11 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
   Widget build(BuildContext context) {
     //здесь определяется логика роутов и переходов по экранам, ну и с какого экрана начинать
 
-    if(_error){
-      return Text("Something wrong with Firebase!");
-    }
+    // if(_error){
+    //   return MaterialApp(home: Center(child: Text("Something wrong with Firebase!")));
+    // }
+
+    // String _title = AppLocalizations.of(context).title;
 
     if(!_initialized){
       return Center(child: CircularProgressIndicator(),);
@@ -65,7 +68,20 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
         debugShowCheckedModeBanner: false,
         //отключает бесячий "дебаг" в верхнем углу экрана
         title: "Microlearning-LMS",
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        // localizationsDelegates: [
+        //   // AppLocalizations.delegate,
+        //   GlobalMaterialLocalizations.delegate,
+        //   GlobalWidgetsLocalizations.delegate,
+        //   GlobalCupertinoLocalizations.delegate,
+        // ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        // supportedLocales: [
+        //   const Locale('en', ''), //english support
+        //   const Locale('ru', ''), //russian support
+        // ],
         initialRoute: '/auth',
+        home: _error ? Center(child: Text(/*AppLocalizations.of(context).errorFirebase)*/" ")) : AuthScreen(),
         theme: ThemeData(
             fontFamily: 'Gilroy',
             primaryColor: Colors.black,

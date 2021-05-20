@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/models/drawer_item.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EventScreen extends StatelessWidget {
   String _id;
@@ -74,7 +75,7 @@ class EventScreen extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text('Назад')),
+          child: Text(AppLocalizations.of(context).back)),
     ),);
   }
 }
