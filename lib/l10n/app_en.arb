@@ -37,6 +37,9 @@
     "favAlertCancel": "Cancel",
     "favAlertDel": "Delete",
 
+    "warningConnection": "Something wrong! Check your connection",
+    "warningConnectionBrowser": "It`s disabled CORS at server, I can`t fix it :(",
+
     "aboutGithub": "This project code on",
     "aboutVk": "VK Profile"
 

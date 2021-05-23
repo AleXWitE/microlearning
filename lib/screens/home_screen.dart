@@ -150,8 +150,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   child: question.type == "video"
                       ? YouTubePlay(url: question.url)
                       : Image.network(question.url)),
-              // child: SvgPicture.asset( // для svg картинок необходимо прописывать ссылку на asset в pubspec.yaml
-              //     "assets/images/LoneWolf.svg"),
               SizedBox(
                 height: 25.0,
               ),

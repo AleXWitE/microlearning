@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:microlearning/db/moor_db.dart';
 import 'package:microlearning/screens/about_screen.dart';
 import 'package:microlearning/screens/add_screen.dart';
@@ -11,6 +12,7 @@ import 'package:microlearning/screens/home_screen.dart';
 import 'package:microlearning/screens/list_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FlutterTutorialApp extends StatefulWidget {
   @override
@@ -18,31 +20,48 @@ class FlutterTutorialApp extends StatefulWidget {
 }
 
 class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
-
   bool _initialized = false;
   bool _error = false;
 
-  // Define an async function to initialize FlutterFire
+  String _userEmail;
+
+
+  // Определяем ассинхронную функцию для инициализации FlutterFire
   void initializeFlutterFire() async {
     try {
-      // Wait for Firebase to initialize and set `_initialized` state to true
+      // Дожидаемся пока пройдет инициализация и меняем состояние `_initialized` на true
       await Firebase.initializeApp();
       setState(() {
         _initialized = true;
       });
-    } catch(e) {
-      // Set `_error` state to true if Firebase initialization fails
+    } catch (e) {
+      // Сменяем `_error` состояние на true если Firebase инициализация провалилась
       setState(() {
         _error = true;
       });
     }
   }
 
+  // Сделать проверку ШП на экране авторизации и если есть ключи, то подставлять их в функцию входа,
+  // чтобы в бд отмечалось время последнего входа
+
+  _getUser() async{
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+
+    _userEmail = _prefs.getString('userEmailPref') ?? null;
+    print('user shared prefs = $_userEmail');
+  }
+
   @override
   void initState() {
+    // стартуем подключение к Firebase
     initializeFlutterFire();
     super.initState();
+    _getUser();
   }
+
+  final Locale rusLocale = Locale('ru', '');
+  final Locale engLocale = Locale('en', '');
 
   @override
   Widget build(BuildContext context) {
@@ -52,11 +71,12 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
     //   return MaterialApp(home: Center(child: Text("Something wrong with Firebase!")));
     // }
 
-    // String _title = AppLocalizations.of(context).title;
-
-    if(!_initialized){
-      return Center(child: CircularProgressIndicator(),);
+    if (!_initialized) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
     }
+
 
     return MultiProvider(
       providers: [
@@ -67,25 +87,46 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         //отключает бесячий "дебаг" в верхнем углу экрана
-        title: "Microlearning-LMS",
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        // localizationsDelegates: [
-        //   // AppLocalizations.delegate,
-        //   GlobalMaterialLocalizations.delegate,
-        //   GlobalWidgetsLocalizations.delegate,
-        //   GlobalCupertinoLocalizations.delegate,
-        // ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        // supportedLocales: [
-        //   const Locale('en', ''), //english support
-        //   const Locale('ru', ''), //russian support
-        // ],
-        initialRoute: '/auth',
-        home: _error ? Center(child: Text(/*AppLocalizations.of(context).errorFirebase)*/" ")) : AuthScreen(),
+        onGenerateTitle: (BuildContext context) => AppLocalizations.of(context).title,
+        // localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        // supportedLocales: AppLocalizations.supportedLocales,
+        supportedLocales: [
+          // const Locale('en', 'US'), //english support
+          // const Locale('ru', 'RU'), //russian support
+          engLocale,
+          rusLocale,
+        ],
+        localeResolutionCallback: (deviceLocale, supportedLocales) {
+
+            for (var locale in supportedLocales) {
+              print(locale.languageCode + deviceLocale.languageCode);
+              if (locale.languageCode == deviceLocale.languageCode ) {
+                print(deviceLocale.languageCode + ' is supported');
+                return deviceLocale;
+              }
+            }
+            print('>>>>> ' +
+                deviceLocale.languageCode +
+                ' <<<<<< is not supported');
+            return supportedLocales.first;
+
+        },
+        initialRoute: _error ? '/' : _userEmail == null ? '/auth' : '/list_events'  ,
+        home: _error
+            ? Center(
+                child:
+                    Text(AppLocalizations.of(context).errorFirebase))
+            : null,
         theme: ThemeData(
-            fontFamily: 'Gilroy',
-            primaryColor: Colors.black,
-            accentColor: Colors.white,
+          fontFamily: 'Gilroy',
+          primaryColor: Colors.black,
+          accentColor: Colors.white,
         ),
         routes: {
           //пути определения классов, переходя по этим ссылкам, будут вызывать эти классы

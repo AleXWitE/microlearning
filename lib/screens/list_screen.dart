@@ -5,6 +5,8 @@ import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
 import 'package:microlearning/models/drawer_item.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ListScreen extends StatefulWidget {
   @override
@@ -44,7 +46,9 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
       await Future.delayed(Duration(seconds: 5));
       setState(() {
         _ifNoData = Center(
-          child: Text("Something wrong! Try check connection!"),
+          child: Text( kIsWeb
+              ? AppLocalizations.of(context).warningConnectionBrowser
+              : AppLocalizations.of(context).warningConnection),
         );
       });
     }
