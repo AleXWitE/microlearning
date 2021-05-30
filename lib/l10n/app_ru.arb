@@ -9,6 +9,11 @@
     "errorFirebase": "Нет подключения к Firebase!",
     "signIn": "Войти",
     "signUp": "Зарегистрироваться",
+
+    "errorSignOut": "Ошибка выхода. Попробуйте снова.",
+    "errorSignInCredentials": "Аккаунт уже существует.",
+    "errorSignInErrCredentials": "Ошибка произошла во время получения данных. Попробуйте снова.",
+    "errorGoogleSignInCredentials": "Ошибка произошла во время входа через Google. Попробуйте снова.",
     "infoAfterReg": "А теперь залогинься!",
 
     "password": "Пароль",
@@ -39,5 +44,15 @@
     "warningConnectionBrowser": "Это выключенный CORS на сервере, у меня нет прав администратора чтобы починить это :(",
 
     "aboutGithub": "Исходный код приложения на",
-    "aboutVk": "Профиль Вк"
+    "aboutVk": "Профиль Вк",
+
+    "addDivision": "Добавить организацию",
+    "addModerator": "Добавить модератора для организации",
+    "addCourse": "Добавить курс для организации",
+    "addCourseCard": "Добавить карточку курса",
+
+    "division": "Организация",
+    "moderator": "Модератор",
+    "courseName": "Название курса",
+    "cardName": "Название карточки"
 }

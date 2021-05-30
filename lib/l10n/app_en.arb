@@ -9,6 +9,12 @@
     "errorFirebase": "Something wrong with Firebase!",
     "signIn": "Sign in",
     "signUp": "Sign up",
+
+    "errorSignOut": "Error signing out. Try again.",
+    "errorSignInCredentials": "The account already exists with a different credential.",
+    "errorSignInErrCredentials": "Error occurred while accessing credentials. Try again.",
+    "errorGoogleSignInCredentials": "Error occurred using Google Sign In. Try again.",
+
     "infoAfterReg": "Now you need sign in!",
     "@startApp": {
         "description": "Something text"
@@ -41,6 +47,17 @@
     "warningConnectionBrowser": "It`s disabled CORS at server, I can`t fix it :(",
 
     "aboutGithub": "This project code on",
-    "aboutVk": "VK Profile"
+    "aboutVk": "VK Profile",
+
+    "addDivision": "Add a division",
+    "addModerator": "Add a moderator to division",
+    "addCourse": "Add a course to division",
+    "addCourseCard": "Add a card to course",
+
+    "division": "Division",
+    "moderator": "Moderator",
+    "course": "Course name",
+    "card": "Card name"
+
 
 }

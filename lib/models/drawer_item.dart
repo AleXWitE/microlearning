@@ -1,8 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:microlearning/api/services/google_sign_in.dart';
 import 'package:microlearning/components/users.dart';
+import 'package:microlearning/screens/auth_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerItem extends StatelessWidget {
@@ -118,6 +123,7 @@ class DrawerItem extends StatelessWidget {
                     context, '/auth', (route) => false);
                 savedUser = null;
                 _delPrefs();
+                GoogleSignInState.signOut();
             }
           ),
         ],

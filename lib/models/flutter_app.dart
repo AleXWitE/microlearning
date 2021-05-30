@@ -10,9 +10,12 @@ import 'package:microlearning/screens/event_screen.dart';
 import 'package:microlearning/screens/favorites_screen.dart';
 import 'package:microlearning/screens/home_screen.dart';
 import 'package:microlearning/screens/list_screen.dart';
+import 'package:microlearning/users_roles/admin_role.dart';
+import 'package:microlearning/users_roles/moderator_role.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 class FlutterTutorialApp extends StatefulWidget {
   @override
@@ -88,7 +91,6 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
         debugShowCheckedModeBanner: false,
         //отключает бесячий "дебаг" в верхнем углу экрана
         onGenerateTitle: (BuildContext context) => AppLocalizations.of(context).title,
-        // localizationsDelegates: AppLocalizations.localizationsDelegates,
         localizationsDelegates: [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -117,7 +119,8 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
             return supportedLocales.first;
 
         },
-        initialRoute: _error ? '/' : _userEmail == null ? '/auth' : '/list_events'  ,
+        // initialRoute: _error ? '/' : _userEmail == null ? '/auth' : '/list_events'  ,
+        initialRoute: '/admin_form',
         home: _error
             ? Center(
                 child:
@@ -137,6 +140,8 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
           '/add': (BuildContext context) => AddScreen(),
           '/favorite': (BuildContext context) => FavoritesScreen(),
           '/auth': (BuildContext context) => AuthScreen(),
+          '/admin_form': (BuildContext context) => AdminRole(),
+          '/moderator_form': (BuildContext context) => ModeratorRole(),
         },
         onGenerateRoute: (routeSettings) {
           //генерация путей второго порядка

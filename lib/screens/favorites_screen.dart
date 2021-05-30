@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
 import 'package:microlearning/db/moor_db.dart';
 import 'package:microlearning/models/drawer_item.dart';
@@ -78,6 +79,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
       _favoritesList.listen((event) async {
         for(int i = 0; i < event.length; i++){
           await _dao.deleteFavorite(event[i]);
+          favorItem.clear();
         }
       });
       });

@@ -54,11 +54,11 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     }
   }
 
-  // @override
-  // void dispose() {
-  //   WidgetsBinding.instance.removeObserver(this);
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -72,6 +72,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
 
   Widget RefreshInd() {
     return RefreshIndicator(
+
         //обновление списка
         key: refreshKey,
         onRefresh: () async {
@@ -92,7 +93,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
 
               return ListView.builder(
                   //возвращаем билд списка
-                  physics: PageScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   itemCount: count,
                   itemBuilder:

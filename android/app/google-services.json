@@ -30,6 +30,13 @@
             {
               "client_id": "411240573430-mfsvklrhei9sdro0g0igq2te4if9mgte.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "411240573430-drnbn206klaqgl5ul4kr9915kj8ru6e5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.alex.microlearning"
+              }
             }
           ]
         }

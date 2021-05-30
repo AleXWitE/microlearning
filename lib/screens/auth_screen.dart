@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:microlearning/api/services/google_sign_in.dart';
 import 'package:microlearning/components/users.dart';
-import 'package:microlearning/models/switch_locale.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -32,6 +31,38 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   Future<String> _userEmail;
   Future<String> _userPass;
+
+  User user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState(){
+    super.initState();
+    if (user != null) {
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/list_events', (route) => false);
+    }
+  }
+
+  customSnackBar(String _errorMsg){
+    return SnackBar(
+        duration: Duration(seconds: 5),
+        elevation: 5.0,
+        backgroundColor: Theme.of(context).primaryColor,
+        width: 400.0,
+        // Width of the SnackBar.
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8.0, // Inner padding for SnackBar content.
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        content: Text(
+          _errorMsg,
+          style:
+          TextStyle(fontSize: 25.0, color: Theme.of(context).accentColor),
+        ));
+  }
 
   Future<void> _prefUser(String loginUser, String passUser) async {
     final SharedPreferences prefs = await _prefs;
@@ -79,24 +110,7 @@ class _AuthScreenState extends State<AuthScreen> {
         _authPass = "";
       });
     }
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        duration: Duration(seconds: 5),
-        elevation: 5.0,
-        backgroundColor: Theme.of(context).primaryColor,
-        width: 400.0,
-        // Width of the SnackBar.
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8.0, // Inner padding for SnackBar content.
-        ),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        content: Text(
-          _errMsg,
-          style:
-              TextStyle(fontSize: 25.0, color: Theme.of(context).accentColor),
-        )));
+    ScaffoldMessenger.of(context).showSnackBar(customSnackBar(_errMsg));
   }
 
   bool _loginValidate() {
@@ -136,24 +150,7 @@ class _AuthScreenState extends State<AuthScreen> {
             _errMsg = "Something wrong!";
             break;
         }
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            duration: Duration(seconds: 5),
-            elevation: 5.0,
-            backgroundColor: Theme.of(context).primaryColor,
-            width: 400.0,
-            // Width of the SnackBar.
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8.0, // Inner padding for SnackBar content.
-            ),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            content: Text(
-              _errMsg,
-              style: TextStyle(
-                  fontSize: 25.0, color: Theme.of(context).accentColor),
-            )));
+        ScaffoldMessenger.of(context).showSnackBar(customSnackBar(_errMsg));
       }
     }
     // setState(() {});
@@ -179,7 +176,7 @@ class _AuthScreenState extends State<AuthScreen> {
               thickness: 3.0,
               height: 2.0,
             )),
-        GoogleSignIn(),
+        GoogleSignInMethod(),
       ],
     );
   }
@@ -332,7 +329,6 @@ class _AuthScreenState extends State<AuthScreen> {
       appBar: AppBar(
         title: Text(
             MediaQuery.of(context).size.width > 600
-                // ? "Enter in app"
                 ? AppLocalizations.of(context).startApp
                 : appBarTitle == ""
                     ? AppLocalizations.of(context).loginApp
@@ -346,26 +342,26 @@ class _AuthScreenState extends State<AuthScreen> {
       body: SafeArea(
         child: MediaQuery.of(context).size.width > 600
             ? SingleChildScrollView(
-                child: Column(children: [
+              child: Column(children: [
                   Row(
-                    children: [
-                      Container(
-                        width: (MediaQuery.of(context).size.width / 2) - 3,
-                        child: LoginWidget(),
-                      ),
-                      VerticalDivider(
-                        width: 3.0,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      Container(
-                        width: (MediaQuery.of(context).size.width / 2) - 3,
-                        child: AuthWidget(),
-                      ),
-                    ],
-                  ),
-                  OrWidget(),
+                      children: [
+                        Container(
+                          width: (MediaQuery.of(context).size.width / 2) - 3,
+                          child: LoginWidget(),
+                        ),
+                        VerticalDivider(
+                          width: 3.0,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        Container(
+                          width: (MediaQuery.of(context).size.width / 2) - 3,
+                          child: AuthWidget(),
+                        ),
+                      ],
+                    ),
+          OrWidget(),
                 ]),
-              )
+            )
             : Container(
                 child: PageView(
                   controller: controller,
