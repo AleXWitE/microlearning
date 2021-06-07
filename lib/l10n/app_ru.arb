@@ -10,6 +10,8 @@
     "signIn": "Войти",
     "signUp": "Зарегистрироваться",
 
+    "add": "Добавить",
+
     "errorSignOut": "Ошибка выхода. Попробуйте снова.",
     "errorSignInCredentials": "Аккаунт уже существует.",
     "errorSignInErrCredentials": "Ошибка произошла во время получения данных. Попробуйте снова.",
@@ -25,7 +27,6 @@
     "emailErr": "Пожалуйста, введите ваш e-mail",
 
     "googleSignInInfo": "Войти с помощью Google",
-
 
     "drawerNav": "Навигация",
     "drawerHome": "Главная",
@@ -51,8 +52,42 @@
     "addCourse": "Добавить курс для организации",
     "addCourseCard": "Добавить карточку курса",
 
+    "addOneCard": "Добавить одну карточку в курс",
+
+    "answer": "Ответ",
+    "curAnswer": "Правильный ответ",
+    "wrongAnswer": "Ответ не введен!",
+    "wrongCurrentAnswer": "Правильный ответ должен совпадать с одним из введенных!",
+
+    "adminForm": "Панель администратора",
+    "moderatorForm": "Панель модератора",
+
+    "notAdmin": "Вы не администратор!",
+    "notModerator": "Вы не модератор!",
+
+
     "division": "Организация",
     "moderator": "Модератор",
     "courseName": "Название курса",
-    "cardName": "Название карточки"
+    "cardName": "Название карточки",
+    "adminBlock": "Добавить в базу",
+
+    "dropdownDivisions": "Выберите организацию",
+    "dropdownModerator": "Выберите модератора",
+    "emptyModUserInDiv": "В выбранной организации нет ни одного пользователя!",
+    "emptyCoursesInDiv": "В выбранной организации нет ни одного курса!",
+    "dropdownCourse": "Выберите курс",
+    "dropdownType": "Выберите тип карточки",
+
+
+
+    "courseError": "Введите название курса!",
+
+    "divisionError": "Введите название организации!",
+    "cardNameError": "Введите название карточки!",
+    "cardQuestion": "Вопрос или теория",
+    "cardQuestionError": "Введите текст вопроса или теории!",
+    "cardContentUrl": "Ссылка на дополнительный контент",
+    "moderatorError": "Выберите модератора!"
+
 }

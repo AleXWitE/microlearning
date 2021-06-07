@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:microlearning/components/users.dart';
 import 'package:microlearning/db/moor_db.dart';
 import 'package:microlearning/screens/about_screen.dart';
 import 'package:microlearning/screens/add_screen.dart';
@@ -28,7 +29,6 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
 
   String _userEmail;
 
-
   // Определяем ассинхронную функцию для инициализации FlutterFire
   void initializeFlutterFire() async {
     try {
@@ -51,16 +51,19 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
   _getUser() async{
     SharedPreferences _prefs = await SharedPreferences.getInstance();
 
+    userRole = _prefs.getString('USER_ROLE') ?? null;
+
     _userEmail = _prefs.getString('userEmailPref') ?? null;
     print('user shared prefs = $_userEmail');
+    print('role shared prefs = $userRole');
   }
 
   @override
   void initState() {
     // стартуем подключение к Firebase
     initializeFlutterFire();
+    getUserRole();
     super.initState();
-    _getUser();
   }
 
   final Locale rusLocale = Locale('ru', '');
@@ -70,16 +73,11 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
   Widget build(BuildContext context) {
     //здесь определяется логика роутов и переходов по экранам, ну и с какого экрана начинать
 
-    // if(_error){
-    //   return MaterialApp(home: Center(child: Text("Something wrong with Firebase!")));
-    // }
-
     if (!_initialized) {
       return Center(
         child: CircularProgressIndicator(),
       );
     }
-
 
     return MultiProvider(
       providers: [
@@ -120,7 +118,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
 
         },
         // initialRoute: _error ? '/' : _userEmail == null ? '/auth' : '/list_events'  ,
-        initialRoute: '/admin_form',
+        initialRoute: userRole.isEmpty ? '/auth' : '/list_events',
         home: _error
             ? Center(
                 child:

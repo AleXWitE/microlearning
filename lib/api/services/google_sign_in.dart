@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:microlearning/screens/auth_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class GoogleSignInMethod extends StatefulWidget {
@@ -17,6 +19,7 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
 
   bool isSignIn = false;
   bool google = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +76,14 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
     FirebaseAuth auth = FirebaseAuth.instance;
     User user;
     String _errMsg;
+    String userRole;
+    String userDiv;
+    String userUid;
+
+
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+
+    final databaseRef = FirebaseFirestore.instance.collection('users');
 
     if (kIsWeb) {
       GoogleAuthProvider authProvider = GoogleAuthProvider();
@@ -82,6 +93,8 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
         await auth.signInWithPopup(authProvider);
 
         user = userCredential.user;
+
+
       } catch (e) {
         print(e);
       }
@@ -105,6 +118,21 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
           await auth.signInWithCredential(credential);
 
           user = userCredential.user;
+
+          // databaseRef.doc(userCredential.user.email).get().then((value) {
+          //   userRole = value.data()['user_role'];
+          //   userDiv = value.data()['user_division'];
+          //   userUid = value.data()['uid'];
+          // });
+          //
+          // databaseRef.doc(userCredential.user.email).set({
+          //   'uid': userUid,
+          //   'user_role': userRole,
+          //   'user_division': userDiv,
+          // }, SetOptions(merge: true)).then((_) => print("User ${userCredential.user.email} add"));
+          // _prefs.setString('USER_ROLE', userRole);
+          // _prefs.setString('USER_DIV', userDiv);
+
         } on FirebaseAuthException catch (e) {
           if (e.code == 'account-exists-with-different-credential') _errMsg = AppLocalizations.of(context).errorSignInCredentials;
            else if (e.code == 'invalid-credential') _errMsg = AppLocalizations.of(context).errorSignInErrCredentials;
@@ -119,6 +147,33 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
         }
       }
     }
+    // databaseRef.doc(user.email).get().then((value) {
+    //   _userRole = value.data()['user_role'];
+    //   _userDiv = value.data()['user_division'];
+    //   _userUid = value.data()['uid'];
+    //   print('${user.email} $_userUid + $_userDiv + $_userRole');
+    // });
+
+    if(user.email == 'witesasha2907@gmail.com'){
+      userDiv = "all";
+      userRole = "admin";
+      userUid = "HqgAIRK3tjg7sSW3iENTTsXpIWP2";
+    } else {
+      userDiv = "Polytech";
+      userRole = "-";
+      await databaseRef.doc(user.email).get().then((value) => userUid = value.data()['uid']);
+    }
+
+    // if (userCredential.user.email == 'witesasha2907@gmail.com') _userRole = 'admin';
+
+    await databaseRef.doc(user.email).set({
+      'uid': userUid,
+      'user_role': userRole,
+      'user_division': userDiv,
+    }, SetOptions(merge: true)).then((value) => print('${user.email} $userUid + $userDiv + $userRole'));
+    _prefs.setString('USER_ROLE', userRole);
+    _prefs.setString('USER_DIV', userDiv);
+
     return user;
   }
   static Future<void> signOut({BuildContext context}) async {
@@ -130,6 +185,7 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
         await googleSignIn.signOut();
       }
       await FirebaseAuth.instance.signOut();
+      print('success');
     } catch (e) {
 
       ScaffoldMessenger.of(context).showSnackBar(AuthScreen().createState().customSnackBar(_errMsg),

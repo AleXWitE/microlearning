@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
@@ -11,7 +12,7 @@ class AuthScreen extends StatefulWidget {
   _AuthScreenState createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _AuthScreenState extends State<AuthScreen>{
   String appBarTitle = "";
   int _selectedIndex = 0;
   int _initPage = 0;
@@ -28,19 +29,39 @@ class _AuthScreenState extends State<AuthScreen> {
   String _authPass;
   String _authRepeat;
 
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  Future<SharedPreferences> prefs = SharedPreferences.getInstance();
   Future<String> _userEmail;
   Future<String> _userPass;
 
-  User user = FirebaseAuth.instance.currentUser;
+  var _user = FirebaseAuth.instance.currentUser;
+  final databaseRef = FirebaseFirestore.instance.collection('users');
+
+  void _getUser() async {
+    var roleUser;
+    var _prefs = await prefs;
+
+    if (_user != null) {
+      databaseRef.doc(_user.email).get().then((value) {
+        roleUser = value.data()['user_role'];
+        _prefs.setString('USER_ROLE', roleUser);
+      });
+      userRole = roleUser;
+      databaseRef.doc(_user.email).update({'uid': _user.uid}).then((_) => print('success $userRole'));
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/list_events', (route) => false);
+  }
+  }
+
+  void _setUserRole(String _role, String _division) async {
+    var _prefs = await prefs;
+    _prefs.setString('USER_ROLE', _role);
+    _prefs.setString('USER_DIV', _division);
+  }
 
   @override
   void initState(){
-    super.initState();
-    if (user != null) {
-      Navigator.pushNamedAndRemoveUntil(
-          context, '/list_events', (route) => false);
-    }
+      super.initState();
+      _getUser();
   }
 
   customSnackBar(String _errorMsg){
@@ -65,17 +86,17 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _prefUser(String loginUser, String passUser) async {
-    final SharedPreferences prefs = await _prefs;
+    final SharedPreferences _prefs = await prefs;
     final String userEmail = loginUser;
     final String userPass = passUser;
 
     setState(() {
       _userEmail =
-          prefs.setString("userEmailPref", userEmail).then((bool success) {
+          _prefs.setString("userEmailPref", userEmail).then((bool success) {
         return userEmail;
       });
       _userPass =
-          prefs.setString("userPassPref", userPass).then((bool success) {
+          _prefs.setString("userPassPref", userPass).then((bool success) {
         return userPass;
       });
     });
@@ -99,6 +120,11 @@ class _AuthScreenState extends State<AuthScreen> {
             email: _authEmail, password: _authPass);
         controller.animateToPage(0,
             duration: Duration(milliseconds: 800), curve: curve);
+        await databaseRef.doc(_authEmail).set({
+            'uid': '-',
+            'user_division': 'Polytech',
+            'user_role': '-'
+          }).then((_) => print("User $_authEmail add"));
         _errMsg = AppLocalizations.of(context).infoAfterReg;
       } catch (e) {
         print('Error: $e');
@@ -128,8 +154,15 @@ class _AuthScreenState extends State<AuthScreen> {
         auth.UserCredential user = await FirebaseAuth.instance
             .signInWithEmailAndPassword(
                 email: _loginEmail, password: _loginPass);
-        savedUser = Users(uid: user.user.uid, email: user.user.email);
+        // savedUser = Users(uid: user.user.uid, email: user.user.email);
         print("User: ${user.user.uid}");
+        databaseRef.doc(user.user.email).get().then((value) {
+          userRole = value.data()['user_role'];
+          userDivision = value.data()['user_division'];
+          _setUserRole(userRole, userDivision);
+          print(userRole + userDivision);
+        });
+
         Navigator.pushNamedAndRemoveUntil(
             context, '/list_events', (route) => false);
         _prefUser(_loginEmail, _loginPass);

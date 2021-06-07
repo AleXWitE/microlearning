@@ -35,7 +35,7 @@ android {
 
     defaultConfig {
         applicationId "com.alex.microlearning"
-        minSdkVersion 17
+        minSdkVersion 23
         targetSdkVersion 30
 //        multiDexEnable true
         versionCode flutterVersionCode.toInteger()

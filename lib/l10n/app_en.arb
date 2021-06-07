@@ -10,15 +10,13 @@
     "signIn": "Sign in",
     "signUp": "Sign up",
 
+    "add": "Add",
+
     "errorSignOut": "Error signing out. Try again.",
     "errorSignInCredentials": "The account already exists with a different credential.",
     "errorSignInErrCredentials": "Error occurred while accessing credentials. Try again.",
     "errorGoogleSignInCredentials": "Error occurred using Google Sign In. Try again.",
-
     "infoAfterReg": "Now you need sign in!",
-    "@startApp": {
-        "description": "Something text"
-    },
 
     "password": "Password",
     "passwordErr": "Please, enter the password",
@@ -54,10 +52,40 @@
     "addCourse": "Add a course to division",
     "addCourseCard": "Add a card to course",
 
+    "addOneCard": "Add one card to course",
+
+    "answer": "Answer",
+    "curAnswer": "The correct answer",
+    "wrongAnswer": "The answer not entered!",
+    "wrongCurrentAnswer": "The correct answer must match one of the entered ones!",
+
+    "adminForm": "Administration console",
+    "moderatorForm": "Moderator console",
+
+    "notAdmin": "You are not admin!",
+    "notModerator": "You are not moderator!",
+
     "division": "Division",
     "moderator": "Moderator",
-    "course": "Course name",
-    "card": "Card name"
+    "courseName": "Course name",
+    "cardName": "Card name",
+    "adminBlock": "Add to base",
+
+    "dropdownDivisions": "Choose the division",
+    "dropdownModerator": "Choose the moderator",
+    "emptyModUserInDiv": "In choose division no one user!",
+    "emptyCoursesInDiv": "In choose division no one course!",
+    "dropdownCourse": "Choose the course",
+    "dropdownType": "Choose a card type",
+
+    "courseError": "Enter the course name!",
+
+    "divisionError": "Enter the division name!",
+    "cardNameError": "Enter the card name!",
+    "cardQuestion": "Question or lecture",
+    "cardQuestionError": "Enter question or lecture!",
+    "cardContentUrl": "Content url",
+    "moderatorError": "Enter moderator name!"
 
 
 }
