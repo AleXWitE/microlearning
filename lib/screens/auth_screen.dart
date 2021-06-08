@@ -52,10 +52,11 @@ class _AuthScreenState extends State<AuthScreen>{
   }
   }
 
-  void _setUserRole(String _role, String _division) async {
+  void _setUserRole(String _role, String _division, String _name) async {
     var _prefs = await prefs;
     _prefs.setString('USER_ROLE', _role);
     _prefs.setString('USER_DIV', _division);
+    _prefs.setString('USER_NAME', _name);
   }
 
   @override
@@ -159,7 +160,8 @@ class _AuthScreenState extends State<AuthScreen>{
         databaseRef.doc(user.user.email).get().then((value) {
           userRole = value.data()['user_role'];
           userDivision = value.data()['user_division'];
-          _setUserRole(userRole, userDivision);
+          userName = user.user.email;
+          _setUserRole(userRole, userDivision, userName);
           print(userRole + userDivision);
         });
 

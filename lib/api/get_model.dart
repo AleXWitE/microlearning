@@ -16,11 +16,11 @@ List<Event> allEventsFromJson(String str) {//возвращаем элемент
   final List jsonData = jsonDecode(str);
   return new List<Event>.from(jsonData.map((i) => Event.fromJson(i)));
 }
-
-List<Answers> allQuestionsFromJsonByEvent(String str) {
-  final List jsonData = jsonDecode(str);
-  return new List<Answers>.from(jsonData.map((i) => Answers.fromJson(i)));
-}
+//
+// List<Answers> allQuestionsFromJsonByEvent(String str) {
+//   final List jsonData = jsonDecode(str);
+//   return new List<Answers>.from(jsonData.map((i) => Answers.fromJson(i)));
+// }
 
 // String allEventsToJson(List<Event> data) {
 //   final dyn = new List<dynamic>.from(data.map((x) => x.toJson()));

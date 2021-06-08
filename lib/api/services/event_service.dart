@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
 import 'package:microlearning/api/get_model.dart';
 import 'package:microlearning/components/event.dart';
+import 'package:microlearning/components/users.dart';
 
 String url = "http://autoinvitro.std-271.ist.mospolytech.ru/api/event/";
 String urlQue = "http://autoinvitro.std-271.ist.mospolytech.ru/api/question";
@@ -18,11 +20,17 @@ Future<List<Event>> getAllEvents() async { //функция вызова все�
   return allEventsFromJson(response.body);
 }
 
-Future<List<Answers>> getAlQuestionsByEvent(String i) async {
-  final response = await http.get(Uri.parse('$urlQue/$i'));
-  // print(response.body);
-  return allQuestionsFromJsonByEvent(response.body);
-}
+// Future<List<Courses>> getAllCourses() async {
+//   final _listCourses = [];
+//   final ref = await FirebaseFirestore.instance.collection('divisions').doc(userDivision).collection('courses').get().then((value) => value.docs.forEach((element) { List<Courses>.from/*_listCourses.add(Courses(course: element.id));*/})/*_listCourses.add(Courses(course: value.id))*/);
+//   return _listCourses;
+// }
+
+// Future<List<Answers>> getAlQuestionsByEvent(String i) async {
+//   final response = await http.get(Uri.parse('$urlQue/$i'));
+//   // print(response.body);
+//   return allQuestionsFromJsonByEvent(response.body);
+// }
 
 Future<Event> getEvent(String i) async { //вызов определенного элемента джсона по id
   final response = await http.get(Uri.parse('$url$i'));

@@ -36,6 +36,11 @@
     "drawerAbout": "О приложении",
     "drawerExit": "Выход",
 
+    "hello": "Привет,",
+    "titleDivision": "в организации",
+
+    "chooseCourse": "Курс",
+
     "favWarning": "В избранное ничего не добавлено!",
     "favAlertInfo": "Вы действительно хотите удалить всё избранное?",
     "favAlertCancel": "Отмена",

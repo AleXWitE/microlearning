@@ -133,7 +133,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
           //пути определения классов, переходя по этим ссылкам, будут вызывать эти классы
           '/home': (BuildContext context) => HomeScreen(),
           '/list_events': (BuildContext context) => ListScreen(),
-          '/event': (BuildContext context) => EventScreen(),
+          '/event': (BuildContext context) => HomeScreen(),
           '/about': (BuildContext context) => AboutScreen(),
           '/add': (BuildContext context) => AddScreen(),
           '/favorite': (BuildContext context) => FavoritesScreen(),
@@ -149,7 +149,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
             //если первая часть пути такая
             return MaterialPageRoute(
               // то вернуть виджет отрисованного роута
-              builder: (context) => EventScreen(id: path[2]),
+              builder: (context) => HomeScreen(course: path[2]),
               //и отрисовать внутри класс по полученному id
               settings: routeSettings,
             );

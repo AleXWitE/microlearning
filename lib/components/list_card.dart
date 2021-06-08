@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:microlearning/components/users.dart';
 import 'package:microlearning/db/moor_db.dart';
 import 'package:provider/provider.dart';
 
@@ -8,7 +9,7 @@ import 'event.dart';
 
 class EventCard extends StatefulWidget {
   //здесь мы получаем элемент списка чтобы нарисовать карточку для конкретнного элемента
-  final List<Event> events;
+  final List<Courses> events;
   final List<Favor> favs;
   final int i;
 
@@ -57,41 +58,41 @@ class _EventCardState extends State<EventCard> {
       });
     });
 
-    var _favItem = favorItem.where((item) =>
-        item.eventId == element.id ||
-        item.id == elId ||
-        element.favorite == true);
+    // var _favItem = favorItem.where((item) =>
+    //     item.eventId == element.id ||
+    //     item.id == elId ||
+    //     element.favorite == true);
 
-    setState(() {
-      switch (_favItem.isEmpty) {
-        case true:
-          _isFavorite = false;
-          break;
-        case false:
-          _isFavorite = true;
-          break;
-        default:
-          _isFavorite = false;
-      }
-    });
+    // setState(() {
+    //   switch (_favItem.isEmpty) {
+    //     case true:
+    //       _isFavorite = false;
+    //       break;
+    //     case false:
+    //       _isFavorite = true;
+    //       break;
+    //     default:
+    //       _isFavorite = false;
+    //   }
+    // });
 
-    insertData(Event ev) {
-      _dao.insertNewFavorite(Favor(
-          eventId: ev.id,
-          name: ev.name,
-          location: ev.location,
-          date: ev.date,
-          favorite: true));
-      favorItem.add(FavorItem(eventId: element.id, favorite: true));
-      _isFavorite = true;
-    }
+    // insertData(Event ev) {
+    //   _dao.insertNewFavorite(Favor(
+    //       eventId: ev.id,
+    //       name: ev.name,
+    //       location: ev.location,
+    //       date: ev.date,
+    //       favorite: true));
+    //   favorItem.add(FavorItem(eventId: element.id, favorite: true));
+    //   _isFavorite = true;
+    // }
 
-    deleteData(int _id) async {
-      Favor checkFavorite = await _dao.getFavorite(_id);
-      if (checkFavorite != null) _dao.deleteFavorite(checkFavorite);
-      favorItem
-          .removeAt(favorItem.indexWhere((el) => el.eventId == element.id));
-    }
+    // deleteData(int _id) async {
+    //   Favor checkFavorite = await _dao.getFavorite(_id);
+    //   if (checkFavorite != null) _dao.deleteFavorite(checkFavorite);
+    //   favorItem
+    //       .removeAt(favorItem.indexWhere((el) => el.eventId == element.id));
+    // }
 
     _Card() {
         return Card(
@@ -103,16 +104,16 @@ class _EventCardState extends State<EventCard> {
                 context,
                 widget.events.isEmpty
                     ? '/event/${element.eventId}'
-                    : '/event/${element.id}',
+                    : '/event/${element.course}',
               );
             },
             // generate route for item card
             enabled: _isEnabled,
             title: Text(
-              element.name,
+              element.course,
               style: TextStyle(fontSize: 20),
             ),
-            subtitle: Text("${element.location} \n${element.date.toString()}"),
+            // subtitle: Text("${element.location} \n${element.date.toString()}"),
             leading: IconButton(
               icon:
                   _isEnabled ? Icon(Icons.lock_outlined) : Icon(Icons.lock_open),
@@ -120,25 +121,25 @@ class _EventCardState extends State<EventCard> {
                 () => _isEnabled = !_isEnabled,
               ),
             ),
-            trailing: IconButton(
-              icon: Icon(
-                _isFavorite ? Icons.favorite : Icons.favorite_border,
-                //задаем смену сердечек от параметра _isFavorite
-                size: 40,
-                // color: Colors.indigo,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isFavorite ? deleteData(elId) : insertData(element);
-                  _isFavorite = !_isFavorite;
-                });
-              },
-            ),
+            // trailing: IconButton(
+            //   icon: Icon(
+            //     _isFavorite ? Icons.favorite : Icons.favorite_border,
+            //     //задаем смену сердечек от параметра _isFavorite
+            //     size: 40,
+            //     // color: Colors.indigo,
+            //   ),
+            //   onPressed: () {
+            //     setState(() {
+            //       _isFavorite ? deleteData(elId) : insertData(element);
+            //       _isFavorite = !_isFavorite;
+            //     });
+            //   },
+            // ),
           ),
       );
     }
 
-    return _fav
+    return /*_fav
         ? Dismissible(
             child: _Card(),
             key: ValueKey<int>(elId),
@@ -151,6 +152,6 @@ class _EventCardState extends State<EventCard> {
               });
             },
           )
-        : _Card();
+        : */_Card();
   }
 }

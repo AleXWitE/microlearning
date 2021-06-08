@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
+import 'package:microlearning/components/users.dart';
 import 'package:microlearning/models/drawer_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -20,9 +22,29 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   int count;
   int asyncCount;
 
+  List<Courses> _coursesList = [];
+
+  Future<List<Courses>> getAllCourses() async {
+    if(_coursesList.isNotEmpty)
+      _coursesList.clear();
+
+    await FirebaseFirestore.instance
+        .collection('divisions')
+        .doc(userDivision)
+        .collection('courses')
+        .get()
+        .then((value) => value.docs.forEach((element) {
+                _coursesList.add(
+                    Courses(id: value.hashCode.toString(), course: element.data()['title']));
+            }));
+    return _coursesList;
+  }
+
   @override
   void initState() {
     super.initState();
+    // print(userDivision);
+    getAllEventsState = getAllCourses().asStream();
     refreshKey = GlobalKey<
         RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
   }
@@ -31,7 +53,11 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     //функция обновления списка
     await Future.delayed(Duration(milliseconds: 1000));
     setState(() {
-      getAllEventsState = getAllEvents().asStream();
+      _coursesList.clear();
+    });
+    setState(() {
+      // getAllEventsState = getAllEvents().asStream();
+      getAllEventsState = getAllCourses().asStream();
       _hasData = true;
       ifNoData(_hasData);
     });
@@ -42,11 +68,11 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   bool _hasData;
 
   Future<Null> ifNoData(bool snapdata) async {
-    if(snapdata == false){
+    if (snapdata == false) {
       await Future.delayed(Duration(seconds: 5));
       setState(() {
         _ifNoData = Center(
-          child: Text( kIsWeb
+          child: Text(kIsWeb
               ? AppLocalizations.of(context).warningConnectionBrowser
               : AppLocalizations.of(context).warningConnection),
         );
@@ -65,7 +91,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     //не работает(((
     if (state == AppLifecycleState.resumed) {
       setState(() {
-        getAllEventsState = getAllEvents().asStream();
+        getAllEventsState = getAllCourses().asStream();
       });
     }
   }
@@ -78,7 +104,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
         onRefresh: () async {
           await refreshList();
         },
-        child: StreamBuilder<List<Event>>(
+        child: StreamBuilder<List<Courses>>(
           stream: getAllEventsState,
           builder: (context, snapshot) {
             // AppLifecycleState state;
@@ -98,7 +124,11 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
                   itemCount: count,
                   itemBuilder:
                       (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
-                          EventCard(events: snapshot.data, i: index, favs: [],));
+                          EventCard(
+                            events: snapshot.data,
+                            i: index,
+                            favs: [],
+                          ));
             } else {
               _hasData = false;
               ifNoData(_hasData);
@@ -112,14 +142,17 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     if (getAllEventsState == null) {
       //если мы первый раз запустили экран - получаем в первый раз данные из интернета
-      getAllEventsState = getAllEvents().asStream();
+      getAllEventsState = getAllCourses().asStream();
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text("List Title ${count == null ? count = 0 : count} cards", style: TextStyle(fontSize: 25.0,)),
+        toolbarHeight: 65.0,
+        title: Text("${AppLocalizations.of(context).hello} $userName \n${AppLocalizations.of(context).titleDivision} $userDivision",
+            style: TextStyle(
+              fontSize: 22.0,
+            )),
         centerTitle: true,
         // backgroundColor: Theme.of(context).accentColor,
-
       ),
       drawer: MediaQuery.of(context).size.width > 600
           ? null
@@ -147,18 +180,15 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
           ? FloatingActionButton(
               onPressed: () async {
                 setState(() {
-                  _ifNoData = Center(child: CircularProgressIndicator(),);
+                  _ifNoData = Center(
+                    child: CircularProgressIndicator(),
+                  );
                 });
                 await refreshList();
-                },
+              },
               child: Icon(Icons.refresh),
             )
-          : FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(context, '/add', ModalRoute.withName('/list_events')); //переход на экран добавления элемента
-              },
-            ),
+          : Container(),
     );
   }
 }

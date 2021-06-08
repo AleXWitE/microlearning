@@ -42,68 +42,69 @@ class Answers {
   String answer1;
   String answer2;
   String answer3;
+  String answerCorrect;
   String title;
   String description;
   String url;
   String type;
 
-  Answers({this.id, this.answer1, this.answer2, this.answer3, this.title, this.description, this.url, this.type});
+  Answers({this.id, this.answer1, this.answer2, this.answer3, this.answerCorrect, this.title, this.description, this.url, this.type});
 
-  factory Answers.fromJson(Map<String, dynamic> json) {
-    return new Answers(
-      id: json['id'],
-      answer1: json['answer1'],
-      answer2: json['answer2'],
-      answer3: json['answer3'],
-      title: json['title'],
-      description: json['description'],
-      url: json['url'],
-      type: json['type'],
-    );
-  }
+  // factory Answers.fromJson(Map<String, dynamic> json) {
+  //   return new Answers(
+  //     id: json['id'],
+  //     answer1: json['answer1'],
+  //     answer2: json['answer2'],
+  //     answer3: json['answer3'],
+  //     title: json['title'],
+  //     description: json['description'],
+  //     url: json['url'],
+  //     type: json['type'],
+  //   );
+  // }
 }
 
 List<Answers> answers = [ //тестовое добавление вопросов локально, без интернета
-  Answers(
-      answer1: "answer10",
-      answer2: "answer11",
-      answer3: "answer12",
-      title: "Title 45",
-      description: "Short description 4",
-      url: "F4Q6lEhmwCY",
-      type: "video"),
-  Answers(
-      answer1: "answer1",
-      answer2: "answer2",
-      answer3: "answer3",
-      title: "Title 1",
-      description: "Short description 1",
-      url: "https://picsum.photos/250?image=10",
-      type: "radio"),
-  Answers(
-      answer1: "answer4",
-      answer2: "answer5",
-      answer3: "answer6",
-      title: "Title 2",
-      description: "Short description 2",
-      url: "https://picsum.photos/250?image=11",
-      type: "checkbox"),
-  Answers(
-      answer1: "answer7",
-      answer2: "answer8",
-      answer3: "answer9",
-      title: "Title 3",
-      description: "Short description 3",
-      url: "https://picsum.photos/250?image=12",
-      type: "lecture"),
-  Answers(
-      answer1: "answer10",
-      answer2: "answer11",
-      answer3: "answer12",
-      title: "Title 4",
-      description: "Short description 4",
-      url: "TmDetBtk5rw",
-      type: "video"),
+  // Answers(
+  //     answer1: "answer10",
+  //     answer2: "answer11",
+  //     answer3: "answer12",
+  //     title: "Title 45",
+  //     description: "Short description 4",
+  //     url: "F4Q6lEhmwCY",
+  //     type: "video"),
+  // Answers(
+  //     answer1: "answer1",
+  //     answer2: "answer2",
+  //     answer3: "answer3",
+  //     title: "Title 1",
+  //     description: "Short description 1",
+  //     url: "https://picsum.photos/250?image=10",
+  //     type: "radio"),
+  // Answers(
+  //     answer1: "answer4",
+  //     answer2: "answer5",
+  //     answer3: "answer6",
+  //     title: "Title 2",
+  //     description: "Short description 2",
+  //     url: "https://picsum.photos/250?image=11",
+  //     type: "checkbox"),
+  // Answers(
+  //     answer1: "answer7",
+  //     answer2: "answer8",
+  //     answer3: "answer9",
+  //     title: "Title 3",
+  //     description: "Short description 3",
+  //     url: "https://picsum.photos/250?image=12",
+  //     type: "lecture"),
+  // Answers(
+  //     answer1: "answer10",
+  //     answer2: "answer11",
+  //     answer3: "answer12",
+  //     title: "Title 4",
+  //     description: "Short description 4",
+  //     url: "TmDetBtk5rw",
+  //     type: "video"),
 ];
 
 List<Event> favorites = [];

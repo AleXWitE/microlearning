@@ -36,6 +36,11 @@
     "drawerAbout": "About app",
     "drawerExit": "Exit",
 
+    "hello": "Hello,",
+    "titleDivision": "in division",
+
+    "chooseCourse": "Course",
+
     "favWarning": "There is no favorite data!",
     "favAlertInfo": "Do you really want delete all favorites?",
     "favAlertCancel": "Cancel",

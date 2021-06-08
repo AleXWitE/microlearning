@@ -289,7 +289,7 @@ class _AdminRoleState extends State<AdminRole> {
           });
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("true"),
+            content: Text("User ${selectedModUser.email} updated to moderator"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -334,7 +334,9 @@ class _AdminRoleState extends State<AdminRole> {
                           value.docs.forEach((element) {
                             if (element.data()['user_division'] ==
                                 selectedDivision.division)
-                              _usersInDiv.add(Users(email: element.id));
+                              setState(() {
+                                _usersInDiv.add(Users(email: element.id));
+                              });
                             // print(_curUser);
                             // print(selectedDivision.division);
                           });
@@ -848,3 +850,4 @@ class _AdminRoleState extends State<AdminRole> {
           );
   }
 }
+//  flutter config --android-studio-dir=

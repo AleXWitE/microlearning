@@ -17,10 +17,14 @@ class Divisions{
 }
 
 class Courses{
+  String id;
   String course;
 
-  Courses({this.course});
+  Courses({this.id, this.course});
+
 }
+
+
 // final databaseRef = FirebaseFirestore.instance.collection('users');
 // var fbUser = FirebaseAuth.instance.currentUser;
 
@@ -31,14 +35,17 @@ class Courses{
 Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
 String userRole;
+String userDivision;
+String userName;
+
 
 getUserRole() async{
   SharedPreferences prefs = await _prefs;
   userRole = prefs.getString('USER_ROLE') ?? '-';
   userDivision = prefs.getString('USER_DIV') ?? '-';
+  userName = prefs.getString('USER_NAME') ?? '-';
   print("User role $userRole");
 }
 
-String userDivision;
 // String userRole = '';
 // String userRole = 'moderator';

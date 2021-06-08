@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart'; //полезный импорт, без него не получится вставить svg картинку. Вставлять только с помощью assert
 import 'package:microlearning/api/youtube.dart';
 import 'package:microlearning/components/event.dart';
+import 'package:microlearning/components/users.dart';
 import 'package:microlearning/models/drawer_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -9,6 +11,10 @@ enum AnswerList { answer1, answer2, answer3 }
 //созданперечень вариантов ответов и значений для радио кнопок
 
 class HomeScreen extends StatefulWidget {
+  String _course;
+
+  HomeScreen({String course}) : _course = course;
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -20,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String textAnsw1;
   String textAnsw2;
   String textAnsw3;
+  String textAnswCorrect;
   String textTitle;
   String textDesc;
   String textUrl;
@@ -42,6 +49,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    FirebaseFirestore.instance
+        .collection('divisions')
+        .doc(userDivision)
+        .collection('courses')
+        .doc(widget._course)
+        .collection('cards')
+        .get()
+        .then((value) => value.docs.forEach((element) {
+      answers.add(Answers(title: element.data()['card_title'],
+          description: element.data()['card_question'],
+          type: element.data()['card_type'],
+          answer1: element.data()['card_answers']['answer_1'],
+          answer2: element.data()['card_answers']['answer_2'],
+          answer3: element.data()['card_answers']['answer_3'],
+          answerCorrect: element.data()['card_answers']['correct_answer'],
+          url: element.data()['card_url'],
+       ));
+    }));
+
   }
 
   onEndAnimation(double ePos) {
@@ -76,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+
     Answers question = answers[answId];
 
     chooseQuestion(int answId) {
@@ -103,72 +130,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     Widget QuestionBody(Answers question) {
       //вынесена повторяющаяся группа виджетов, чтобыне загромождать код
-      return
-        Container(
-            width: double.infinity,
-            alignment: Alignment.topCenter,
-            padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
-            margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                width: 1,
-                color: Theme.of(context).accentColor,
-                style: BorderStyle.solid,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).primaryColor,
-                  blurRadius: 10,
-                  spreadRadius: 5,
-                ),
-              ],
+      return Container(
+          width: double.infinity,
+          alignment: Alignment.topCenter,
+          padding: EdgeInsets.fromLTRB(40, 20, 60, 30),
+          margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(
+              width: 1,
+              color: Theme.of(context).accentColor,
+              style: BorderStyle.solid,
             ),
-            child: Column(children: [
-              Text("${question.title}\n",
-                  style: TextStyle(
-                      fontFamily: "Redressed",
-                      fontSize: 30.0,
-                      fontStyle: FontStyle.italic,
-                      color: Theme.of(context).accentColor,
-                      decoration: TextDecoration.underline)),
-
-              Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      width: 1,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Theme.of(context).accentColor,
-                          blurRadius: 15,
-                          spreadRadius: 3)
-                    ],
-                  ),
-                  child: question.type == "video"
-                      ? YouTubePlay(url: question.url)
-                      : Image.network(question.url)),
-              SizedBox(
-                height: 25.0,
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).primaryColor,
+                blurRadius: 10,
+                spreadRadius: 5,
               ),
-              Container(
-                width: MediaQuery.of(context).size.width - 60.0,
-                padding: EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
+            ],
+          ),
+          child: Column(children: [
+            Text("${question.title}\n",
+                style: TextStyle(
+                    fontFamily: "Redressed",
+                    fontSize: 30.0,
+                    fontStyle: FontStyle.italic,
                     color: Theme.of(context).accentColor,
-                    borderRadius: BorderRadius.circular(15)),
-                child: Text(
-                  "${question.description}",
-                  style: TextStyle(
-                      // color: question.type == "video" ? Colors.white : Colors.red,
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 25.0),
+                    decoration: TextDecoration.underline)),
+            Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 1,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Theme.of(context).accentColor,
+                        blurRadius: 15,
+                        spreadRadius: 3)
+                  ],
                 ),
-              )
-            ]))
-      ;
+                child: question.type == "video"
+                    ? YouTubePlay(url: question.url)
+                    : Image.network(question.url)),
+            SizedBox(
+              height: 25.0,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width - 60.0,
+              padding: EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                  borderRadius: BorderRadius.circular(15)),
+              child: Text(
+                "${question.description}",
+                style: TextStyle(
+                    // color: question.type == "video" ? Colors.white : Colors.red,
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 25.0),
+              ),
+            )
+          ]));
     }
 
     ValidateCheckbox(String type) {
@@ -202,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Column(
               children: [
                 QuestionBody(
-                        question) //подстановка повторяющейся группы виджетов
+                    question) //подстановка повторяющейся группы виджетов
                 ,
                 Container(
                   padding: EdgeInsets.all(30),
@@ -226,26 +250,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     key: _formKey,
                     child: Column(
                       children: [
-                        RadioListTile(
-                            title: Text(question.answer1),
-                            value: AnswerList.answer1,
-                            groupValue: answerCheck,
-                            activeColor: Theme.of(context).primaryColor,
-                            onChanged: (AnswerList value) {
-                              setState(() {
-                                answerCheck = value;
-                              });
-                            }),
-                        RadioListTile(
-                            title: Text(question.answer1),
-                            value: AnswerList.answer1,
-                            groupValue: answerCheck,
-                            activeColor: Theme.of(context).primaryColor,
-                            onChanged: (AnswerList value) {
-                              setState(() {
-                                answerCheck = value;
-                              });
-                            }),
                         RadioListTile(
                             title: Text(question.answer1),
                             value: AnswerList.answer1,
@@ -405,7 +409,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       //скаффолд один из самых главных виджетов материал дизайна
       appBar: AppBar(
-        title: Text("Flutter tutorial $count taps",
+        title: Text(
+            "${AppLocalizations.of(context).chooseCourse} ${widget._course}",
             style: TextStyle(
               fontSize: 25.0,
             )),
@@ -461,60 +466,75 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            MaterialButton(
-              elevation: 5.0,
-              color: Theme.of(context).accentColor,
-              padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
-              onPressed: answId == 0 ||
-                      ValidateCheckbox(question
-                          .type) //теренарные операторы наше все, позволяют задавать элс иф внутри виджетов
-                  ? null
-                  : () => {
-                        setState(() {
-                          // при нажатии кнопки определяем в какую сторону сдвигается анимация, меняем id элемента списка и обнуляем все значения, в будущем, надо будет сначала сохранять значения, а потом обнулять
-                          endPos = -1.5;
-                          answId--;
-                          answerCheck = null;
-                          answ1check = false;
-                          answ2check = false;
-                          answ3check = false;
-                          // _videoController.pause();
-                        }),
-                        chooseQuestion(answId) //вызываем смену вопроса
-                      },
-              child: RichText(
-                text: TextSpan(
-                    style: TextStyle(
-                        fontSize: 20.0, color: Theme.of(context).primaryColor),
-                    text: AppLocalizations.of(context).back),
+            SizedBox(
+              width: 15.0,
+            ),
+            Expanded(
+              child: MaterialButton(
+                elevation: 5.0,
+                color: Theme.of(context).accentColor,
+                padding: EdgeInsets.all(10),
+                onPressed: answId == 0 ||
+                        ValidateCheckbox(question
+                            .type) //теренарные операторы наше все, позволяют задавать элс иф внутри виджетов
+                    ? null
+                    : () => {
+                          setState(() {
+                            // при нажатии кнопки определяем в какую сторону сдвигается анимация, меняем id элемента списка и обнуляем все значения, в будущем, надо будет сначала сохранять значения, а потом обнулять
+                            endPos = -1.5;
+                            answId--;
+                            answerCheck = null;
+                            answ1check = false;
+                            answ2check = false;
+                            answ3check = false;
+                            // _videoController.pause();
+                          }),
+                          chooseQuestion(answId) //вызываем смену вопроса
+                        },
+                child: RichText(
+                  text: TextSpan(
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          color: Theme.of(context).primaryColor),
+                      text: AppLocalizations.of(context).back),
+                ),
               ),
             ),
-            MaterialButton(
-              elevation: 5.0,
-              color: Theme.of(context).accentColor,
-              padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
-              onPressed: answId == answers.length - 1 ||
-                      ValidateCheckbox(question.type)
-                  ? null
-                  : () => {
-                        setState(() {
-                          endPos = 1.5;
-                          answId++;
-                          answerCheck = null;
-                          answ1check = false;
-                          answ2check = false;
-                          answ3check = false;
-                          // _videoController.pause();
-                        }),
-                        chooseQuestion(answId)
-                      },
-              child: RichText(
-                text: TextSpan(
-                    style: TextStyle(
-                        fontSize: 20.0, color: Theme.of(context).primaryColor),
-                    text: AppLocalizations.of(context).next),
+            SizedBox(
+              width: 15.0,
+            ),
+            Expanded(
+              child: MaterialButton(
+                elevation: 5.0,
+                color: Theme.of(context).accentColor,
+                padding: EdgeInsets.all(10),
+                onPressed: answId == answers.length - 1 ||
+                        ValidateCheckbox(question.type)
+                    ? null
+                    : () => {
+                          setState(() {
+                            endPos = 1.5;
+                            answId++;
+                            answerCheck = null;
+                            answ1check = false;
+                            answ2check = false;
+                            answ3check = false;
+                            // _videoController.pause();
+                          }),
+                          chooseQuestion(answId)
+                        },
+                child: RichText(
+                  text: TextSpan(
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          color: Theme.of(context).primaryColor),
+                      text: AppLocalizations.of(context).next),
+                ),
               ),
-            )
+            ),
+            SizedBox(
+              width: 15.0,
+            ),
           ],
         ),
       ),
