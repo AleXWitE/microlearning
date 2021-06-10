@@ -6,9 +6,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:microlearning/components/users.dart';
 import 'package:microlearning/screens/auth_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class GoogleSignInMethod extends StatefulWidget {
   GoogleSignInState createState() => GoogleSignInState();
@@ -19,7 +19,6 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
 
   bool isSignIn = false;
   bool google = false;
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,15 +56,14 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
                   child: SvgPicture.asset("assets/icons/google_icon.svg"),
                   height: 35.0,
                 ),
-                   Text(
-                    AppLocalizations.of(context).googleSignInInfo,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.w600,
-                    ),
+                Text(
+                  AppLocalizations.of(context).googleSignInInfo,
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w600,
                   ),
-
+                ),
               ],
             ),
           )),
@@ -80,7 +78,6 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
     String userDiv;
     String userUid;
 
-
     SharedPreferences _prefs = await SharedPreferences.getInstance();
 
     final databaseRef = FirebaseFirestore.instance.collection('users');
@@ -90,11 +87,9 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
 
       try {
         final UserCredential userCredential =
-        await auth.signInWithPopup(authProvider);
+            await auth.signInWithPopup(authProvider);
 
         user = userCredential.user;
-
-
       } catch (e) {
         print(e);
       }
@@ -102,11 +97,11 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
       final GoogleSignIn googleSignIn = GoogleSignIn();
 
       final GoogleSignInAccount googleSignInAccount =
-      await googleSignIn.signIn();
+          await googleSignIn.signIn();
 
       if (googleSignInAccount != null) {
         final GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount.authentication;
+            await googleSignInAccount.authentication;
 
         final AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleSignInAuthentication.accessToken,
@@ -115,67 +110,48 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
 
         try {
           final UserCredential userCredential =
-          await auth.signInWithCredential(credential);
+              await auth.signInWithCredential(credential);
 
           user = userCredential.user;
 
-          // databaseRef.doc(userCredential.user.email).get().then((value) {
-          //   userRole = value.data()['user_role'];
-          //   userDiv = value.data()['user_division'];
-          //   userUid = value.data()['uid'];
-          // });
-          //
-          // databaseRef.doc(userCredential.user.email).set({
-          //   'uid': userUid,
-          //   'user_role': userRole,
-          //   'user_division': userDiv,
-          // }, SetOptions(merge: true)).then((_) => print("User ${userCredential.user.email} add"));
-          // _prefs.setString('USER_ROLE', userRole);
-          // _prefs.setString('USER_DIV', userDiv);
-
         } on FirebaseAuthException catch (e) {
-          if (e.code == 'account-exists-with-different-credential') _errMsg = AppLocalizations.of(context).errorSignInCredentials;
-           else if (e.code == 'invalid-credential') _errMsg = AppLocalizations.of(context).errorSignInErrCredentials;
-            ScaffoldMessenger.of(context).showSnackBar(
-              AuthScreen().createState().customSnackBar(_errMsg),
-            );
+          if (e.code == 'account-exists-with-different-credential')
+            _errMsg = AppLocalizations.of(context).errorSignInCredentials;
+          else if (e.code == 'invalid-credential')
+            _errMsg = AppLocalizations.of(context).errorSignInErrCredentials;
+          ScaffoldMessenger.of(context).showSnackBar(
+            AuthScreen().createState().customSnackBar(_errMsg),
+          );
         } catch (e) {
           _errMsg = AppLocalizations.of(context).errorGoogleSignInCredentials;
           ScaffoldMessenger.of(context).showSnackBar(
-              AuthScreen().createState().customSnackBar(_errMsg),
+            AuthScreen().createState().customSnackBar(_errMsg),
           );
         }
       }
     }
-    // databaseRef.doc(user.email).get().then((value) {
-    //   _userRole = value.data()['user_role'];
-    //   _userDiv = value.data()['user_division'];
-    //   _userUid = value.data()['uid'];
-    //   print('${user.email} $_userUid + $_userDiv + $_userRole');
-    // });
 
-    if(user.email == 'witesasha2907@gmail.com'){
-      userDiv = "all";
-      userRole = "admin";
-      userUid = "HqgAIRK3tjg7sSW3iENTTsXpIWP2";
-    } else {
-      userDiv = "Polytech";
-      userRole = "-";
-      await databaseRef.doc(user.email).get().then((value) => userUid = value.data()['uid']);
-    }
+      await databaseRef.doc(user.email).get().then((value) {
+        userUid = value.data()['uid'];
+        userDiv = value.data()['user_division'];
+        userRole = value.data()['user_role'];
+      });
+    userName = user.email;
 
-    // if (userCredential.user.email == 'witesasha2907@gmail.com') _userRole = 'admin';
+
 
     await databaseRef.doc(user.email).set({
       'uid': userUid,
       'user_role': userRole,
       'user_division': userDiv,
-    }, SetOptions(merge: true)).then((value) => print('${user.email} $userUid + $userDiv + $userRole'));
+    }, SetOptions(merge: true)).then(
+        (value) => print('${user.email} $userUid + $userDiv + $userRole'));
     _prefs.setString('USER_ROLE', userRole);
     _prefs.setString('USER_DIV', userDiv);
 
     return user;
   }
+
   static Future<void> signOut({BuildContext context}) async {
     final GoogleSignIn googleSignIn = GoogleSignIn();
 
@@ -187,8 +163,8 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
       await FirebaseAuth.instance.signOut();
       print('success');
     } catch (e) {
-
-      ScaffoldMessenger.of(context).showSnackBar(AuthScreen().createState().customSnackBar(_errMsg),
+      ScaffoldMessenger.of(context).showSnackBar(
+        AuthScreen().createState().customSnackBar(_errMsg),
       );
     }
   }

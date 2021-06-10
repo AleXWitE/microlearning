@@ -88,22 +88,6 @@ class _AdminRoleState extends State<AdminRole> {
     getData();
   }
 
-  void readData() {
-    var fbUser = FirebaseAuth.instance.currentUser;
-
-    // await databaseRef.once().then((snapshot) => print('Data :${snapshot.value}'));
-    // databaseRef.doc(fbUser.email).set({
-    //   'uid': fbUser.uid,
-    //   'user_division': 'Polytech',
-    //   'user_role': '-'
-    // }).then((_) => print(fbUser.email));
-    databaseRefUsers.doc(fbUser.email).get().then((value) {
-      setState(() {
-        userRole = value.data()['user_role'];
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final List<String> _butList = [
@@ -177,7 +161,6 @@ class _AdminRoleState extends State<AdminRole> {
                 currentState = visCard();
                 break;
             }
-            // getData();
           });
     }
 
@@ -193,6 +176,7 @@ class _AdminRoleState extends State<AdminRole> {
 
       void _saveDivision(String _div) {
         databaseRefDivs.doc(_div).set({
+          'title': _div,
           'add': true,
         }, SetOptions(merge: true));
       }
@@ -201,7 +185,7 @@ class _AdminRoleState extends State<AdminRole> {
         if (_divValidate()) {
           _saveDivision(_divName);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("true"),
+            content: Text("${AppLocalizations.of(context).division} $_divName added"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -303,25 +287,6 @@ class _AdminRoleState extends State<AdminRole> {
             key: _keyAddModerator,
             child: ListView(
               children: [
-                // TextFormField(
-                //   validator: (value) {
-                //     if (value.isEmpty)
-                //       return AppLocalizations.of(context).divisionError;
-                //     else
-                //       _modDivName = value;
-                //   },
-                //   onSaved: (value) => _modDivName = value,
-                //   decoration: InputDecoration(
-                //     labelText: AppLocalizations.of(context).division,
-                //     focusColor: Theme.of(context).primaryColor,
-                //   ),
-                //   keyboardType: TextInputType.text,
-                // ),
-                //             PopupMenuButton<String>(
-                //                 itemBuilder: (BuildContext context) <PopupMenyEntry<String>>{
-                //                   for(var i in _divisions)
-                //                   PopupMenuItem<String>(value: i, child: Text(i),);
-                // }),
                 DropdownButton<Divisions>(
                     hint: Text(AppLocalizations.of(context).dropdownDivisions),
                     value: selectedDivision,
@@ -337,11 +302,8 @@ class _AdminRoleState extends State<AdminRole> {
                               setState(() {
                                 _usersInDiv.add(Users(email: element.id));
                               });
-                            // print(_curUser);
-                            // print(selectedDivision.division);
                           });
                         });
-                        // getData();
                       });
                     },
                     items: _divisions.map((item) {
@@ -349,20 +311,6 @@ class _AdminRoleState extends State<AdminRole> {
                           value: item, child: Text(item.division));
                     }).toList()),
                 SizedBox(height: 20.0),
-                // TextFormField(
-                //   validator: (value) {
-                //     if (value.isEmpty)
-                //       return AppLocalizations.of(context).moderatorError;
-                //     else
-                //       _modName = value;
-                //   },
-                //   onSaved: (value) => _modName = value,
-                //   decoration: InputDecoration(
-                //     labelText: AppLocalizations.of(context).moderator,
-                //     focusColor: Theme.of(context).primaryColor,
-                //   ),
-                //   keyboardType: TextInputType.text,
-                // ),
                 DropdownButton<Users>(
                     hint: _usersInDiv.isEmpty
                         ? Text(AppLocalizations.of(context).emptyModUserInDiv)
@@ -419,7 +367,7 @@ class _AdminRoleState extends State<AdminRole> {
               .set({'title': _courseName});
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("true"),
+            content: Text("${AppLocalizations.of(context).courseName} $_courseName added"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -484,7 +432,6 @@ class _AdminRoleState extends State<AdminRole> {
                   ))),
                   onPressed: () {
                     _onSavedCourse();
-                    print("click!");
                   },
                   child: Text(
                     AppLocalizations.of(context).add,
@@ -530,7 +477,7 @@ class _AdminRoleState extends State<AdminRole> {
             'card_url': _cardContentUrl,
           });
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("true"),
+            content: Text("Card $_cardName added to course ${selectedCourseInCard.course}"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -604,19 +551,6 @@ class _AdminRoleState extends State<AdminRole> {
           child: ListView(
             shrinkWrap: true,
             children: [
-              // TextFormField(
-              //   validator: (value) {
-              //     if (value.isEmpty)
-              //       return AppLocalizations.of(context).divisionError;
-              //     else
-              //       _cardDiv = value;
-              //   },
-              //   onSaved: (value) => _cardDiv = value,
-              //   decoration: InputDecoration(
-              //     labelText: AppLocalizations.of(context).division,
-              //     focusColor: Theme.of(context).primaryColor,
-              //   ),
-              // ),
               DropdownButton<Divisions>(
                   hint: Text(AppLocalizations.of(context).dropdownDivisions),
                   value: selectedDivisionInCard,
@@ -643,19 +577,6 @@ class _AdminRoleState extends State<AdminRole> {
               SizedBox(
                 height: 20.0,
               ),
-              // TextFormField(
-              //   validator: (value) {
-              //     if (value.isEmpty)
-              //       return AppLocalizations.of(context).divisionError;
-              //     else
-              //       _cardCourse = value;
-              //   },
-              //   onSaved: (value) => _cardCourse = value,
-              //   decoration: InputDecoration(
-              //     labelText: AppLocalizations.of(context).courseName,
-              //     focusColor: Theme.of(context).primaryColor,
-              //   ),
-              // ),
               DropdownButton<Courses>(
                   hint: _courses.isEmpty
                       ? Text(AppLocalizations.of(context).emptyCoursesInDiv)

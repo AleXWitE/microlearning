@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
+import 'package:microlearning/components/users.dart';
 import 'package:microlearning/db/moor_db.dart';
 import 'package:microlearning/models/drawer_item.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    getFavStream();
+    _getFavStream();
     // print(favEvent.length);
   }
 
@@ -61,7 +62,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
               itemCount: snapshot.data.length,
               itemBuilder:
                   (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
-              EventCard(events: [], i: index, favs: snapshot.data));
+              EventCard(courses: [], i: index, favs: snapshot.data));
         } else {
           _hasFav = false;
           ifNoFavorite(_hasFav);
@@ -83,7 +84,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
         }
       });
       });
-      getFavStream();
+      _getFavStream();
     }
     return showDialog<void>(
       context: context,
@@ -129,7 +130,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("In favorite ${count == null ? count = 0 : count} cards", style: TextStyle(fontSize: 25.0,)),
+          title: Text("${AppLocalizations.of(context).userFavoritesCourses} $userName", style: TextStyle(fontSize: 25.0,)),
           centerTitle: true,
           actions: [
             IconButton(

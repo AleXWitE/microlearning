@@ -19,6 +19,10 @@ class _AuthScreenState extends State<AuthScreen>{
   final _formKeyLogin = GlobalKey<FormState>();
   final _formKeyAuth = GlobalKey<FormState>();
 
+  Divisions selectedDivision;
+  List<Divisions> _divisions = [];
+
+
   final controller = PageController(initialPage: 0);
 
   Curve curve = Curves.ease;
@@ -63,6 +67,11 @@ class _AuthScreenState extends State<AuthScreen>{
   void initState(){
       super.initState();
       _getUser();
+
+      FirebaseFirestore.instance.collection('divisions').get().then((value) => value.docs.forEach((element) {
+        _divisions.add(Divisions(division: element.id));
+      }));
+      // selectedDivision = _divisions.first;
   }
 
   customSnackBar(String _errorMsg){
@@ -122,8 +131,8 @@ class _AuthScreenState extends State<AuthScreen>{
         controller.animateToPage(0,
             duration: Duration(milliseconds: 800), curve: curve);
         await databaseRef.doc(_authEmail).set({
-            'uid': '-',
-            'user_division': 'Polytech',
+            'uid': FirebaseAuth.instance.currentUser.uid,
+            'user_division': selectedDivision.division,
             'user_role': '-'
           }).then((_) => print("User $_authEmail add"));
         _errMsg = AppLocalizations.of(context).infoAfterReg;
@@ -156,7 +165,6 @@ class _AuthScreenState extends State<AuthScreen>{
             .signInWithEmailAndPassword(
                 email: _loginEmail, password: _loginPass);
         // savedUser = Users(uid: user.user.uid, email: user.user.email);
-        print("User: ${user.user.uid}");
         databaseRef.doc(user.user.email).get().then((value) {
           userRole = value.data()['user_role'];
           userDivision = value.data()['user_division'];
@@ -164,6 +172,10 @@ class _AuthScreenState extends State<AuthScreen>{
           _setUserRole(userRole, userDivision, userName);
           print(userRole + userDivision);
         });
+        databaseRef.doc(user.user.email).update({
+          'uid': user.user.uid,
+        });
+        print("User: ${user.user.uid} $userName $userRole $userDivision");
 
         Navigator.pushNamedAndRemoveUntil(
             context, '/list_events', (route) => false);
@@ -321,6 +333,20 @@ class _AuthScreenState extends State<AuthScreen>{
                   focusColor: Theme.of(context).primaryColor,
                 ),
               ),
+              SizedBox(height: 20.0),
+              DropdownButton<Divisions>(
+                  hint: Text(AppLocalizations.of(context).dropdownDivisions),
+                  value: selectedDivision,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedDivision = value;
+
+                    });
+                  },
+                  items: _divisions.map((item) {
+                    return DropdownMenuItem<Divisions>(
+                        value: item, child: Text(item.division));
+                  }).toList()),
               SizedBox(height: 20.0),
               MaterialButton(
                 onPressed: () => _authButton(),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:microlearning/api/services/event_service.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
@@ -25,25 +26,46 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   List<Courses> _coursesList = [];
 
   Future<List<Courses>> getAllCourses() async {
+    String _divName;
     if(_coursesList.isNotEmpty)
       _coursesList.clear();
 
-    await FirebaseFirestore.instance
-        .collection('divisions')
-        .doc(userDivision)
-        .collection('courses')
-        .get()
-        .then((value) => value.docs.forEach((element) {
-                _coursesList.add(
-                    Courses(id: value.hashCode.toString(), course: element.data()['title']));
-            }));
+    int i = 1;
+
+    if(userDivision != 'all'){
+      await FirebaseFirestore.instance
+          .collection('divisions')
+          .doc(userDivision)
+          .collection('courses')
+          .get()
+          .then((value) => value.docs.forEach((element) {
+        _coursesList.add(
+            Courses(id: i++, course: element.data()['title']));
+      }));
+    } else {
+      // await FirebaseFirestore.instance
+      //     .collection('divisions').get().then((value) => value.docs.forEach((element) {
+      //       _divName = element.data()['title_division'];
+      //       FirebaseFirestore.instance.collection('divisions').doc(_divName).collection('courses').get().then((value) => value.docs.forEach((element) {
+      //         _coursesList.add(Courses(id: i++, course: element.data()['title'], division: _divName, favorite: false));
+      //       }));
+      // }));
+      await FirebaseFirestore.instance.collection('divisions').get().then((value) => value.docs.forEach((element) {
+        var _division = element.id;
+        var _course = element.data()['courses'];
+        var _title = element.data()['courses'][_course]['title'];
+        _coursesList.add(Courses(id: i++, course: _title, division: _division, favorite: false));
+      })
+      );
+    }
+
+
     return _coursesList;
   }
 
   @override
   void initState() {
     super.initState();
-    // print(userDivision);
     getAllEventsState = getAllCourses().asStream();
     refreshKey = GlobalKey<
         RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
@@ -56,7 +78,6 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
       _coursesList.clear();
     });
     setState(() {
-      // getAllEventsState = getAllEvents().asStream();
       getAllEventsState = getAllCourses().asStream();
       _hasData = true;
       ifNoData(_hasData);
@@ -80,11 +101,11 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     }
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   WidgetsBinding.instance.removeObserver(this);
+  //   super.dispose();
+  // }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -98,7 +119,6 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
 
   Widget RefreshInd() {
     return RefreshIndicator(
-
         //обновление списка
         key: refreshKey,
         onRefresh: () async {
@@ -125,7 +145,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
                   itemBuilder:
                       (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
                           EventCard(
-                            events: snapshot.data,
+                            courses: snapshot.data,
                             i: index,
                             favs: [],
                           ));

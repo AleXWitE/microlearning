@@ -7,7 +7,6 @@ import 'package:microlearning/db/moor_db.dart';
 import 'package:microlearning/screens/about_screen.dart';
 import 'package:microlearning/screens/add_screen.dart';
 import 'package:microlearning/screens/auth_screen.dart';
-import 'package:microlearning/screens/event_screen.dart';
 import 'package:microlearning/screens/favorites_screen.dart';
 import 'package:microlearning/screens/home_screen.dart';
 import 'package:microlearning/screens/list_screen.dart';
@@ -51,9 +50,8 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
   _getUser() async{
     SharedPreferences _prefs = await SharedPreferences.getInstance();
 
-    userRole = _prefs.getString('USER_ROLE') ?? null;
-
-    _userEmail = _prefs.getString('userEmailPref') ?? null;
+    userRole = _prefs.getString('USER_ROLE') ?? '';
+    _userEmail = _prefs.getString('userEmailPref') ?? '';
     print('user shared prefs = $_userEmail');
     print('role shared prefs = $userRole');
   }
@@ -118,7 +116,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
 
         },
         // initialRoute: _error ? '/' : _userEmail == null ? '/auth' : '/list_events'  ,
-        initialRoute: userRole.isEmpty ? '/auth' : '/list_events',
+        initialRoute: userRole == '' ? '/auth' : '/list_events',
         home: _error
             ? Center(
                 child:

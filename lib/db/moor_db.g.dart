@@ -9,36 +9,25 @@ part of 'moor_db.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
 class Favor extends DataClass implements Insertable<Favor> {
   final int id;
-  final String eventId;
-  final String name;
-  final String location;
-  final String date;
+  final int courseId;
+  final String title;
   final bool favorite;
   Favor(
       {@required this.id,
-      @required this.eventId,
-      @required this.name,
-      @required this.location,
-      @required this.date,
+      @required this.courseId,
+      @required this.title,
       @required this.favorite});
   factory Favor.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
-    final intType = db.typeSystem.forDartType<int>();
-    final stringType = db.typeSystem.forDartType<String>();
-    final boolType = db.typeSystem.forDartType<bool>();
     return Favor(
-      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
-      eventId: stringType
-          .mapFromDatabaseResponse(data['${effectivePrefix}event_id']),
-      name: stringType
-          .mapFromDatabaseResponse(data['${effectivePrefix}event_name']),
-      location: stringType
-          .mapFromDatabaseResponse(data['${effectivePrefix}event_location']),
-      date: stringType
-          .mapFromDatabaseResponse(data['${effectivePrefix}event_date']),
-      favorite:
-          boolType.mapFromDatabaseResponse(data['${effectivePrefix}event_fav']),
+      id: const IntType().mapFromDatabaseResponse(data['${effectivePrefix}id']),
+      courseId: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}courseId']),
+      title: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}course_title']),
+      favorite: const BoolType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}course_fav']),
     );
   }
   @override
@@ -47,20 +36,14 @@ class Favor extends DataClass implements Insertable<Favor> {
     if (!nullToAbsent || id != null) {
       map['id'] = Variable<int>(id);
     }
-    if (!nullToAbsent || eventId != null) {
-      map['event_id'] = Variable<String>(eventId);
+    if (!nullToAbsent || courseId != null) {
+      map['courseId'] = Variable<int>(courseId);
     }
-    if (!nullToAbsent || name != null) {
-      map['event_name'] = Variable<String>(name);
-    }
-    if (!nullToAbsent || location != null) {
-      map['event_location'] = Variable<String>(location);
-    }
-    if (!nullToAbsent || date != null) {
-      map['event_date'] = Variable<String>(date);
+    if (!nullToAbsent || title != null) {
+      map['course_title'] = Variable<String>(title);
     }
     if (!nullToAbsent || favorite != null) {
-      map['event_fav'] = Variable<bool>(favorite);
+      map['course_fav'] = Variable<bool>(favorite);
     }
     return map;
   }
@@ -68,14 +51,11 @@ class Favor extends DataClass implements Insertable<Favor> {
   FavorsCompanion toCompanion(bool nullToAbsent) {
     return FavorsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
-      eventId: eventId == null && nullToAbsent
+      courseId: courseId == null && nullToAbsent
           ? const Value.absent()
-          : Value(eventId),
-      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
-      location: location == null && nullToAbsent
-          ? const Value.absent()
-          : Value(location),
-      date: date == null && nullToAbsent ? const Value.absent() : Value(date),
+          : Value(courseId),
+      title:
+          title == null && nullToAbsent ? const Value.absent() : Value(title),
       favorite: favorite == null && nullToAbsent
           ? const Value.absent()
           : Value(favorite),
@@ -87,10 +67,8 @@ class Favor extends DataClass implements Insertable<Favor> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return Favor(
       id: serializer.fromJson<int>(json['id']),
-      eventId: serializer.fromJson<String>(json['eventId']),
-      name: serializer.fromJson<String>(json['name']),
-      location: serializer.fromJson<String>(json['location']),
-      date: serializer.fromJson<String>(json['date']),
+      courseId: serializer.fromJson<int>(json['courseId']),
+      title: serializer.fromJson<String>(json['title']),
       favorite: serializer.fromJson<bool>(json['favorite']),
     );
   }
@@ -99,121 +77,84 @@ class Favor extends DataClass implements Insertable<Favor> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'eventId': serializer.toJson<String>(eventId),
-      'name': serializer.toJson<String>(name),
-      'location': serializer.toJson<String>(location),
-      'date': serializer.toJson<String>(date),
+      'courseId': serializer.toJson<int>(courseId),
+      'title': serializer.toJson<String>(title),
       'favorite': serializer.toJson<bool>(favorite),
     };
   }
 
-  Favor copyWith(
-          {int id,
-          String eventId,
-          String name,
-          String location,
-          String date,
-          bool favorite}) =>
-      Favor(
+  Favor copyWith({int id, int courseId, String title, bool favorite}) => Favor(
         id: id ?? this.id,
-        eventId: eventId ?? this.eventId,
-        name: name ?? this.name,
-        location: location ?? this.location,
-        date: date ?? this.date,
+        courseId: courseId ?? this.courseId,
+        title: title ?? this.title,
         favorite: favorite ?? this.favorite,
       );
   @override
   String toString() {
     return (StringBuffer('Favor(')
           ..write('id: $id, ')
-          ..write('eventId: $eventId, ')
-          ..write('name: $name, ')
-          ..write('location: $location, ')
-          ..write('date: $date, ')
+          ..write('courseId: $courseId, ')
+          ..write('title: $title, ')
           ..write('favorite: $favorite')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(
-      id.hashCode,
-      $mrjc(
-          eventId.hashCode,
-          $mrjc(
-              name.hashCode,
-              $mrjc(location.hashCode,
-                  $mrjc(date.hashCode, favorite.hashCode))))));
+  int get hashCode => $mrjf($mrjc(id.hashCode,
+      $mrjc(courseId.hashCode, $mrjc(title.hashCode, favorite.hashCode))));
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Favor &&
           other.id == this.id &&
-          other.eventId == this.eventId &&
-          other.name == this.name &&
-          other.location == this.location &&
-          other.date == this.date &&
+          other.courseId == this.courseId &&
+          other.title == this.title &&
           other.favorite == this.favorite);
 }
 
 class FavorsCompanion extends UpdateCompanion<Favor> {
   final Value<int> id;
-  final Value<String> eventId;
-  final Value<String> name;
-  final Value<String> location;
-  final Value<String> date;
+  final Value<int> courseId;
+  final Value<String> title;
   final Value<bool> favorite;
   const FavorsCompanion({
     this.id = const Value.absent(),
-    this.eventId = const Value.absent(),
-    this.name = const Value.absent(),
-    this.location = const Value.absent(),
-    this.date = const Value.absent(),
+    this.courseId = const Value.absent(),
+    this.title = const Value.absent(),
     this.favorite = const Value.absent(),
   });
   FavorsCompanion.insert({
     this.id = const Value.absent(),
-    @required String eventId,
-    @required String name,
-    @required String location,
-    @required String date,
+    @required int courseId,
+    @required String title,
     @required bool favorite,
-  })  : eventId = Value(eventId),
-        name = Value(name),
-        location = Value(location),
-        date = Value(date),
+  })  : courseId = Value(courseId),
+        title = Value(title),
         favorite = Value(favorite);
   static Insertable<Favor> custom({
     Expression<int> id,
-    Expression<String> eventId,
-    Expression<String> name,
-    Expression<String> location,
-    Expression<String> date,
+    Expression<int> courseId,
+    Expression<String> title,
     Expression<bool> favorite,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (eventId != null) 'event_id': eventId,
-      if (name != null) 'event_name': name,
-      if (location != null) 'event_location': location,
-      if (date != null) 'event_date': date,
-      if (favorite != null) 'event_fav': favorite,
+      if (courseId != null) 'courseId': courseId,
+      if (title != null) 'course_title': title,
+      if (favorite != null) 'course_fav': favorite,
     });
   }
 
   FavorsCompanion copyWith(
       {Value<int> id,
-      Value<String> eventId,
-      Value<String> name,
-      Value<String> location,
-      Value<String> date,
+      Value<int> courseId,
+      Value<String> title,
       Value<bool> favorite}) {
     return FavorsCompanion(
       id: id ?? this.id,
-      eventId: eventId ?? this.eventId,
-      name: name ?? this.name,
-      location: location ?? this.location,
-      date: date ?? this.date,
+      courseId: courseId ?? this.courseId,
+      title: title ?? this.title,
       favorite: favorite ?? this.favorite,
     );
   }
@@ -224,20 +165,14 @@ class FavorsCompanion extends UpdateCompanion<Favor> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (eventId.present) {
-      map['event_id'] = Variable<String>(eventId.value);
+    if (courseId.present) {
+      map['courseId'] = Variable<int>(courseId.value);
     }
-    if (name.present) {
-      map['event_name'] = Variable<String>(name.value);
-    }
-    if (location.present) {
-      map['event_location'] = Variable<String>(location.value);
-    }
-    if (date.present) {
-      map['event_date'] = Variable<String>(date.value);
+    if (title.present) {
+      map['course_title'] = Variable<String>(title.value);
     }
     if (favorite.present) {
-      map['event_fav'] = Variable<bool>(favorite.value);
+      map['course_fav'] = Variable<bool>(favorite.value);
     }
     return map;
   }
@@ -246,10 +181,8 @@ class FavorsCompanion extends UpdateCompanion<Favor> {
   String toString() {
     return (StringBuffer('FavorsCompanion(')
           ..write('id: $id, ')
-          ..write('eventId: $eventId, ')
-          ..write('name: $name, ')
-          ..write('location: $location, ')
-          ..write('date: $date, ')
+          ..write('courseId: $courseId, ')
+          ..write('title: $title, ')
           ..write('favorite: $favorite')
           ..write(')'))
         .toString();
@@ -269,46 +202,25 @@ class $FavorsTable extends Favors with TableInfo<$FavorsTable, Favor> {
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
   }
 
-  final VerificationMeta _eventIdMeta = const VerificationMeta('eventId');
-  GeneratedTextColumn _eventId;
+  final VerificationMeta _courseIdMeta = const VerificationMeta('courseId');
+  GeneratedIntColumn _courseId;
   @override
-  GeneratedTextColumn get eventId => _eventId ??= _constructEventId();
-  GeneratedTextColumn _constructEventId() {
-    return GeneratedTextColumn('event_id', $tableName, false,
-        $customConstraints: 'REMOVE UNIQUE');
-  }
-
-  final VerificationMeta _nameMeta = const VerificationMeta('name');
-  GeneratedTextColumn _name;
-  @override
-  GeneratedTextColumn get name => _name ??= _constructName();
-  GeneratedTextColumn _constructName() {
-    return GeneratedTextColumn(
-      'event_name',
+  GeneratedIntColumn get courseId => _courseId ??= _constructCourseId();
+  GeneratedIntColumn _constructCourseId() {
+    return GeneratedIntColumn(
+      'courseId',
       $tableName,
       false,
     );
   }
 
-  final VerificationMeta _locationMeta = const VerificationMeta('location');
-  GeneratedTextColumn _location;
+  final VerificationMeta _titleMeta = const VerificationMeta('title');
+  GeneratedTextColumn _title;
   @override
-  GeneratedTextColumn get location => _location ??= _constructLocation();
-  GeneratedTextColumn _constructLocation() {
+  GeneratedTextColumn get title => _title ??= _constructTitle();
+  GeneratedTextColumn _constructTitle() {
     return GeneratedTextColumn(
-      'event_location',
-      $tableName,
-      false,
-    );
-  }
-
-  final VerificationMeta _dateMeta = const VerificationMeta('date');
-  GeneratedTextColumn _date;
-  @override
-  GeneratedTextColumn get date => _date ??= _constructDate();
-  GeneratedTextColumn _constructDate() {
-    return GeneratedTextColumn(
-      'event_date',
+      'course_title',
       $tableName,
       false,
     );
@@ -320,15 +232,14 @@ class $FavorsTable extends Favors with TableInfo<$FavorsTable, Favor> {
   GeneratedBoolColumn get favorite => _favorite ??= _constructFavorite();
   GeneratedBoolColumn _constructFavorite() {
     return GeneratedBoolColumn(
-      'event_fav',
+      'course_fav',
       $tableName,
       false,
     );
   }
 
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, eventId, name, location, date, favorite];
+  List<GeneratedColumn> get $columns => [id, courseId, title, favorite];
   @override
   $FavorsTable get asDslTable => this;
   @override
@@ -343,35 +254,21 @@ class $FavorsTable extends Favors with TableInfo<$FavorsTable, Favor> {
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id'], _idMeta));
     }
-    if (data.containsKey('event_id')) {
-      context.handle(_eventIdMeta,
-          eventId.isAcceptableOrUnknown(data['event_id'], _eventIdMeta));
+    if (data.containsKey('courseId')) {
+      context.handle(_courseIdMeta,
+          courseId.isAcceptableOrUnknown(data['courseId'], _courseIdMeta));
     } else if (isInserting) {
-      context.missing(_eventIdMeta);
+      context.missing(_courseIdMeta);
     }
-    if (data.containsKey('event_name')) {
-      context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['event_name'], _nameMeta));
+    if (data.containsKey('course_title')) {
+      context.handle(_titleMeta,
+          title.isAcceptableOrUnknown(data['course_title'], _titleMeta));
     } else if (isInserting) {
-      context.missing(_nameMeta);
+      context.missing(_titleMeta);
     }
-    if (data.containsKey('event_location')) {
-      context.handle(
-          _locationMeta,
-          location.isAcceptableOrUnknown(
-              data['event_location'], _locationMeta));
-    } else if (isInserting) {
-      context.missing(_locationMeta);
-    }
-    if (data.containsKey('event_date')) {
-      context.handle(
-          _dateMeta, date.isAcceptableOrUnknown(data['event_date'], _dateMeta));
-    } else if (isInserting) {
-      context.missing(_dateMeta);
-    }
-    if (data.containsKey('event_fav')) {
+    if (data.containsKey('course_fav')) {
       context.handle(_favoriteMeta,
-          favorite.isAcceptableOrUnknown(data['event_fav'], _favoriteMeta));
+          favorite.isAcceptableOrUnknown(data['course_fav'], _favoriteMeta));
     } else if (isInserting) {
       context.missing(_favoriteMeta);
     }
@@ -392,16 +289,687 @@ class $FavorsTable extends Favors with TableInfo<$FavorsTable, Favor> {
   }
 }
 
+class FavorCard extends DataClass implements Insertable<FavorCard> {
+  final int id;
+  final String cardId;
+  final String cardCourseId;
+  final String cardTitle;
+  final String cardQuestion;
+  final String cardType;
+  final String cardAnswer1;
+  final String cardAnswer2;
+  final String cardAnswer3;
+  final String cardAnswerCorrect;
+  final String cardUrl;
+  FavorCard(
+      {@required this.id,
+      @required this.cardId,
+      @required this.cardCourseId,
+      @required this.cardTitle,
+      @required this.cardQuestion,
+      @required this.cardType,
+      @required this.cardAnswer1,
+      @required this.cardAnswer2,
+      @required this.cardAnswer3,
+      @required this.cardAnswerCorrect,
+      @required this.cardUrl});
+  factory FavorCard.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
+    return FavorCard(
+      id: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id_card']),
+      cardId: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}card_id']),
+      cardCourseId: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}card_course_id']),
+      cardTitle: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}card_title']),
+      cardQuestion: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}card_question']),
+      cardType: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}card_type']),
+      cardAnswer1: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}card_answer_1']),
+      cardAnswer2: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}card_answer_2']),
+      cardAnswer3: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}card_answer_3']),
+      cardAnswerCorrect: const StringType().mapFromDatabaseResponse(
+          data['${effectivePrefix}card_answer_correct']),
+      cardUrl: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}card_url']),
+    );
+  }
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id_card'] = Variable<int>(id);
+    }
+    if (!nullToAbsent || cardId != null) {
+      map['card_id'] = Variable<String>(cardId);
+    }
+    if (!nullToAbsent || cardCourseId != null) {
+      map['card_course_id'] = Variable<String>(cardCourseId);
+    }
+    if (!nullToAbsent || cardTitle != null) {
+      map['card_title'] = Variable<String>(cardTitle);
+    }
+    if (!nullToAbsent || cardQuestion != null) {
+      map['card_question'] = Variable<String>(cardQuestion);
+    }
+    if (!nullToAbsent || cardType != null) {
+      map['card_type'] = Variable<String>(cardType);
+    }
+    if (!nullToAbsent || cardAnswer1 != null) {
+      map['card_answer_1'] = Variable<String>(cardAnswer1);
+    }
+    if (!nullToAbsent || cardAnswer2 != null) {
+      map['card_answer_2'] = Variable<String>(cardAnswer2);
+    }
+    if (!nullToAbsent || cardAnswer3 != null) {
+      map['card_answer_3'] = Variable<String>(cardAnswer3);
+    }
+    if (!nullToAbsent || cardAnswerCorrect != null) {
+      map['card_answer_correct'] = Variable<String>(cardAnswerCorrect);
+    }
+    if (!nullToAbsent || cardUrl != null) {
+      map['card_url'] = Variable<String>(cardUrl);
+    }
+    return map;
+  }
+
+  FavorCardsCompanion toCompanion(bool nullToAbsent) {
+    return FavorCardsCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      cardId:
+          cardId == null && nullToAbsent ? const Value.absent() : Value(cardId),
+      cardCourseId: cardCourseId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardCourseId),
+      cardTitle: cardTitle == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardTitle),
+      cardQuestion: cardQuestion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardQuestion),
+      cardType: cardType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardType),
+      cardAnswer1: cardAnswer1 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardAnswer1),
+      cardAnswer2: cardAnswer2 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardAnswer2),
+      cardAnswer3: cardAnswer3 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardAnswer3),
+      cardAnswerCorrect: cardAnswerCorrect == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardAnswerCorrect),
+      cardUrl: cardUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardUrl),
+    );
+  }
+
+  factory FavorCard.fromJson(Map<String, dynamic> json,
+      {ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return FavorCard(
+      id: serializer.fromJson<int>(json['id']),
+      cardId: serializer.fromJson<String>(json['cardId']),
+      cardCourseId: serializer.fromJson<String>(json['cardCourseId']),
+      cardTitle: serializer.fromJson<String>(json['cardTitle']),
+      cardQuestion: serializer.fromJson<String>(json['cardQuestion']),
+      cardType: serializer.fromJson<String>(json['cardType']),
+      cardAnswer1: serializer.fromJson<String>(json['cardAnswer1']),
+      cardAnswer2: serializer.fromJson<String>(json['cardAnswer2']),
+      cardAnswer3: serializer.fromJson<String>(json['cardAnswer3']),
+      cardAnswerCorrect: serializer.fromJson<String>(json['cardAnswerCorrect']),
+      cardUrl: serializer.fromJson<String>(json['cardUrl']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'cardId': serializer.toJson<String>(cardId),
+      'cardCourseId': serializer.toJson<String>(cardCourseId),
+      'cardTitle': serializer.toJson<String>(cardTitle),
+      'cardQuestion': serializer.toJson<String>(cardQuestion),
+      'cardType': serializer.toJson<String>(cardType),
+      'cardAnswer1': serializer.toJson<String>(cardAnswer1),
+      'cardAnswer2': serializer.toJson<String>(cardAnswer2),
+      'cardAnswer3': serializer.toJson<String>(cardAnswer3),
+      'cardAnswerCorrect': serializer.toJson<String>(cardAnswerCorrect),
+      'cardUrl': serializer.toJson<String>(cardUrl),
+    };
+  }
+
+  FavorCard copyWith(
+          {int id,
+          String cardId,
+          String cardCourseId,
+          String cardTitle,
+          String cardQuestion,
+          String cardType,
+          String cardAnswer1,
+          String cardAnswer2,
+          String cardAnswer3,
+          String cardAnswerCorrect,
+          String cardUrl}) =>
+      FavorCard(
+        id: id ?? this.id,
+        cardId: cardId ?? this.cardId,
+        cardCourseId: cardCourseId ?? this.cardCourseId,
+        cardTitle: cardTitle ?? this.cardTitle,
+        cardQuestion: cardQuestion ?? this.cardQuestion,
+        cardType: cardType ?? this.cardType,
+        cardAnswer1: cardAnswer1 ?? this.cardAnswer1,
+        cardAnswer2: cardAnswer2 ?? this.cardAnswer2,
+        cardAnswer3: cardAnswer3 ?? this.cardAnswer3,
+        cardAnswerCorrect: cardAnswerCorrect ?? this.cardAnswerCorrect,
+        cardUrl: cardUrl ?? this.cardUrl,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('FavorCard(')
+          ..write('id: $id, ')
+          ..write('cardId: $cardId, ')
+          ..write('cardCourseId: $cardCourseId, ')
+          ..write('cardTitle: $cardTitle, ')
+          ..write('cardQuestion: $cardQuestion, ')
+          ..write('cardType: $cardType, ')
+          ..write('cardAnswer1: $cardAnswer1, ')
+          ..write('cardAnswer2: $cardAnswer2, ')
+          ..write('cardAnswer3: $cardAnswer3, ')
+          ..write('cardAnswerCorrect: $cardAnswerCorrect, ')
+          ..write('cardUrl: $cardUrl')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => $mrjf($mrjc(
+      id.hashCode,
+      $mrjc(
+          cardId.hashCode,
+          $mrjc(
+              cardCourseId.hashCode,
+              $mrjc(
+                  cardTitle.hashCode,
+                  $mrjc(
+                      cardQuestion.hashCode,
+                      $mrjc(
+                          cardType.hashCode,
+                          $mrjc(
+                              cardAnswer1.hashCode,
+                              $mrjc(
+                                  cardAnswer2.hashCode,
+                                  $mrjc(
+                                      cardAnswer3.hashCode,
+                                      $mrjc(cardAnswerCorrect.hashCode,
+                                          cardUrl.hashCode)))))))))));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FavorCard &&
+          other.id == this.id &&
+          other.cardId == this.cardId &&
+          other.cardCourseId == this.cardCourseId &&
+          other.cardTitle == this.cardTitle &&
+          other.cardQuestion == this.cardQuestion &&
+          other.cardType == this.cardType &&
+          other.cardAnswer1 == this.cardAnswer1 &&
+          other.cardAnswer2 == this.cardAnswer2 &&
+          other.cardAnswer3 == this.cardAnswer3 &&
+          other.cardAnswerCorrect == this.cardAnswerCorrect &&
+          other.cardUrl == this.cardUrl);
+}
+
+class FavorCardsCompanion extends UpdateCompanion<FavorCard> {
+  final Value<int> id;
+  final Value<String> cardId;
+  final Value<String> cardCourseId;
+  final Value<String> cardTitle;
+  final Value<String> cardQuestion;
+  final Value<String> cardType;
+  final Value<String> cardAnswer1;
+  final Value<String> cardAnswer2;
+  final Value<String> cardAnswer3;
+  final Value<String> cardAnswerCorrect;
+  final Value<String> cardUrl;
+  const FavorCardsCompanion({
+    this.id = const Value.absent(),
+    this.cardId = const Value.absent(),
+    this.cardCourseId = const Value.absent(),
+    this.cardTitle = const Value.absent(),
+    this.cardQuestion = const Value.absent(),
+    this.cardType = const Value.absent(),
+    this.cardAnswer1 = const Value.absent(),
+    this.cardAnswer2 = const Value.absent(),
+    this.cardAnswer3 = const Value.absent(),
+    this.cardAnswerCorrect = const Value.absent(),
+    this.cardUrl = const Value.absent(),
+  });
+  FavorCardsCompanion.insert({
+    this.id = const Value.absent(),
+    @required String cardId,
+    @required String cardCourseId,
+    @required String cardTitle,
+    @required String cardQuestion,
+    @required String cardType,
+    @required String cardAnswer1,
+    @required String cardAnswer2,
+    @required String cardAnswer3,
+    @required String cardAnswerCorrect,
+    @required String cardUrl,
+  })  : cardId = Value(cardId),
+        cardCourseId = Value(cardCourseId),
+        cardTitle = Value(cardTitle),
+        cardQuestion = Value(cardQuestion),
+        cardType = Value(cardType),
+        cardAnswer1 = Value(cardAnswer1),
+        cardAnswer2 = Value(cardAnswer2),
+        cardAnswer3 = Value(cardAnswer3),
+        cardAnswerCorrect = Value(cardAnswerCorrect),
+        cardUrl = Value(cardUrl);
+  static Insertable<FavorCard> custom({
+    Expression<int> id,
+    Expression<String> cardId,
+    Expression<String> cardCourseId,
+    Expression<String> cardTitle,
+    Expression<String> cardQuestion,
+    Expression<String> cardType,
+    Expression<String> cardAnswer1,
+    Expression<String> cardAnswer2,
+    Expression<String> cardAnswer3,
+    Expression<String> cardAnswerCorrect,
+    Expression<String> cardUrl,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id_card': id,
+      if (cardId != null) 'card_id': cardId,
+      if (cardCourseId != null) 'card_course_id': cardCourseId,
+      if (cardTitle != null) 'card_title': cardTitle,
+      if (cardQuestion != null) 'card_question': cardQuestion,
+      if (cardType != null) 'card_type': cardType,
+      if (cardAnswer1 != null) 'card_answer_1': cardAnswer1,
+      if (cardAnswer2 != null) 'card_answer_2': cardAnswer2,
+      if (cardAnswer3 != null) 'card_answer_3': cardAnswer3,
+      if (cardAnswerCorrect != null) 'card_answer_correct': cardAnswerCorrect,
+      if (cardUrl != null) 'card_url': cardUrl,
+    });
+  }
+
+  FavorCardsCompanion copyWith(
+      {Value<int> id,
+      Value<String> cardId,
+      Value<String> cardCourseId,
+      Value<String> cardTitle,
+      Value<String> cardQuestion,
+      Value<String> cardType,
+      Value<String> cardAnswer1,
+      Value<String> cardAnswer2,
+      Value<String> cardAnswer3,
+      Value<String> cardAnswerCorrect,
+      Value<String> cardUrl}) {
+    return FavorCardsCompanion(
+      id: id ?? this.id,
+      cardId: cardId ?? this.cardId,
+      cardCourseId: cardCourseId ?? this.cardCourseId,
+      cardTitle: cardTitle ?? this.cardTitle,
+      cardQuestion: cardQuestion ?? this.cardQuestion,
+      cardType: cardType ?? this.cardType,
+      cardAnswer1: cardAnswer1 ?? this.cardAnswer1,
+      cardAnswer2: cardAnswer2 ?? this.cardAnswer2,
+      cardAnswer3: cardAnswer3 ?? this.cardAnswer3,
+      cardAnswerCorrect: cardAnswerCorrect ?? this.cardAnswerCorrect,
+      cardUrl: cardUrl ?? this.cardUrl,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id_card'] = Variable<int>(id.value);
+    }
+    if (cardId.present) {
+      map['card_id'] = Variable<String>(cardId.value);
+    }
+    if (cardCourseId.present) {
+      map['card_course_id'] = Variable<String>(cardCourseId.value);
+    }
+    if (cardTitle.present) {
+      map['card_title'] = Variable<String>(cardTitle.value);
+    }
+    if (cardQuestion.present) {
+      map['card_question'] = Variable<String>(cardQuestion.value);
+    }
+    if (cardType.present) {
+      map['card_type'] = Variable<String>(cardType.value);
+    }
+    if (cardAnswer1.present) {
+      map['card_answer_1'] = Variable<String>(cardAnswer1.value);
+    }
+    if (cardAnswer2.present) {
+      map['card_answer_2'] = Variable<String>(cardAnswer2.value);
+    }
+    if (cardAnswer3.present) {
+      map['card_answer_3'] = Variable<String>(cardAnswer3.value);
+    }
+    if (cardAnswerCorrect.present) {
+      map['card_answer_correct'] = Variable<String>(cardAnswerCorrect.value);
+    }
+    if (cardUrl.present) {
+      map['card_url'] = Variable<String>(cardUrl.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavorCardsCompanion(')
+          ..write('id: $id, ')
+          ..write('cardId: $cardId, ')
+          ..write('cardCourseId: $cardCourseId, ')
+          ..write('cardTitle: $cardTitle, ')
+          ..write('cardQuestion: $cardQuestion, ')
+          ..write('cardType: $cardType, ')
+          ..write('cardAnswer1: $cardAnswer1, ')
+          ..write('cardAnswer2: $cardAnswer2, ')
+          ..write('cardAnswer3: $cardAnswer3, ')
+          ..write('cardAnswerCorrect: $cardAnswerCorrect, ')
+          ..write('cardUrl: $cardUrl')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FavorCardsTable extends FavorCards
+    with TableInfo<$FavorCardsTable, FavorCard> {
+  final GeneratedDatabase _db;
+  final String _alias;
+  $FavorCardsTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  GeneratedIntColumn _id;
+  @override
+  GeneratedIntColumn get id => _id ??= _constructId();
+  GeneratedIntColumn _constructId() {
+    return GeneratedIntColumn('id_card', $tableName, false,
+        hasAutoIncrement: true, declaredAsPrimaryKey: true);
+  }
+
+  final VerificationMeta _cardIdMeta = const VerificationMeta('cardId');
+  GeneratedTextColumn _cardId;
+  @override
+  GeneratedTextColumn get cardId => _cardId ??= _constructCardId();
+  GeneratedTextColumn _constructCardId() {
+    return GeneratedTextColumn(
+      'card_id',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cardCourseIdMeta =
+      const VerificationMeta('cardCourseId');
+  GeneratedTextColumn _cardCourseId;
+  @override
+  GeneratedTextColumn get cardCourseId =>
+      _cardCourseId ??= _constructCardCourseId();
+  GeneratedTextColumn _constructCardCourseId() {
+    return GeneratedTextColumn(
+      'card_course_id',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cardTitleMeta = const VerificationMeta('cardTitle');
+  GeneratedTextColumn _cardTitle;
+  @override
+  GeneratedTextColumn get cardTitle => _cardTitle ??= _constructCardTitle();
+  GeneratedTextColumn _constructCardTitle() {
+    return GeneratedTextColumn(
+      'card_title',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cardQuestionMeta =
+      const VerificationMeta('cardQuestion');
+  GeneratedTextColumn _cardQuestion;
+  @override
+  GeneratedTextColumn get cardQuestion =>
+      _cardQuestion ??= _constructCardQuestion();
+  GeneratedTextColumn _constructCardQuestion() {
+    return GeneratedTextColumn(
+      'card_question',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cardTypeMeta = const VerificationMeta('cardType');
+  GeneratedTextColumn _cardType;
+  @override
+  GeneratedTextColumn get cardType => _cardType ??= _constructCardType();
+  GeneratedTextColumn _constructCardType() {
+    return GeneratedTextColumn(
+      'card_type',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cardAnswer1Meta =
+      const VerificationMeta('cardAnswer1');
+  GeneratedTextColumn _cardAnswer1;
+  @override
+  GeneratedTextColumn get cardAnswer1 =>
+      _cardAnswer1 ??= _constructCardAnswer1();
+  GeneratedTextColumn _constructCardAnswer1() {
+    return GeneratedTextColumn(
+      'card_answer_1',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cardAnswer2Meta =
+      const VerificationMeta('cardAnswer2');
+  GeneratedTextColumn _cardAnswer2;
+  @override
+  GeneratedTextColumn get cardAnswer2 =>
+      _cardAnswer2 ??= _constructCardAnswer2();
+  GeneratedTextColumn _constructCardAnswer2() {
+    return GeneratedTextColumn(
+      'card_answer_2',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cardAnswer3Meta =
+      const VerificationMeta('cardAnswer3');
+  GeneratedTextColumn _cardAnswer3;
+  @override
+  GeneratedTextColumn get cardAnswer3 =>
+      _cardAnswer3 ??= _constructCardAnswer3();
+  GeneratedTextColumn _constructCardAnswer3() {
+    return GeneratedTextColumn(
+      'card_answer_3',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cardAnswerCorrectMeta =
+      const VerificationMeta('cardAnswerCorrect');
+  GeneratedTextColumn _cardAnswerCorrect;
+  @override
+  GeneratedTextColumn get cardAnswerCorrect =>
+      _cardAnswerCorrect ??= _constructCardAnswerCorrect();
+  GeneratedTextColumn _constructCardAnswerCorrect() {
+    return GeneratedTextColumn(
+      'card_answer_correct',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cardUrlMeta = const VerificationMeta('cardUrl');
+  GeneratedTextColumn _cardUrl;
+  @override
+  GeneratedTextColumn get cardUrl => _cardUrl ??= _constructCardUrl();
+  GeneratedTextColumn _constructCardUrl() {
+    return GeneratedTextColumn(
+      'card_url',
+      $tableName,
+      false,
+    );
+  }
+
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        cardId,
+        cardCourseId,
+        cardTitle,
+        cardQuestion,
+        cardType,
+        cardAnswer1,
+        cardAnswer2,
+        cardAnswer3,
+        cardAnswerCorrect,
+        cardUrl
+      ];
+  @override
+  $FavorCardsTable get asDslTable => this;
+  @override
+  String get $tableName => _alias ?? 'favor_cards';
+  @override
+  final String actualTableName = 'favor_cards';
+  @override
+  VerificationContext validateIntegrity(Insertable<FavorCard> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id_card')) {
+      context.handle(
+          _idMeta, id.isAcceptableOrUnknown(data['id_card'], _idMeta));
+    }
+    if (data.containsKey('card_id')) {
+      context.handle(_cardIdMeta,
+          cardId.isAcceptableOrUnknown(data['card_id'], _cardIdMeta));
+    } else if (isInserting) {
+      context.missing(_cardIdMeta);
+    }
+    if (data.containsKey('card_course_id')) {
+      context.handle(
+          _cardCourseIdMeta,
+          cardCourseId.isAcceptableOrUnknown(
+              data['card_course_id'], _cardCourseIdMeta));
+    } else if (isInserting) {
+      context.missing(_cardCourseIdMeta);
+    }
+    if (data.containsKey('card_title')) {
+      context.handle(_cardTitleMeta,
+          cardTitle.isAcceptableOrUnknown(data['card_title'], _cardTitleMeta));
+    } else if (isInserting) {
+      context.missing(_cardTitleMeta);
+    }
+    if (data.containsKey('card_question')) {
+      context.handle(
+          _cardQuestionMeta,
+          cardQuestion.isAcceptableOrUnknown(
+              data['card_question'], _cardQuestionMeta));
+    } else if (isInserting) {
+      context.missing(_cardQuestionMeta);
+    }
+    if (data.containsKey('card_type')) {
+      context.handle(_cardTypeMeta,
+          cardType.isAcceptableOrUnknown(data['card_type'], _cardTypeMeta));
+    } else if (isInserting) {
+      context.missing(_cardTypeMeta);
+    }
+    if (data.containsKey('card_answer_1')) {
+      context.handle(
+          _cardAnswer1Meta,
+          cardAnswer1.isAcceptableOrUnknown(
+              data['card_answer_1'], _cardAnswer1Meta));
+    } else if (isInserting) {
+      context.missing(_cardAnswer1Meta);
+    }
+    if (data.containsKey('card_answer_2')) {
+      context.handle(
+          _cardAnswer2Meta,
+          cardAnswer2.isAcceptableOrUnknown(
+              data['card_answer_2'], _cardAnswer2Meta));
+    } else if (isInserting) {
+      context.missing(_cardAnswer2Meta);
+    }
+    if (data.containsKey('card_answer_3')) {
+      context.handle(
+          _cardAnswer3Meta,
+          cardAnswer3.isAcceptableOrUnknown(
+              data['card_answer_3'], _cardAnswer3Meta));
+    } else if (isInserting) {
+      context.missing(_cardAnswer3Meta);
+    }
+    if (data.containsKey('card_answer_correct')) {
+      context.handle(
+          _cardAnswerCorrectMeta,
+          cardAnswerCorrect.isAcceptableOrUnknown(
+              data['card_answer_correct'], _cardAnswerCorrectMeta));
+    } else if (isInserting) {
+      context.missing(_cardAnswerCorrectMeta);
+    }
+    if (data.containsKey('card_url')) {
+      context.handle(_cardUrlMeta,
+          cardUrl.isAcceptableOrUnknown(data['card_url'], _cardUrlMeta));
+    } else if (isInserting) {
+      context.missing(_cardUrlMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FavorCard map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return FavorCard.fromData(data, _db, prefix: effectivePrefix);
+  }
+
+  @override
+  $FavorCardsTable createAlias(String alias) {
+    return $FavorCardsTable(_db, alias);
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   $FavorsTable _favors;
   $FavorsTable get favors => _favors ??= $FavorsTable(this);
+  $FavorCardsTable _favorCards;
+  $FavorCardsTable get favorCards => _favorCards ??= $FavorCardsTable(this);
   FavorDao _favorDao;
   FavorDao get favorDao => _favorDao ??= FavorDao(this as AppDatabase);
+  FavorCardsDao _favorCardsDao;
+  FavorCardsDao get favorCardsDao =>
+      _favorCardsDao ??= FavorCardsDao(this as AppDatabase);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [favors];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [favors, favorCards];
 }
 
 // **************************************************************************
@@ -410,4 +978,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 mixin _$FavorDaoMixin on DatabaseAccessor<AppDatabase> {
   $FavorsTable get favors => attachedDatabase.favors;
+}
+mixin _$FavorCardsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $FavorCardsTable get favorCards => attachedDatabase.favorCards;
 }

@@ -50,15 +50,15 @@ class _AddScreenState extends State<AddScreen> {
         name: '$_name',
         location: '$_location',
         date: '$_finalDate');
-    createEvent(event).then((response) {
-      //сборка элемента, по готовности отправка запроса
-      if (response.statusCode > 200)
-        print(response.body);
-      else
-        print(response.statusCode);
-    }).catchError((error) {
-      print('error : $error');
-    });
+    // createEvent(event).then((response) {
+    //   //сборка элемента, по готовности отправка запроса
+    //   if (response.statusCode > 200)
+    //     print(response.body);
+    //   else
+    //     print(response.statusCode);
+    // }).catchError((error) {
+    //   print('error : $error');
+    // });
   }
 
   Widget FormChild() {

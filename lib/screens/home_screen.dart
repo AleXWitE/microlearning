@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/svg.dart'; //полезный импорт, без него не получится вставить svg картинку. Вставлять только с помощью assert
 import 'package:microlearning/api/youtube.dart';
 import 'package:microlearning/components/event.dart';
@@ -448,18 +450,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ],
                   )),
       ),
-
-      floatingActionButton: FloatingActionButton(
-        //активная интерактивная кнопка справа внизу
-        child: Icon(
-          Icons.search,
-          size: 40.0,
-        ),
-        onPressed: () {
-          print("tap");
-          setState(() => count++);
-        },
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   //активная интерактивная кнопка справа внизу
+      //   child: Icon(
+      //     Icons.search,
+      //     size: 40.0,
+      //   ),
+      //   onPressed: () {
+      //     print("tap");
+      //     setState(() => count++);
+      //   },
+      // ),
       bottomNavigationBar: BottomAppBar(
         //наиболее лучшая реализация кнопок вперед назад чтобы они были прифлочены к нижней границе
         color: Theme.of(context).primaryColor,

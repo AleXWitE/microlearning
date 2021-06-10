@@ -9,11 +9,11 @@ import 'event.dart';
 
 class EventCard extends StatefulWidget {
   //здесь мы получаем элемент списка чтобы нарисовать карточку для конкретнного элемента
-  final List<Courses> events;
+  final List<Courses> courses;
   final List<Favor> favs;
   final int i;
 
-  EventCard({Key key, this.events, this.i, this.favs}) : super(key: key);
+  EventCard({Key key, this.courses, this.i, this.favs}) : super(key: key);
 
   @override
   _EventCardState createState() => _EventCardState();
@@ -23,7 +23,7 @@ class _EventCardState extends State<EventCard> {
   @override
   void initState() {
     super.initState();
-    print("${widget.events.length}\n"); //вывод в консоли количество элементов
+    print("${widget.courses.length}\n"); //вывод в консоли количество элементов
     print("${widget.favs.length}"); //вывод в консоли количество элементов
   }
 
@@ -38,13 +38,13 @@ class _EventCardState extends State<EventCard> {
 
     var element;
     var elId;
-    if (widget.events.isEmpty && widget.favs.isNotEmpty) {
-      element = widget.favs[widget.i];
-      elId = int.parse(element.eventId);
+    if (widget.courses.isEmpty && widget.favs.isNotEmpty) {
+      element = widget.favs[widget.i] as Favor;
+      elId = element.courseId.toString();
       _fav = true;
     } else {
-      element = widget.events[widget.i];
-      elId = int.parse(element.id);
+      element = widget.courses[widget.i] as Courses;
+      elId = element.id.toString();
       _fav = false;
     }
 
@@ -53,46 +53,53 @@ class _EventCardState extends State<EventCard> {
     eventFav.listen((event) {
       setState(() {
         for (int i = 0; i < event.length - 1; i++) {
-          favorItem.add(FavorItem(eventId: event[i].eventId, favorite: true));
+          favorItem.add(FavorItem(courseId: event[i].courseId, favorite: true));
         }
       });
     });
 
-    // var _favItem = favorItem.where((item) =>
-    //     item.eventId == element.id ||
-    //     item.id == elId ||
-    //     element.favorite == true);
+    var _favItem = favorItem.where((item) =>
+        item.courseId == element.id ||
+        item.id == elId ||
+        element.favorite == true);
 
-    // setState(() {
-    //   switch (_favItem.isEmpty) {
-    //     case true:
-    //       _isFavorite = false;
-    //       break;
-    //     case false:
-    //       _isFavorite = true;
-    //       break;
-    //     default:
-    //       _isFavorite = false;
-    //   }
-    // });
+    setState(() {
+      switch (_favItem.isEmpty) {
+        case true:
+          _isFavorite = false;
+          break;
+        case false:
+          _isFavorite = true;
+          break;
+        default:
+          _isFavorite = false;
+      }
+    });
 
-    // insertData(Event ev) {
-    //   _dao.insertNewFavorite(Favor(
-    //       eventId: ev.id,
-    //       name: ev.name,
-    //       location: ev.location,
-    //       date: ev.date,
-    //       favorite: true));
-    //   favorItem.add(FavorItem(eventId: element.id, favorite: true));
-    //   _isFavorite = true;
-    // }
+    insertData(Courses courses/*Answers answ*/) {
+      _dao.insertNewFavorite(Favor(
+          courseId: courses.id,
+          title: courses.course,
+          /*cardCourseId: answ.courseId,
+          cardTitle: answ.title,
+          cardQuestion: answ.description,
+          cardType: answ.type,
+          cardAnswer1: answ.answer1,
+          cardAnswer2: answ.answer2,
+          cardAnswer3: answ.answer3,
+          cardAnswerCorrect: answ.answerCorrect,
+          cardUrl: answ.url,*/
+          favorite: true));
+      favorItem.add(FavorItem(courseId: element.id, favorite: true));
+      _isFavorite = true;
+    }
 
-    // deleteData(int _id) async {
-    //   Favor checkFavorite = await _dao.getFavorite(_id);
-    //   if (checkFavorite != null) _dao.deleteFavorite(checkFavorite);
-    //   favorItem
-    //       .removeAt(favorItem.indexWhere((el) => el.eventId == element.id));
-    // }
+    deleteData(int _id) async {
+      Favor checkFavorite = await _dao.getFavorite(_id);
+      if (checkFavorite != null) _dao.deleteFavorite(checkFavorite);
+      favorItem
+          .removeAt(favorItem.indexWhere((el) => el.courseId == element.id));
+    }
 
     _Card() {
         return Card(
@@ -102,15 +109,16 @@ class _EventCardState extends State<EventCard> {
             onTap: () {
               Navigator.pushNamed(
                 context,
-                widget.events.isEmpty
-                    ? '/event/${element.eventId}'
+                widget.courses.isEmpty
+                    ? '/event/${element.courseId}'
                     : '/event/${element.course}',
               );
             },
             // generate route for item card
             enabled: _isEnabled,
             title: Text(
-              element.course,
+              _fav ? element.title : element.course,
+              // element.course,
               style: TextStyle(fontSize: 20),
             ),
             // subtitle: Text("${element.location} \n${element.date.toString()}"),
@@ -121,20 +129,20 @@ class _EventCardState extends State<EventCard> {
                 () => _isEnabled = !_isEnabled,
               ),
             ),
-            // trailing: IconButton(
-            //   icon: Icon(
-            //     _isFavorite ? Icons.favorite : Icons.favorite_border,
-            //     //задаем смену сердечек от параметра _isFavorite
-            //     size: 40,
-            //     // color: Colors.indigo,
-            //   ),
-            //   onPressed: () {
-            //     setState(() {
-            //       _isFavorite ? deleteData(elId) : insertData(element);
-            //       _isFavorite = !_isFavorite;
-            //     });
-            //   },
-            // ),
+            trailing: IconButton(
+              icon: Icon(
+                _isFavorite ? Icons.favorite : Icons.favorite_border,
+                //задаем смену сердечек от параметра _isFavorite
+                size: 40,
+                // color: Colors.indigo,
+              ),
+              onPressed: () {
+                setState(() {
+                  _isFavorite ? deleteData(int.parse(elId)) : insertData(element);
+                  _isFavorite = !_isFavorite;
+                });
+              },
+            ),
           ),
       );
     }

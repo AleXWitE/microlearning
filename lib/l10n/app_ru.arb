@@ -93,6 +93,9 @@
     "cardQuestion": "Вопрос или теория",
     "cardQuestionError": "Введите текст вопроса или теории!",
     "cardContentUrl": "Ссылка на дополнительный контент",
-    "moderatorError": "Выберите модератора!"
+    "moderatorError": "Выберите модератора!",
+
+    "userFavoritesCourses": "Избранные курсы у пользователя"
+
 
 }

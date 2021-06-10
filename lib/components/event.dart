@@ -39,6 +39,7 @@ class Event {
 
 class Answers {
   int id;
+  String courseId;
   String answer1;
   String answer2;
   String answer3;
@@ -48,7 +49,7 @@ class Answers {
   String url;
   String type;
 
-  Answers({this.id, this.answer1, this.answer2, this.answer3, this.answerCorrect, this.title, this.description, this.url, this.type});
+  Answers({this.id, this.courseId, this.answer1, this.answer2, this.answer3, this.answerCorrect, this.title, this.description, this.url, this.type});
 
   // factory Answers.fromJson(Map<String, dynamic> json) {
   //   return new Answers(
@@ -113,8 +114,8 @@ List<FavorItem> favorItem = [];
 
 class FavorItem{
   int id;
-  String eventId;
+  int courseId;
   bool favorite;
 
-  FavorItem({ this.id, this.eventId, this.favorite });
+  FavorItem({ this.id, this.courseId, this.favorite });
   }

@@ -90,7 +90,9 @@
     "cardQuestion": "Question or lecture",
     "cardQuestionError": "Enter question or lecture!",
     "cardContentUrl": "Content url",
-    "moderatorError": "Enter moderator name!"
+    "moderatorError": "Enter moderator name!",
+
+    "userFavoritesCourses": "Favorite courses of"
 
 
 }

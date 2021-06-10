@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Users{
@@ -17,10 +15,12 @@ class Divisions{
 }
 
 class Courses{
-  String id;
+  int id;
   String course;
+  String division;
+  bool favorite;
 
-  Courses({this.id, this.course});
+  Courses({this.id, this.course, this.division, this.favorite});
 
 }
 
@@ -41,9 +41,9 @@ String userName;
 
 getUserRole() async{
   SharedPreferences prefs = await _prefs;
-  userRole = prefs.getString('USER_ROLE') ?? '-';
-  userDivision = prefs.getString('USER_DIV') ?? '-';
-  userName = prefs.getString('USER_NAME') ?? '-';
+  userRole = prefs.getString('USER_ROLE') ?? '';
+  userDivision = prefs.getString('USER_DIV') ?? '';
+  userName = prefs.getString('USER_NAME') ?? '';
   print("User role $userRole");
 }
 
