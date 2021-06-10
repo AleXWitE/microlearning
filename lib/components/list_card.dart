@@ -110,8 +110,8 @@ class _EventCardState extends State<EventCard> {
               Navigator.pushNamed(
                 context,
                 widget.courses.isEmpty
-                    ? '/event/${element.courseId}'
-                    : '/event/${element.course}',
+                    ? '/course/${element.courseId}'
+                    : '/course/${element.course}',
               );
             },
             // generate route for item card

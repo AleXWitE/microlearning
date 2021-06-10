@@ -414,7 +414,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         title: Text(
             "${AppLocalizations.of(context).chooseCourse} ${widget._course}",
             style: TextStyle(
-              fontSize: 25.0,
+              fontSize: 22.0,
             )),
         centerTitle: true,
       ),

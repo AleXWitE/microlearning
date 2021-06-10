@@ -92,7 +92,14 @@
     "cardContentUrl": "Content url",
     "moderatorError": "Enter moderator name!",
 
-    "userFavoritesCourses": "Favorite courses of"
+    "userFavoritesCourses": "Favorite courses of",
 
+    "aboutApp1": "This training application, with the principles of microlearning, was developed by a student of the Moscow Polytechnic University in the conditions of the competence Final qualification work The tasks of this application are as follows:",
+    "aboutApp2": "- User registration and authorization via email and login via Google account;",
+    "aboutApp3": "- differentiation of roles for the user (only viewing courses), the moderator (adding a course for the organization in which it is registered) and the administrator, who can add everything (organizations, courses, moderators and course cards);",
+    "aboutApp4": "- view courses, read theory, watch videos from youtube hosting, answer test parts of courses (radio buttons and checkboxes);",
+    "aboutApp5": "- adding courses to favorites;",
+    "aboutApp6": "- deleting courses from favorites;",
+    "aboutApp7": "- exit the application and then log in."
 
 }

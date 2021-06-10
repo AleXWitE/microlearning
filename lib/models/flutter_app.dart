@@ -129,11 +129,9 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
         ),
         routes: {
           //пути определения классов, переходя по этим ссылкам, будут вызывать эти классы
-          '/home': (BuildContext context) => HomeScreen(),
           '/list_events': (BuildContext context) => ListScreen(),
-          '/event': (BuildContext context) => HomeScreen(),
+          '/course': (BuildContext context) => HomeScreen(),
           '/about': (BuildContext context) => AboutScreen(),
-          '/add': (BuildContext context) => AddScreen(),
           '/favorite': (BuildContext context) => FavoritesScreen(),
           '/auth': (BuildContext context) => AuthScreen(),
           '/admin_form': (BuildContext context) => AdminRole(),
@@ -143,7 +141,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
           //генерация путей второго порядка
           var path = routeSettings.name.split('/'); //разделитель путей в адресе
 
-          if (path[1] == "event") {
+          if (path[1] == "course") {
             //если первая часть пути такая
             return MaterialPageRoute(
               // то вернуть виджет отрисованного роута

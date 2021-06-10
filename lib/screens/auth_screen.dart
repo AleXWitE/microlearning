@@ -395,7 +395,7 @@ class _AuthScreenState extends State<AuthScreen>{
                     ? AppLocalizations.of(context).loginApp
                     : appBarTitle,
             style: TextStyle(
-              fontSize: 25.0,
+              fontSize: 22.0,
             )),
         // actions: [SwitchLocale()],
         centerTitle: true,

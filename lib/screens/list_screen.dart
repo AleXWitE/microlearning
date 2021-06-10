@@ -3,13 +3,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:microlearning/api/services/event_service.dart';
-import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
 import 'package:microlearning/components/users.dart';
 import 'package:microlearning/models/drawer_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ListScreen extends StatefulWidget {
   @override
@@ -93,9 +90,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
       await Future.delayed(Duration(seconds: 5));
       setState(() {
         _ifNoData = Center(
-          child: Text(kIsWeb
-              ? AppLocalizations.of(context).warningConnectionBrowser
-              : AppLocalizations.of(context).warningConnection),
+          child: Text(AppLocalizations.of(context).warningConnection),
         );
       });
     }
@@ -166,7 +161,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     }
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 65.0,
+        toolbarHeight: 70.0,
         title: Text("${AppLocalizations.of(context).hello} $userName \n${AppLocalizations.of(context).titleDivision} $userDivision",
             style: TextStyle(
               fontSize: 22.0,

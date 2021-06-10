@@ -130,7 +130,7 @@ class FavoriteScreenState extends State<FavoritesScreen> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("${AppLocalizations.of(context).userFavoritesCourses} $userName", style: TextStyle(fontSize: 25.0,)),
+          title: Text("${AppLocalizations.of(context).userFavoritesCourses} $userName", style: TextStyle(fontSize: 22.0,)),
           centerTitle: true,
           actions: [
             IconButton(
