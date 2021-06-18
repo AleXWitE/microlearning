@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,10 +26,13 @@ class _EventCardState extends State<EventCard> {
     super.initState();
     print("${widget.courses.length}\n"); //вывод в консоли количество элементов
     print("${widget.favs.length}"); //вывод в консоли количество элементов
+
   }
 
   bool _isEnabled = true;
   bool _isFavorite;
+
+  String _course;
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +43,11 @@ class _EventCardState extends State<EventCard> {
     var element;
     var elId;
     if (widget.courses.isEmpty && widget.favs.isNotEmpty) {
-      element = widget.favs[widget.i] as Favor;
+      element = widget.favs[widget.i];
       elId = element.courseId.toString();
       _fav = true;
     } else {
-      element = widget.courses[widget.i] as Courses;
+      element = widget.courses[widget.i];
       elId = element.id.toString();
       _fav = false;
     }
@@ -101,17 +105,42 @@ class _EventCardState extends State<EventCard> {
           .removeAt(favorItem.indexWhere((el) => el.courseId == element.id));
     }
 
+    Future _getAnswers(String _chooseCourse) async {
+      await FirebaseFirestore.instance
+          .collection('divisions')
+          .doc(userDivision)
+          .collection('courses')
+          .doc(_chooseCourse)
+          .collection('cards')
+          .get()
+          .then((value) => value.docs.forEach((element) {
+        answers.add(Answers(title: element.data()['card_title'],
+          description: element.data()['card_question'],
+          type: element.data()['card_type'],
+          answer1: element.data()['card_answers']['answer_1'],
+          answer2: element.data()['card_answers']['answer_2'],
+          answer3: element.data()['card_answers']['answer_3'],
+          answerCorrect: element.data()['card_answers']['correct_answer'],
+          url: element.data()['card_url'],
+        ));
+      }));
+    }
     _Card() {
+      if(widget.courses.isEmpty)
+        _course = element.title;
+      else
+        _course = element.course;
+
         return Card(
           elevation: 15.0,
           margin: EdgeInsets.symmetric(vertical: 20),
           child: ListTile(
-            onTap: () {
+            onTap: () async {
+              await _getAnswers(_course);
+              if(answers.isNotEmpty)
               Navigator.pushNamed(
                 context,
-                widget.courses.isEmpty
-                    ? '/course/${element.courseId}'
-                    : '/course/${element.course}',
+                    '/courses/$_course',
               );
             },
             // generate route for item card
@@ -121,7 +150,6 @@ class _EventCardState extends State<EventCard> {
               // element.course,
               style: TextStyle(fontSize: 20),
             ),
-            // subtitle: Text("${element.location} \n${element.date.toString()}"),
             leading: IconButton(
               icon:
                   _isEnabled ? Icon(Icons.lock_outlined) : Icon(Icons.lock_open),

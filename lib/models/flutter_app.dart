@@ -115,8 +115,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
             return supportedLocales.first;
 
         },
-        // initialRoute: _error ? '/' : _userEmail == null ? '/auth' : '/list_events'  ,
-        initialRoute: userRole == '' ? '/auth' : '/list_events',
+        initialRoute: userRole == '' ? '/auth' : '/courses',
         home: _error
             ? Center(
                 child:
@@ -129,8 +128,8 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
         ),
         routes: {
           //пути определения классов, переходя по этим ссылкам, будут вызывать эти классы
-          '/list_events': (BuildContext context) => ListScreen(),
-          '/course': (BuildContext context) => HomeScreen(),
+          // '/list_events': (BuildContext context) => ListScreen(),
+          '/courses': (BuildContext context) => ListScreen(),
           '/about': (BuildContext context) => AboutScreen(),
           '/favorite': (BuildContext context) => FavoritesScreen(),
           '/auth': (BuildContext context) => AuthScreen(),
@@ -141,7 +140,7 @@ class _FlutterTutorialAppState extends State<FlutterTutorialApp> {
           //генерация путей второго порядка
           var path = routeSettings.name.split('/'); //разделитель путей в адресе
 
-          if (path[1] == "course") {
+          if (path[1] == "courses") {
             //если первая часть пути такая
             return MaterialPageRoute(
               // то вернуть виджет отрисованного роута

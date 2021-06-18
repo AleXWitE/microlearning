@@ -479,7 +479,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
             child: Center(
               child: Text(AppLocalizations
                   .of(context)
-                  .notAdmin),
+                  .notModerator),
             ),
           )
         ],

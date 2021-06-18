@@ -63,15 +63,17 @@ class _AuthScreenState extends State<AuthScreen>{
     _prefs.setString('USER_NAME', _name);
   }
 
+  void _getDivisions() async {
+    await FirebaseFirestore.instance.collection('divisions').get().then((value) => value.docs.forEach((element) {
+      _divisions.add(Divisions(division: element.id));
+    }));
+  }
+
   @override
   void initState(){
       super.initState();
       _getUser();
-
-      FirebaseFirestore.instance.collection('divisions').get().then((value) => value.docs.forEach((element) {
-        _divisions.add(Divisions(division: element.id));
-      }));
-      // selectedDivision = _divisions.first;
+      _getDivisions();
   }
 
   customSnackBar(String _errorMsg){
@@ -178,7 +180,7 @@ class _AuthScreenState extends State<AuthScreen>{
         print("User: ${user.user.uid} $userName $userRole $userDivision");
 
         Navigator.pushNamedAndRemoveUntil(
-            context, '/list_events', (route) => false);
+            context, '/courses', (route) => false);
         _prefUser(_loginEmail, _loginPass);
       } catch (e) {
         print("Error: $e");
@@ -224,6 +226,15 @@ class _AuthScreenState extends State<AuthScreen>{
               height: 2.0,
             )),
         GoogleSignInMethod(),
+        Padding(
+            padding: EdgeInsets.all(15.0),
+            child: Text("Для отладки и для комисси на защите диплома,\n"
+                "было добавлено несколько учетных записей\n\n"
+                "адрес почты                пароль               роль\n"
+                "admin@admin.ru         admin1                администратор\n"
+                "moder@moder.ru         moder1               модератор\n"
+                "user@user.ru                 user12                  рядовой пользователь")),
+
       ],
     );
   }

@@ -38,6 +38,7 @@
 
     "hello": "Hello,",
     "titleDivision": "in division",
+    "titleAvailable": "available",
 
     "chooseCourse": "Course",
 
@@ -64,8 +65,8 @@
     "wrongAnswer": "The answer not entered!",
     "wrongCurrentAnswer": "The correct answer must match one of the entered ones!",
 
-    "adminForm": "Administration console",
-    "moderatorForm": "Moderator console",
+    "adminForm": "Remote console",
+    "moderatorForm": "Remote console",
 
     "notAdmin": "You are not admin!",
     "notModerator": "You are not moderator!",
@@ -100,6 +101,7 @@
     "aboutApp4": "- view courses, read theory, watch videos from youtube hosting, answer test parts of courses (radio buttons and checkboxes);",
     "aboutApp5": "- adding courses to favorites;",
     "aboutApp6": "- deleting courses from favorites;",
-    "aboutApp7": "- exit the application and then log in."
+    "aboutApp7": "- exit the application and then log in.",
+    "youAreAdmin": "You are admin. Choose the division for continue."
 
 }

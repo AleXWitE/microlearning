@@ -79,7 +79,6 @@ class _AdminRoleState extends State<AdminRole> {
     selectedDivision = _divisions.first;
     selectedDivisionInCourse = _divisions.first;
     selectedDivisionInCard = _divisions.first;
-    // selectedCourseInCard = _courses.first;
   }
 
   @override
@@ -290,21 +289,22 @@ class _AdminRoleState extends State<AdminRole> {
                 DropdownButton<Divisions>(
                     hint: Text(AppLocalizations.of(context).dropdownDivisions),
                     value: selectedDivision,
-                    onChanged: (value) {
-                      setState(() {
+                    onChanged: (value) async {
+                       setState(() {
                         selectedDivision = value;
                         if (_usersInDiv.isNotEmpty) _usersInDiv.clear();
 
-                        databaseRefUsers.get().then((value) {
-                          value.docs.forEach((element) {
-                            if (element.data()['user_division'] ==
-                                selectedDivision.division)
-                              setState(() {
-                                _usersInDiv.add(Users(email: element.id));
-                              });
-                          });
-                        });
                       });
+
+                       await databaseRefUsers.get().then((value) {
+                         value.docs.forEach((element) {
+                           if (element.data()['user_division'] ==
+                               selectedDivision.division)
+                             setState(() {
+                               _usersInDiv.add(Users(email: element.id));
+                             });
+                         });
+                       });
                     },
                     items: _divisions.map((item) {
                       return DropdownMenuItem<Divisions>(
@@ -396,20 +396,6 @@ class _AdminRoleState extends State<AdminRole> {
                   keyboardType: TextInputType.text,
                 ),
                 SizedBox(height: 20.0),
-                // TextFormField(
-                //   validator: (value) {
-                //     if (value.isEmpty)
-                //       return AppLocalizations.of(context).divisionError;
-                //     else
-                //       _courseDiv = value;
-                //   },
-                //   onSaved: (value) => _courseDiv = value,
-                //   decoration: InputDecoration(
-                //     labelText: AppLocalizations.of(context).division,
-                //     focusColor: Theme.of(context).primaryColor,
-                //   ),
-                //   keyboardType: TextInputType.text,
-                // ),
                 DropdownButton<Divisions>(
                     hint: Text(AppLocalizations.of(context).dropdownDivisions),
                     value: selectedDivisionInCourse,
@@ -554,21 +540,21 @@ class _AdminRoleState extends State<AdminRole> {
               DropdownButton<Divisions>(
                   hint: Text(AppLocalizations.of(context).dropdownDivisions),
                   value: selectedDivisionInCard,
-                  onChanged: (value) {
+                  onChanged: (value) async {
                     setState(() {
                       selectedDivisionInCard = value;
                     });
-                    setState(() {
-                      databaseRefDivs
+
+                      await databaseRefDivs
                           .doc(selectedDivisionInCard.division)
                           .collection('courses')
                           .get()
                           .then((value) {
+                            _courses.clear();
                         value.docs.forEach((element) {
                           _courses.add(Courses(course: element.id));
                         });
                       });
-                    });
                   },
                   items: _divisions.map((item) {
                     return DropdownMenuItem<Divisions>(
@@ -714,7 +700,7 @@ class _AdminRoleState extends State<AdminRole> {
         ? Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: Text(AppLocalizations.of(context).adminBlock),
+              title: Text(AppLocalizations.of(context).adminBlock, style: TextStyle(fontSize: 22.0),),
             ),
             drawer: MediaQuery.of(context).size.width > 600
                 ? null

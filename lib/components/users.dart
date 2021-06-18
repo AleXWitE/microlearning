@@ -24,20 +24,11 @@ class Courses{
 
 }
 
-
-// final databaseRef = FirebaseFirestore.instance.collection('users');
-// var fbUser = FirebaseAuth.instance.currentUser;
-
-// var userRole = databaseRef.doc(fbUser.email).get().then((value) => value.data()['user_role']).toString();
-
-// String userRole = 'admin';
-
 Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
 String userRole;
 String userDivision;
 String userName;
-
 
 getUserRole() async{
   SharedPreferences prefs = await _prefs;
@@ -46,6 +37,3 @@ getUserRole() async{
   userName = prefs.getString('USER_NAME') ?? '';
   print("User role $userRole");
 }
-
-// String userRole = '';
-// String userRole = 'moderator';

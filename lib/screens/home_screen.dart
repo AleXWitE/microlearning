@@ -48,28 +48,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   //проверка на валидацию значений чекбоксов и радио
 
+  // Future _getAnswers() async {
+  //    await FirebaseFirestore.instance
+  //        .collection('divisions')
+  //        .doc(userDivision)
+  //        .collection('courses')
+  //        .doc(widget._course)
+  //        .collection('cards')
+  //        .get()
+  //        .then((value) => value.docs.forEach((element) {
+  //      answers.add(Answers(title: element.data()['card_title'],
+  //        description: element.data()['card_question'],
+  //        type: element.data()['card_type'],
+  //        answer1: element.data()['card_answers']['answer_1'],
+  //        answer2: element.data()['card_answers']['answer_2'],
+  //        answer3: element.data()['card_answers']['answer_3'],
+  //        answerCorrect: element.data()['card_answers']['correct_answer'],
+  //        url: element.data()['card_url'],
+  //      ));
+  //    }));
+  //  }
+
   @override
   void initState() {
+    // _getAnswers();
     super.initState();
-    FirebaseFirestore.instance
-        .collection('divisions')
-        .doc(userDivision)
-        .collection('courses')
-        .doc(widget._course)
-        .collection('cards')
-        .get()
-        .then((value) => value.docs.forEach((element) {
-      answers.add(Answers(title: element.data()['card_title'],
-          description: element.data()['card_question'],
-          type: element.data()['card_type'],
-          answer1: element.data()['card_answers']['answer_1'],
-          answer2: element.data()['card_answers']['answer_2'],
-          answer3: element.data()['card_answers']['answer_3'],
-          answerCorrect: element.data()['card_answers']['correct_answer'],
-          url: element.data()['card_url'],
-       ));
-    }));
-
   }
 
   onEndAnimation(double ePos) {
@@ -104,7 +107,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     Answers question = answers[answId];
 
     chooseQuestion(int answId) {
@@ -161,22 +163,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     fontStyle: FontStyle.italic,
                     color: Theme.of(context).accentColor,
                     decoration: TextDecoration.underline)),
-            Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Theme.of(context).accentColor,
-                        blurRadius: 15,
-                        spreadRadius: 3)
-                  ],
-                ),
-                child: question.type == "video"
-                    ? YouTubePlay(url: question.url)
-                    : Image.network(question.url)),
+            question.url == "" || question.url == "-"
+                ? Container()
+                : Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Theme.of(context).accentColor,
+                            blurRadius: 15,
+                            spreadRadius: 3)
+                      ],
+                    ),
+                    child: question.type == "video"
+                        ? YouTubePlay(url: question.url)
+                        : Image.network(question.url)),
             SizedBox(
               height: 25.0,
             ),
@@ -540,5 +544,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    answers.clear();
+    answId = 0;
+
+    super.dispose();
   }
 }

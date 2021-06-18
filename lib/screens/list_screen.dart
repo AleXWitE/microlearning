@@ -21,18 +21,27 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   int asyncCount;
 
   List<Courses> _coursesList = [];
+  List<Divisions> _divCoursesList = [];
+  Divisions selectedDivision;
 
-  Future<List<Courses>> getAllCourses() async {
-    String _divName;
+
+  final databaseRefDivs = FirebaseFirestore.instance.collection('divisions');
+
+  String _choosenDiv = "Example";
+
+  Future<List<Courses>> getAllCourses(String _div) async {
     if(_coursesList.isNotEmpty)
       _coursesList.clear();
 
     int i = 1;
 
+    if(userDivision != 'all') _choosenDiv = userDivision;
+    else _choosenDiv = _div;
+
     if(userDivision != 'all'){
       await FirebaseFirestore.instance
           .collection('divisions')
-          .doc(userDivision)
+          .doc(_choosenDiv)
           .collection('courses')
           .get()
           .then((value) => value.docs.forEach((element) {
@@ -40,22 +49,12 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
             Courses(id: i++, course: element.data()['title']));
       }));
     } else {
-      // await FirebaseFirestore.instance
-      //     .collection('divisions').get().then((value) => value.docs.forEach((element) {
-      //       _divName = element.data()['title_division'];
-      //       FirebaseFirestore.instance.collection('divisions').doc(_divName).collection('courses').get().then((value) => value.docs.forEach((element) {
-      //         _coursesList.add(Courses(id: i++, course: element.data()['title'], division: _divName, favorite: false));
-      //       }));
-      // }));
-      await FirebaseFirestore.instance.collection('divisions').get().then((value) => value.docs.forEach((element) {
-        var _division = element.id;
-        var _course = element.data()['courses'];
-        var _title = element.data()['courses'][_course]['title'];
-        _coursesList.add(Courses(id: i++, course: _title, division: _division, favorite: false));
-      })
-      );
+      await FirebaseFirestore.instance
+          .collection('divisions').get().then((value) => value.docs.forEach((element) {
+            _divCoursesList.add(element.data()['title_division']);
+            selectedDivision = _divCoursesList.first;
+      }));
     }
-
 
     return _coursesList;
   }
@@ -63,7 +62,12 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    getAllEventsState = getAllCourses().asStream();
+    getAllEventsState = getAllCourses(userDivision).asStream();
+    databaseRefDivs.get().then((value) => value.docs.forEach((element) {
+      _divCoursesList.add(Divisions(division: element.id));
+      print(element.id);
+    }));
+    // selectedDivision = _divCoursesList.first;
     refreshKey = GlobalKey<
         RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
   }
@@ -75,7 +79,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
       _coursesList.clear();
     });
     setState(() {
-      getAllEventsState = getAllCourses().asStream();
+      getAllEventsState = getAllCourses(userDivision).asStream();
       _hasData = true;
       ifNoData(_hasData);
     });
@@ -85,12 +89,35 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   Widget _ifNoData = Center(child: CircularProgressIndicator());
   bool _hasData;
 
+  Widget _chooseCourse() {
+    return DropdownButton<Divisions>(
+        hint: Text(AppLocalizations.of(context).dropdownDivisions, style: TextStyle(color: Theme.of(context).accentColor),),
+        value: selectedDivision,
+        style: TextStyle(color: Theme.of(context).accentColor),
+        dropdownColor: Theme.of(context).primaryColor,
+        onChanged: (value) async {
+          setState(() {
+            selectedDivision = value;
+            userDivision = value.division;
+          });
+          await getAllCourses(selectedDivision.division);
+          await refreshList();
+
+        },
+        items: _divCoursesList.map((item) {
+          return DropdownMenuItem<Divisions>(
+              value: item, child: Text(item.division, ));
+        }).toList());
+  }
+
+
+
   Future<Null> ifNoData(bool snapdata) async {
     if (snapdata == false) {
       await Future.delayed(Duration(seconds: 5));
       setState(() {
         _ifNoData = Center(
-          child: Text(AppLocalizations.of(context).warningConnection),
+          child: Text(userRole == 'admin' ? AppLocalizations.of(context).youAreAdmin : AppLocalizations.of(context).warningConnection),
         );
       });
     }
@@ -107,7 +134,7 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     //не работает(((
     if (state == AppLifecycleState.resumed) {
       setState(() {
-        getAllEventsState = getAllCourses().asStream();
+        getAllEventsState = getAllCourses(userDivision).asStream();
       });
     }
   }
@@ -157,16 +184,21 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     if (getAllEventsState == null) {
       //если мы первый раз запустили экран - получаем в первый раз данные из интернета
-      getAllEventsState = getAllCourses().asStream();
+      getAllEventsState = getAllCourses(userDivision).asStream();
     }
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 70.0,
-        title: Text("${AppLocalizations.of(context).hello} $userName \n${AppLocalizations.of(context).titleDivision} $userDivision",
+        toolbarHeight: 100.0,
+        title: Text("${AppLocalizations.of(context).hello} $userName\n"
+            "${AppLocalizations.of(context).titleDivision} $userDivision\n"
+            "${AppLocalizations.of(context).titleAvailable} $count",
             style: TextStyle(
               fontSize: 22.0,
             )),
         centerTitle: true,
+        actions: [
+          userRole == 'admin' ? _chooseCourse() : Container(),
+        ],
         // backgroundColor: Theme.of(context).accentColor,
       ),
       drawer: MediaQuery.of(context).size.width > 600
@@ -207,3 +239,14 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     );
   }
 }
+
+//   TODO: Нужно на каждый активити добавить заголовок где находиться пользователь (почему Даньшиной не нравится в аппбаре подписи, не понимаю),
+//   TODO: проверить орфографию (зарегЕстрироваться и т.д),
+//   TODO: проверить английскую орфографию (попросить ЗВёздочку помочь),
+//   TODO: убрать все тени и сделать более политеховские цвета (бред какой-то...) убрать скругления,
+//   TODO: переделать активити "О приложении" (убрать гиганское лого [либо полностью убрать, либо отцентровать и сделать фиксированного размера]),
+//   TODO: переделать карточку разработчика, дописать "Разработано: Каштанов Александр Андреевич, студент Мос политеха, группа 171-331,\n мой контакт для связи: (и более ровно расписать мой профиль [туда же перенести кнопку на ссылку гитхаба])"
+//   TODO: как-то показать активные элементы, чтобы сразу было понятно что с ними можно взаимодействовать,
+//   TODO: повесить снекбар на пустой курс, чтобы выводилось сообщение, что курс еще пустой... или проверять его заполняемость и блокировать, чтобы он был не доступен к нажатию
+//   TODO: доделать заявленный функционал (удаление курсов и редактирование)
+

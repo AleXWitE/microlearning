@@ -36,7 +36,7 @@ class GoogleSignInState extends State<GoogleSignInMethod> {
           onPressed: () async {
             signInWithGoogle().then((auth.User user) {
               Navigator.pushNamedAndRemoveUntil(
-                  context, '/list_events', (route) => false);
+                  context, '/courses', (route) => false);
             }).catchError((e) => print(e));
             setState(() {
               _isSigningIn = true;
