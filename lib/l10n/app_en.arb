@@ -3,10 +3,10 @@
     "back": "Back",
     "or": "Or",
     "next": "Next",
-    "startApp": "Enter the App!",
+    "startApp": "Welcome to the App!",
     "loginApp": "Please, sign in!",
-    "registerApp": "Don`t have account? Sign up!",
-    "errorFirebase": "Something wrong with Firebase!",
+    "registerApp": "Don`t have an account? Sign up!",
+    "errorFirebase": "Something is wrong with Firebase!",
     "signIn": "Sign in",
     "signUp": "Sign up",
 
@@ -58,6 +58,16 @@
     "addCourse": "Add a course to division",
     "addCourseCard": "Add a card to course",
 
+    "updateDivision": "Update division",
+    "updateModerator": "Update moderator in division",
+    "updateCourse": "Update course in division",
+    "updateCourseCard": "Update card in course",
+
+    "deleteDivision": "Delete division",
+    "deleteModerator": "Delete moderator in division",
+    "deleteCourse": "Delete course in division",
+    "deleteCourseCard": "Delete card in course",
+
     "addOneCard": "Add one card to course",
 
     "answer": "Answer",
@@ -78,10 +88,13 @@
     "adminBlock": "Add to base",
 
     "dropdownDivisions": "Choose the division",
-    "dropdownModerator": "Choose the moderator",
-    "emptyModUserInDiv": "In choose division no one user!",
-    "emptyCoursesInDiv": "In choose division no one course!",
+    "dropdownModerator": "Choose a new moderator",
+    "dropdownOldModerator": "Choose the old moderator",
+    "emptyModUserInDiv": "In selected division no one user!",
+    "emptyCoursesInDiv": "In selected division no one course!",
+    "emptyCardsInCourse": "In selected course no one card!",
     "dropdownCourse": "Choose the course",
+    "dropdownCard": "Choose the card",
     "dropdownType": "Choose a card type",
 
     "courseError": "Enter the course name!",
@@ -92,6 +105,11 @@
     "cardQuestionError": "Enter question or lecture!",
     "cardContentUrl": "Content url",
     "moderatorError": "Enter moderator name!",
+
+    "del": "Delete",
+    "update": "Update",
+    "create": "Create",
+    "chooseAction": "Choose action",
 
     "userFavoritesCourses": "Favorite courses of",
 

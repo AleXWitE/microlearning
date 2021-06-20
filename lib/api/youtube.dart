@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+
 // import 'package:flutter/services.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-class YouTubePlay extends StatefulWidget{
+class YouTubePlay extends StatefulWidget {
   final String url;
+
   YouTubePlay({Key key, this.url}) : super(key: key);
 
   @override
   _YouTubePlayState createState() => _YouTubePlayState();
 }
 
-class _YouTubePlayState extends State<YouTubePlay>{
+class _YouTubePlayState extends State<YouTubePlay> {
   YoutubePlayerController _controller; //объявляем контроллер для работы iframe
 
   @override
@@ -38,8 +40,6 @@ class _YouTubePlayState extends State<YouTubePlay>{
     };*/
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     const player = YoutubePlayerIFrame(); //определяем под переменную сам iframe
@@ -47,7 +47,6 @@ class _YouTubePlayState extends State<YouTubePlay>{
       controller: _controller,
       child: player,
     );
-
   }
 
   @override

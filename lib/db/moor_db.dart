@@ -1,7 +1,7 @@
-// import 'package:moor_flutter/moor_flutter.dart';
-import 'package:moor/moor.dart';
+import 'package:moor_flutter/moor_flutter.dart';
+// import 'package:moor/moor.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:moor/moor_web.dart';
+// import 'package:moor/moor_web.dart';
 
 part 'moor_db.g.dart';
 
@@ -19,9 +19,9 @@ class Favors extends Table {
 class AppDatabase extends _$AppDatabase {
   var _db;
 
-  AppDatabase(QueryExecutor e) : super(e);
-  //     : super((FlutterQueryExecutor.inDatabaseFolder(
-  //           path: "db.sqlite", logStatements: true)));
+  // AppDatabase(QueryExecutor e) : super(e);
+      AppDatabase() : super((FlutterQueryExecutor.inDatabaseFolder(
+            path: "db.sqlite", logStatements: true)));
 
   @override
   int get schemaVersion => 2;

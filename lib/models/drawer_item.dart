@@ -107,7 +107,7 @@ class DrawerItem extends StatelessWidget {
                   color: Theme.of(context).accentColor,
                 )),
             onTap: () => Navigator.pushNamedAndRemoveUntil(
-                context, '/list_events', ModalRoute.withName('/list_events')),
+                context, '/courses', ModalRoute.withName('/courses')),
           ),
           // Divider(
           //   height: 3.0,
@@ -159,7 +159,7 @@ class DrawerItem extends StatelessWidget {
                   color: Theme.of(context).accentColor,
                 )),
             onTap: () => Navigator.pushNamedAndRemoveUntil(
-                context, '/favorite', ModalRoute.withName('/list_events')),
+                context, '/favorite', ModalRoute.withName('/courses')),
           ),
           Divider(
             height: 3.0,
@@ -176,7 +176,7 @@ class DrawerItem extends StatelessWidget {
                   color: Theme.of(context).accentColor,
                 )),
             onTap: () => Navigator.pushNamedAndRemoveUntil(
-                context, '/about', ModalRoute.withName('/list_events')),
+                context, '/about', ModalRoute.withName('/courses')),
           ),
           Divider(
             height: 3.0,

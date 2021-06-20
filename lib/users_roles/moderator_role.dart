@@ -31,17 +31,20 @@ class _ModeratorRoleState extends State<ModeratorRole> {
 
   List<Courses> _courses = [];
 
+  List<String> row = ['1', '2', '3', 'current'];
+
+
   List<String> _typeCard = ["radio", "checkbox", "lecture", "video"];
 
-
-  var databaseRef = FirebaseFirestore.instance.collection('divisions').doc(
-      userDivision).collection('courses');
+  var databaseRef = FirebaseFirestore.instance
+      .collection('divisions')
+      .doc(userDivision)
+      .collection('courses');
 
   @override
   void initState() {
     super.initState();
-    databaseRef.get().then((value) =>
-        value.docs.forEach((element) {
+    databaseRef.get().then((value) => value.docs.forEach((element) {
           _courses.add(Courses(course: element.id));
         }));
   }
@@ -64,17 +67,13 @@ class _ModeratorRoleState extends State<ModeratorRole> {
     }
 
     return MaterialButton(
-        color: Theme
-            .of(context)
-            .primaryColor,
+        color: Theme.of(context).primaryColor,
         height: 50.0,
         child: Center(
           child: Text(
             _name,
             style:
-            TextStyle(fontSize: 20.0, color: Theme
-                .of(context)
-                .accentColor),
+                TextStyle(fontSize: 20.0, color: Theme.of(context).accentColor),
           ),
         ),
         onPressed: () {
@@ -89,15 +88,74 @@ class _ModeratorRoleState extends State<ModeratorRole> {
         });
   }
 
+  Widget answInput(String _i) {
+    return Container(
+      margin: EdgeInsets.only(left: 50.0),
+      child: TextFormField(
+        validator: (value) {
+          if (value.isEmpty && _i != 'current')
+            return AppLocalizations.of(context).wrongAnswer;
+          else if (value != _answer1 &&
+              value != _answer2 &&
+              value != _answer3 &&
+              _i == 'current')
+            return AppLocalizations.of(context).wrongCurrentAnswer;
+          else
+            setState(() {
+              switch (_i) {
+                case '1':
+                  _answer1 = value;
+                  break;
+                case '2':
+                  _answer2 = value;
+                  break;
+                case '3':
+                  _answer3 = value;
+                  break;
+                case 'current':
+                  _answerCurrent = value;
+                  break;
+              }
+            });
+        },
+        onSaved: (value) {
+          setState(() {
+            switch (_i) {
+              case '1':
+                _answer1 = value;
+                break;
+              case '2':
+                _answer2 = value;
+                break;
+              case '3':
+                _answer3 = value;
+                break;
+              case 'current':
+                _answerCurrent = value;
+                break;
+            }
+          });
+        },
+        decoration: InputDecoration(
+          labelText: _i != 'current'
+              ? AppLocalizations.of(context).answer + ' $_i'
+              : AppLocalizations.of(context).curAnswer,
+          focusColor: Theme.of(context).primaryColor,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<String> _butList = [
-      AppLocalizations
-          .of(context)
-          .addCourse,
-      AppLocalizations
-          .of(context)
-          .addCourseCard,
+      AppLocalizations.of(context).addCourse,
+      AppLocalizations.of(context).addCourseCard,
+    ];
+
+    final List<String> _butListUpdate = [
+      AppLocalizations.of(context).updateCourse,
+      AppLocalizations.of(context).updateCourseCard,
     ];
 
     courseForm() {
@@ -116,8 +174,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Course $_courseName added"),
           ));
-        }
-        else
+        } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Something wrong"),
           ));
@@ -132,20 +189,77 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                 TextFormField(
                   validator: (value) {
                     if (value.isEmpty)
-                      return AppLocalizations
-                          .of(context)
-                          .courseError;
+                      return AppLocalizations.of(context).courseError;
                     else
                       _courseName = value;
                   },
                   onSaved: (value) => _courseName = value,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations
-                        .of(context)
-                        .courseName,
-                    focusColor: Theme
-                        .of(context)
-                        .primaryColor,
+                    labelText: AppLocalizations.of(context).courseName,
+                    focusColor: Theme.of(context).primaryColor,
+                  ),
+                  keyboardType: TextInputType.text,
+                ),
+                SizedBox(height: 20.0),
+                OutlinedButton(
+                  style: ButtonStyle(
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ))),
+                  onPressed: () {
+                    _onSavedCourse();
+                    print("click!");
+                  },
+                  child: Text(
+                    AppLocalizations.of(context).add,
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor, fontSize: 22.0),
+                  ),
+                ),
+              ],
+            )),
+      );
+    }
+
+    courseFormUpdate() {
+      bool _courseValidate() {
+        final _formCourse = _keyAddCourse.currentState;
+        if (_formCourse.validate()) {
+          _formCourse.save();
+          return true;
+        }
+        return false;
+      }
+
+      void _onSavedCourse() {
+        if (_courseValidate()) {
+          databaseRef.doc(_courseName).set({'title': _courseName});
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Course $_courseName added"),
+          ));
+        } else
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Something wrong"),
+          ));
+      }
+
+      return Container(
+        padding: EdgeInsets.all(10.0),
+        child: Form(
+            key: _keyAddCourse,
+            child: ListView(
+              children: [
+                TextFormField(
+                  validator: (value) {
+                    if (value.isEmpty)
+                      return AppLocalizations.of(context).courseError;
+                    else
+                      _courseName = value;
+                  },
+                  onSaved: (value) => _courseName = value,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context).courseName,
+                    focusColor: Theme.of(context).primaryColor,
                   ),
                   keyboardType: TextInputType.text,
                 ),
@@ -160,13 +274,9 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                     print("click!");
                   },
                   child: Text(
-                    AppLocalizations
-                        .of(context)
-                        .add,
+                    AppLocalizations.of(context).add,
                     style: TextStyle(
-                        color: Theme
-                            .of(context)
-                            .primaryColor, fontSize: 22.0),
+                        color: Theme.of(context).primaryColor, fontSize: 22.0),
                   ),
                 ),
               ],
@@ -175,8 +285,6 @@ class _ModeratorRoleState extends State<ModeratorRole> {
     }
 
     cardForm() {
-      List<String> row = ['1', '2', '3', 'current'];
-
       bool _cardValidate() {
         final _formCard = _keyAddCourseCard.currentState;
         if (_formCard.validate()) {
@@ -188,7 +296,8 @@ class _ModeratorRoleState extends State<ModeratorRole> {
 
       void _onSavedCard() {
         if (_cardValidate()) {
-          databaseRef.doc(selectedCourseInCard.course)
+          databaseRef
+              .doc(selectedCourseInCard.course)
               .collection('cards')
               .doc(_cardName)
               .set({
@@ -204,89 +313,17 @@ class _ModeratorRoleState extends State<ModeratorRole> {
             'card_url': _cardContentUrl,
           });
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Card $_cardName in course ${selectedCourseInCard
-                .course} added"),
+            content: Text(
+                "Card $_cardName in course ${selectedCourseInCard.course} added"),
           ));
-        }
-        else
+        } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Something wrong"),
           ));
       }
 
-      Widget answInput(String _i) {
-        return Container(
-          margin: EdgeInsets.only(left: 50.0),
-          child: TextFormField(
-            validator: (value) {
-              if (value.isEmpty && _i != 'current')
-                return AppLocalizations
-                    .of(context)
-                    .wrongAnswer;
-              else if (value != _answer1 &&
-                  value != _answer2 &&
-                  value != _answer3 &&
-                  _i == 'current')
-                return AppLocalizations
-                    .of(context)
-                    .wrongCurrentAnswer;
-              else
-                setState(() {
-                  switch (_i) {
-                    case '1':
-                      _answer1 = value;
-                      break;
-                    case '2':
-                      _answer2 = value;
-                      break;
-                    case '3':
-                      _answer3 = value;
-                      break;
-                    case 'current':
-                      _answerCurrent = value;
-                      break;
-                  }
-                });
-            },
-            onSaved: (value) {
-              setState(() {
-                switch (_i) {
-                  case '1':
-                    _answer1 = value;
-                    break;
-                  case '2':
-                    _answer2 = value;
-                    break;
-                  case '3':
-                    _answer3 = value;
-                    break;
-                  case 'current':
-                    _answerCurrent = value;
-                    break;
-                }
-              });
-            },
-            decoration: InputDecoration(
-              labelText: _i != 'current'
-                  ? AppLocalizations
-                  .of(context)
-                  .answer + ' $_i'
-                  : AppLocalizations
-                  .of(context)
-                  .curAnswer,
-              focusColor: Theme
-                  .of(context)
-                  .primaryColor,
-            ),
-          ),
-        );
-      }
-
       return Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(10.0),
         child: Form(
           key: _keyAddCourseCard,
@@ -295,12 +332,8 @@ class _ModeratorRoleState extends State<ModeratorRole> {
             children: [
               DropdownButton<Courses>(
                   hint: _courses.isEmpty
-                      ? Text(AppLocalizations
-                      .of(context)
-                      .emptyCoursesInDiv)
-                      : Text(AppLocalizations
-                      .of(context)
-                      .dropdownCourse),
+                      ? Text(AppLocalizations.of(context).emptyCoursesInDiv)
+                      : Text(AppLocalizations.of(context).dropdownCourse),
                   value: selectedCourseInCard,
                   onChanged: (value) {
                     setState(() {
@@ -317,29 +350,21 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               TextFormField(
                 validator: (value) {
                   if (value.isEmpty)
-                    return AppLocalizations
-                        .of(context)
-                        .cardNameError;
+                    return AppLocalizations.of(context).cardNameError;
                   else
                     _cardName = value;
                 },
                 onSaved: (value) => _cardName = value,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations
-                      .of(context)
-                      .cardName,
-                  focusColor: Theme
-                      .of(context)
-                      .primaryColor,
+                  labelText: AppLocalizations.of(context).cardName,
+                  focusColor: Theme.of(context).primaryColor,
                 ),
               ),
               SizedBox(
                 height: 20.0,
               ),
               DropdownButton<String>(
-                  hint: Text(AppLocalizations
-                      .of(context)
-                      .dropdownType),
+                  hint: Text(AppLocalizations.of(context).dropdownType),
                   value: selectedCardType,
                   onChanged: (value) {
                     setState(() {
@@ -356,20 +381,14 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               TextFormField(
                 validator: (value) {
                   if (value.isEmpty)
-                    return AppLocalizations
-                        .of(context)
-                        .cardQuestionError;
+                    return AppLocalizations.of(context).cardQuestionError;
                   else
                     _cardName = value;
                 },
                 onSaved: (value) => _cardQuestion = value,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations
-                      .of(context)
-                      .cardQuestion,
-                  focusColor: Theme
-                      .of(context)
-                      .primaryColor,
+                  labelText: AppLocalizations.of(context).cardQuestion,
+                  focusColor: Theme.of(context).primaryColor,
                 ),
               ),
               SizedBox(
@@ -382,12 +401,154 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               TextFormField(
                 onSaved: (value) => _cardContentUrl = value,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations
-                      .of(context)
-                      .cardContentUrl,
-                  focusColor: Theme
-                      .of(context)
-                      .primaryColor,
+                  labelText: AppLocalizations.of(context).cardContentUrl,
+                  focusColor: Theme.of(context).primaryColor,
+                ),
+              ),
+              SizedBox(
+                height: 25.0,
+              ),
+              OutlinedButton(
+                style: ButtonStyle(
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ))),
+                onPressed: () {
+                  // _cardValidate();
+                  _onSavedCard();
+                  print("click!");
+                },
+                child: Text(
+                  AppLocalizations.of(context).add,
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor, fontSize: 22.0),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    cardFormUpdate() {
+      bool _cardValidate() {
+        final _formCard = _keyAddCourseCard.currentState;
+        if (_formCard.validate()) {
+          _formCard.save();
+          return true;
+        }
+        return false;
+      }
+
+      // void _onSavedCard() {
+      //   if (_cardValidate()) {
+      //     databaseRef
+      //         .doc(selectedCourseInCard.course)
+      //         .collection('cards')
+      //         .doc(selectedCard)
+      //         .set({
+      //       'card_title': _cardName,
+      //       'card_type': selectedCardType,
+      //       'card_question': _cardQuestion,
+      //       'card_answers': {
+      //         'answer_1': _answer1,
+      //         'answer_2': _answer2,
+      //         'answer_3': _answer3,
+      //         'correct_answer': _answerCurrent,
+      //       },
+      //       'card_url': _cardContentUrl,
+      //     });
+      //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //       content: Text(
+      //           "Card $_cardName in course ${selectedCourseInCard.course} added"),
+      //     ));
+      //   } else
+      //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //       content: Text("Something wrong"),
+      //     ));
+      // }
+
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(10.0),
+        child: Form(
+          key: _keyAddCourseCard,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              DropdownButton<Courses>(
+                  hint: _courses.isEmpty
+                      ? Text(AppLocalizations.of(context).emptyCoursesInDiv)
+                      : Text(AppLocalizations.of(context).dropdownCourse),
+                  value: selectedCourseInCard,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCourseInCard = value;
+                    });
+                  },
+                  items: _courses.map((item) {
+                    return DropdownMenuItem<Courses>(
+                        value: item, child: Text(item.course));
+                  }).toList()),
+              SizedBox(
+                height: 20.0,
+              ),
+              TextFormField(
+                validator: (value) {
+                  if (value.isEmpty)
+                    return AppLocalizations.of(context).cardNameError;
+                  else
+                    _cardName = value;
+                },
+                onSaved: (value) => _cardName = value,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).cardName,
+                  focusColor: Theme.of(context).primaryColor,
+                ),
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+              DropdownButton<String>(
+                  hint: Text(AppLocalizations.of(context).dropdownType),
+                  value: selectedCardType,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCardType = value;
+                    });
+                  },
+                  items: _typeCard.map((item) {
+                    return DropdownMenuItem<String>(
+                        value: item, child: Text(item));
+                  }).toList()),
+              SizedBox(
+                height: 20.0,
+              ),
+              TextFormField(
+                validator: (value) {
+                  if (value.isEmpty)
+                    return AppLocalizations.of(context).cardQuestionError;
+                  else
+                    _cardName = value;
+                },
+                onSaved: (value) => _cardQuestion = value,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).cardQuestion,
+                  focusColor: Theme.of(context).primaryColor,
+                ),
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+              for (var i in row) answInput(i), //генерация списка ввода текста
+              SizedBox(
+                height: 20.0,
+              ),
+              TextFormField(
+                onSaved: (value) => _cardContentUrl = value,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).cardContentUrl,
+                  focusColor: Theme.of(context).primaryColor,
                 ),
               ),
               SizedBox(
@@ -400,17 +561,13 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                     ))),
                 onPressed: () {
                   // _cardValidate();
-                  _onSavedCard();
+                  // _onSavedCard();
                   print("click!");
                 },
                 child: Text(
-                  AppLocalizations
-                      .of(context)
-                      .add,
+                  AppLocalizations.of(context).add,
                   style: TextStyle(
-                      color: Theme
-                          .of(context)
-                          .primaryColor, fontSize: 22.0),
+                      color: Theme.of(context).primaryColor, fontSize: 22.0),
                 ),
               ),
             ],
@@ -419,7 +576,9 @@ class _ModeratorRoleState extends State<ModeratorRole> {
       );
     }
 
-    _formColumn() {
+    Widget _formColumn;
+
+    _formColumnCreate() {
       return Column(
         children: [
           Expanded(
@@ -440,90 +599,123 @@ class _ModeratorRoleState extends State<ModeratorRole> {
       );
     }
 
+    _formColumnUpdate() {
+      return Column(
+        children: [
+          Expanded(
+              flex: 2,
+              child: Container(
+                  margin: EdgeInsets.all(10.0),
+                  child: materialButList(_butListUpdate[0], 0))),
+          _visibleCourse
+              ? Expanded(flex: 13, child: courseFormUpdate())
+              : Container(),
+          Expanded(
+              flex: 2,
+              child: Container(
+                  margin: EdgeInsets.all(10.0),
+                  child: materialButList(_butListUpdate[1], 1))),
+          _visibleCard ? Expanded(flex: 13, child: cardFormUpdate()) : Container(),
+        ],
+      );
+    }
+
+    final List<String> _chooseActions = [
+      AppLocalizations.of(context).create,
+      AppLocalizations.of(context).update,
+    ];
+
+    String selectedAction;
+
+    widgetActions(){
+      return DropdownButton<String>(
+          hint: Text(AppLocalizations.of(context).chooseAction),
+          value: selectedAction,
+          onChanged: (value) {
+            setState(() {
+              selectedAction = value;
+              // _divisions.clear();
+              // _courses.clear();
+              // _users.clear();
+              // _newUsersInDiv.clear();
+              // _oldUsersInDiv.clear();
+            });
+          },
+          items: _chooseActions.map((item) {
+            return DropdownMenuItem<String>(
+                value: item, child: Text(item));
+          }).toList());
+    }
+
+    if(selectedAction == "Create" || selectedAction == "Создать")
+      setState(() {
+        _formColumn = _formColumnCreate();
+      });
+    else
+      setState(() {
+        _formColumn = _formColumnUpdate();
+      });
+
     return userRole != 'moderator'
         ? Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(AppLocalizations
-            .of(context)
-            .adminBlock),
-      ),
-      drawer: MediaQuery
-          .of(context)
-          .size
-          .width > 600
-          ? null
-          : Drawer(
-        child: DrawerItem(),
-      ),
-      body: MediaQuery
-          .of(context)
-          .size
-          .width < 600
-          ? Center(
-        child: Text(AppLocalizations
-            .of(context)
-            .notModerator),
-      )
-          : Row(
-        children: [
-          Container(
-            width: 200,
-            child: DrawerItem(),
-          ),
-          Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width - 200,
-            child: Center(
-              child: Text(AppLocalizations
-                  .of(context)
-                  .notModerator),
+            appBar: AppBar(
+              centerTitle: true,
+              title: Text(AppLocalizations.of(context).adminBlock),
             ),
+            drawer: MediaQuery.of(context).size.width > 600
+                ? null
+                : Drawer(
+                    child: DrawerItem(),
+                  ),
+            body: MediaQuery.of(context).size.width < 600
+                ? Center(
+                    child: Text(AppLocalizations.of(context).notModerator),
+                  )
+                : Row(
+                    children: [
+                      Container(
+                        width: 200,
+                        child: DrawerItem(),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width - 200,
+                        child: Center(
+                          child:
+                              Text(AppLocalizations.of(context).notModerator),
+                        ),
+                      )
+                    ],
+                  ),
           )
-        ],
-      ),
-    )
         : Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(AppLocalizations
-            .of(context)
-            .adminBlock),
-      ),
-      drawer: MediaQuery
-          .of(context)
-          .size
-          .width > 600
-          ? null
-          : Drawer(
-        child: DrawerItem(),
-      ),
-      body: SafeArea(
-        // child: ListView(
-        //   shrinkWrap: true,
-        child: MediaQuery
-            .of(context)
-            .size
-            .width < 600
-            ? _formColumn()
-            : Row(
-          children: [
-            Container(
-              width: 200,
-              child: DrawerItem(),
+            appBar: AppBar(
+              centerTitle: true,
+              title: Text(AppLocalizations.of(context).adminBlock),
+              actions: [widgetActions()],
             ),
-            Container(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width - 200,
-              child: _formColumn(),
-            )
-          ],
-        ),
-      ),
-    );
+            drawer: MediaQuery.of(context).size.width > 600
+                ? null
+                : Drawer(
+                    child: DrawerItem(),
+                  ),
+            body: SafeArea(
+              // child: ListView(
+              //   shrinkWrap: true,
+              child: MediaQuery.of(context).size.width < 600
+                  ? _formColumn
+                  : Row(
+                      children: [
+                        Container(
+                          width: 200,
+                          child: DrawerItem(),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width - 200,
+                          child: _formColumn,
+                        )
+                      ],
+                    ),
+            ),
+          );
   }
 }

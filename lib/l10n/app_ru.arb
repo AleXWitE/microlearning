@@ -58,6 +58,16 @@
     "addCourse": "Добавить курс для организации",
     "addCourseCard": "Добавить карточку курса",
 
+    "updateDivision": "Изменить организацию",
+    "updateModerator": "Изменить модератора в организации",
+    "updateCourse": "Изменить курс в организации",
+    "updateCourseCard": "Изменить карточку в курсе",
+
+    "deleteDivision": "Удалить организацию",
+    "deleteModerator": "Удалить модератора в организации",
+    "deleteCourse": "Удалить курс в организации",
+    "deleteCourseCard": "Удалить карточку в курсе",
+
     "addOneCard": "Добавить одну карточку в курс",
 
     "answer": "Ответ",
@@ -79,13 +89,14 @@
     "adminBlock": "Добавить в базу",
 
     "dropdownDivisions": "Выберите организацию",
-    "dropdownModerator": "Выберите модератора",
+    "dropdownModerator": "Выберите нового модератора",
+    "dropdownOldModerator": "Выберите старого модератора",
     "emptyModUserInDiv": "В выбранной организации нет ни одного пользователя!",
     "emptyCoursesInDiv": "В выбранной организации нет ни одного курса!",
+    "emptyCardsInCourse": "В выбранном курсе нет ни одной карточки!",
     "dropdownCourse": "Выберите курс",
+    "dropdownCard": "Выберите карточку",
     "dropdownType": "Выберите тип карточки",
-
-
 
     "courseError": "Введите название курса!",
 
@@ -95,6 +106,11 @@
     "cardQuestionError": "Введите текст вопроса или теории!",
     "cardContentUrl": "Ссылка на дополнительный контент",
     "moderatorError": "Выберите модератора!",
+
+    "del": "Удалить",
+    "update": "Обновить",
+    "create": "Создать",
+    "chooseAction": "Выберите действие",
 
     "userFavoritesCourses": "Избранные курсы у пользователя",
 
