@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:microlearning/components/bread_dots.dart';
 import 'package:microlearning/components/list_card.dart';
 import 'package:microlearning/components/users.dart';
 import 'package:microlearning/models/drawer_item.dart';
@@ -24,38 +25,48 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   List<Divisions> _divCoursesList = [];
   Divisions selectedDivision;
 
-
   final databaseRefDivs = FirebaseFirestore.instance.collection('divisions');
 
   String _choosenDiv = "Example";
 
   Future<List<Courses>> getAllCourses(String _div) async {
-    if(_coursesList.isNotEmpty)
-      _coursesList.clear();
+    if (_coursesList.isNotEmpty) _coursesList.clear();
 
     int i = 1;
 
-    if(userDivision != 'all') _choosenDiv = userDivision;
-    else _choosenDiv = _div;
+    if (userDivision != 'all')
+      _choosenDiv = userDivision;
+    else
+      _choosenDiv = _div;
 
-    if(userDivision != 'all'){
+    if (userDivision != 'all') {
       await FirebaseFirestore.instance
           .collection('divisions')
           .doc(_choosenDiv)
           .collection('courses')
           .get()
           .then((value) => value.docs.forEach((element) {
-        _coursesList.add(
-            Courses(id: i++, course: element.data()['title']));
-      }));
+                setState(() {
+                  _coursesList.add(Courses(
+                      id: i++,
+                      course: element.data()['title'],
+                      division: element.id));
+                });
+              }));
     } else {
       await FirebaseFirestore.instance
-          .collection('divisions').get().then((value) => value.docs.forEach((element) {
-            _divCoursesList.add(element.data()['title_division']);
-            selectedDivision = _divCoursesList.first;
-      }));
+          .collection('divisions')
+          .get()
+          .then((value) => value.docs.forEach((element) {
+                setState(() {
+                  _divCoursesList.clear();
+                  _divCoursesList.add(Divisions(
+                      division: element.id,
+                      title: element.data()['title_division']));
+                  selectedDivision = _divCoursesList.first;
+                });
+              }));
     }
-
     return _coursesList;
   }
 
@@ -64,9 +75,10 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     super.initState();
     getAllEventsState = getAllCourses(userDivision).asStream();
     databaseRefDivs.get().then((value) => value.docs.forEach((element) {
-      _divCoursesList.add(Divisions(division: element.id));
-      print(element.id);
-    }));
+          _divCoursesList.add(Divisions(
+              title: element.data()['title_division'], division: element.id));
+          print(element.id + element.data()['title_division']);
+        }));
     // selectedDivision = _divCoursesList.first;
     refreshKey = GlobalKey<
         RefreshIndicatorState>(); //задача уникального ключа для виджета обновления спсика
@@ -91,7 +103,10 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
 
   Widget _chooseCourse() {
     return DropdownButton<Divisions>(
-        hint: Text(AppLocalizations.of(context).dropdownDivisions, style: TextStyle(color: Theme.of(context).accentColor),),
+        hint: Text(
+          AppLocalizations.of(context).dropdownDivisions,
+          style: TextStyle(color: Theme.of(context).accentColor),
+        ),
         value: selectedDivision,
         style: TextStyle(color: Theme.of(context).accentColor),
         dropdownColor: Theme.of(context).primaryColor,
@@ -102,32 +117,28 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
           });
           await getAllCourses(selectedDivision.division);
           await refreshList();
-
         },
         items: _divCoursesList.map((item) {
           return DropdownMenuItem<Divisions>(
-              value: item, child: Text(item.division, ));
+              value: item,
+              child: Text(
+                item.title,
+              ));
         }).toList());
   }
-
-
 
   Future<Null> ifNoData(bool snapdata) async {
     if (snapdata == false) {
       await Future.delayed(Duration(seconds: 5));
       setState(() {
         _ifNoData = Center(
-          child: Text(userRole == 'admin' ? AppLocalizations.of(context).youAreAdmin : AppLocalizations.of(context).warningConnection),
+          child: Text(userRole == 'admin'
+              ? AppLocalizations.of(context).youAreAdmin
+              : AppLocalizations.of(context).warningConnection),
         );
       });
     }
   }
-
-  // @override
-  // void dispose() {
-  //   WidgetsBinding.instance.removeObserver(this);
-  //   super.dispose();
-  // }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -143,41 +154,51 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     return RefreshIndicator(
         //обновление списка
         key: refreshKey,
+        backgroundColor: Theme.of(context).primaryColor,
         onRefresh: () async {
           await refreshList();
         },
-        child: StreamBuilder<List<Courses>>(
-          stream: getAllEventsState,
-          builder: (context, snapshot) {
-            // AppLifecycleState state;
-            print(snapshot.hasData);
-            if (snapshot.connectionState == ConnectionState.done &&
-                snapshot.hasData) {
-              _hasData = true;
-              count = snapshot.data.length;
-              if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
+        child: Column(children: [
+          Expanded(
+              flex: 1,
+              child: BreadDots(
+                  title: AppLocalizations.of(context).breadDotsCourses)),
+          Expanded(
+            flex: 9,
+            child: StreamBuilder<List<Courses>>(
+              stream: getAllEventsState,
+              builder: (context, snapshot) {
+                // AppLifecycleState state;
+                print(snapshot.hasData);
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  _hasData = true;
+                  count = snapshot.data.length;
+                  if (snapshot.hasError) {
+                    return Text('${snapshot.error}');
+                  }
 
-              return ListView.builder(
-                  //возвращаем билд списка
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: 40),
-                  itemCount: count,
-                  itemBuilder:
-                      (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
-                          EventCard(
-                            courses: snapshot.data,
-                            i: index,
-                            favs: [],
-                          ));
-            } else {
-              _hasData = false;
-              ifNoData(_hasData);
-              return _ifNoData;
-            }
-          },
-        ));
+                  return ListView.builder(
+                      //возвращаем билд списка
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(horizontal: 40),
+                      itemCount: count,
+                      itemBuilder:
+                          (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
+                              EventCard(
+                                courses: snapshot.data,
+                                i: index,
+                                favs: [],
+                              ));
+                } else {
+                  _hasData = false;
+                  ifNoData(_hasData);
+                  return _ifNoData;
+                }
+              },
+            ),
+          ),
+        ]));
   }
 
   @override
@@ -189,7 +210,8 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100.0,
-        title: Text("${AppLocalizations.of(context).hello} $userName\n"
+        title: Text(
+            "${AppLocalizations.of(context).hello} $userName\n"
             "${AppLocalizations.of(context).titleDivision} $userDivision\n"
             "${AppLocalizations.of(context).titleAvailable} $count",
             style: TextStyle(
@@ -240,13 +262,5 @@ class _ListScreenState extends State<ListScreen> with WidgetsBindingObserver {
   }
 }
 
-//   TODO: Нужно на каждый активити добавить заголовок где находиться пользователь (почему Даньшиной не нравится в аппбаре подписи, не понимаю),
-//   TODO: проверить орфографию (зарегЕстрироваться и т.д),
 //   TODO: проверить английскую орфографию (попросить ЗВёздочку помочь),
 //   TODO: убрать все тени и сделать более политеховские цвета (бред какой-то...) убрать скругления,
-//   TODO: переделать активити "О приложении" (убрать гиганское лого [либо полностью убрать, либо отцентровать и сделать фиксированного размера]),
-//   TODO: переделать карточку разработчика, дописать "Разработано: Каштанов Александр Андреевич, студент Мос политеха, группа 171-331,\n мой контакт для связи: (и более ровно расписать мой профиль [туда же перенести кнопку на ссылку гитхаба])"
-//   TODO: как-то показать активные элементы, чтобы сразу было понятно что с ними можно взаимодействовать,
-//   TODO: повесить снекбар на пустой курс, чтобы выводилось сообщение, что курс еще пустой... или проверять его заполняемость и блокировать, чтобы он был не доступен к нажатию
-//   TODO: доделать заявленный функционал (удаление курсов и редактирование)
-

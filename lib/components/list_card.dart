@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:microlearning/components/users.dart';
 import 'package:microlearning/db/moor_db.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'event.dart';
 
@@ -26,7 +27,6 @@ class _EventCardState extends State<EventCard> {
     super.initState();
     print("${widget.courses.length}\n"); //вывод в консоли количество элементов
     print("${widget.favs.length}"); //вывод в консоли количество элементов
-
   }
 
   bool _isEnabled = true;
@@ -80,7 +80,7 @@ class _EventCardState extends State<EventCard> {
       }
     });
 
-    insertData(Courses courses/*Answers answ*/) {
+    insertData(Courses courses /*Answers answ*/) {
       _dao.insertNewFavorite(Favor(
           courseId: courses.id,
           title: courses.course,
@@ -105,73 +105,106 @@ class _EventCardState extends State<EventCard> {
           .removeAt(favorItem.indexWhere((el) => el.courseId == element.id));
     }
 
-    Future _getAnswers(String _chooseCourse) async {
-      await FirebaseFirestore.instance
-          .collection('divisions')
-          .doc(userDivision)
-          .collection('courses')
-          .doc(_chooseCourse)
-          .collection('cards')
-          .get()
-          .then((value) => value.docs.forEach((element) {
-        answers.add(Answers(title: element.data()['card_title'],
-          description: element.data()['card_question'],
-          type: element.data()['card_type'],
-          answer1: element.data()['card_answers']['answer_1'],
-          answer2: element.data()['card_answers']['answer_2'],
-          answer3: element.data()['card_answers']['answer_3'],
-          answerCorrect: element.data()['card_answers']['correct_answer'],
-          url: element.data()['card_url'],
-        ));
-      }));
-    }
+
     _Card() {
-      if(widget.courses.isEmpty)
+      if (widget.courses.isEmpty)
         _course = element.title;
       else
         _course = element.course;
 
-        return Card(
-          elevation: 15.0,
-          margin: EdgeInsets.symmetric(vertical: 20),
-          child: ListTile(
-            onTap: () async {
-              await _getAnswers(_course);
-              if(answers.isNotEmpty)
+      String _courseId;
+
+      _getCourseId() async {
+        await FirebaseFirestore.instance
+            .collection('divisions')
+            .doc(userDivision)
+            .collection('courses')
+            .get()
+            .then((value) {
+          value.docs.forEach((element) {
+            if (element.data()['title'] == _course)
+              setState(() {
+                _courseId = element.id;
+              });
+            // print(_courseId);
+          });
+        });
+      }
+
+      _getAnswers(String _courseName) async {
+        print(_courseName);
+        await FirebaseFirestore.instance
+            .collection('divisions')
+            .doc(userDivision)
+            .collection('courses')
+            .doc(_courseName)
+            .collection('cards')
+            .orderBy('id')
+            .get()
+            .then((value) => value.docs.forEach((element) {
+              // print(element.id);
+              setState(() {
+                answers.add(Answers(
+                  title: element.data()['card_title'],
+                  description: element.data()['card_question'],
+                  type: element.data()['card_type'],
+                  answer1: element.data()['card_answers']['answer_1'],
+                  answer2: element.data()['card_answers']['answer_2'],
+                  answer3: element.data()['card_answers']['answer_3'],
+                  answerCorrect: element.data()['card_answers']
+                  ['correct_answer'],
+                  url: element.data()['card_url'],
+                ));
+              });
+        }));
+      }
+
+      return Card(
+        elevation: 15.0,
+        margin: EdgeInsets.symmetric(vertical: 20),
+        child: ListTile(
+          onTap: () async {
+            await _getCourseId();
+            print(_courseId);
+            await _getAnswers(_courseId);
+            if (answers.isNotEmpty)
               Navigator.pushNamed(
                 context,
-                    '/courses/$_course',
+                '/courses/$_course',
               );
-            },
-            // generate route for item card
-            enabled: _isEnabled,
-            title: Text(
-              _fav ? element.title : element.course,
-              // element.course,
-              style: TextStyle(fontSize: 20),
-            ),
-            leading: IconButton(
-              icon:
-                  _isEnabled ? Icon(Icons.lock_outlined) : Icon(Icons.lock_open),
-              onPressed: () => setState(
-                () => _isEnabled = !_isEnabled,
-              ),
-            ),
-            trailing: IconButton(
-              icon: Icon(
-                _isFavorite ? Icons.favorite : Icons.favorite_border,
-                //задаем смену сердечек от параметра _isFavorite
-                size: 40,
-                // color: Colors.indigo,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isFavorite ? deleteData(int.parse(elId)) : insertData(element);
-                  _isFavorite = !_isFavorite;
-                });
-              },
+            else ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(AppLocalizations.of(context).emptyCourse),
+            ));
+          },
+          // generate route for item card
+          enabled: _isEnabled,
+          title: Text(
+            _fav ? element.title : element.course,
+            // element.course,
+            style: TextStyle(fontSize: 20),
+          ),
+          leading: IconButton(
+            icon:
+                _isEnabled ? Icon(Icons.lock_outlined) : Icon(Icons.lock_open),
+            onPressed: () => setState(
+              () => _isEnabled = !_isEnabled,
             ),
           ),
+          trailing: IconButton(
+            icon: Icon(
+              _isFavorite ? Icons.favorite : Icons.favorite_border,
+              //задаем смену сердечек от параметра _isFavorite
+              size: 40,
+              // color: Colors.indigo,
+            ),
+            onPressed: () {
+              setState(() {
+                _isFavorite ? deleteData(int.parse(elId)) : insertData(element);
+                _isFavorite = !_isFavorite;
+              });
+            },
+          ),
+        ),
       );
     }
 
@@ -188,6 +221,7 @@ class _EventCardState extends State<EventCard> {
               });
             },
           )
-        : */_Card();
+        : */
+        _Card();
   }
 }

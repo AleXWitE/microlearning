@@ -29,7 +29,7 @@
     "googleSignInInfo": "Sign in with Google",
 
     "drawerNav": "Navigation",
-    "drawerHome": "Home",
+    "drawerHome": "List of courses",
     "drawerToList": "To list",
     "drawerAdd": "Add event",
     "drawerFavorite": "Favorites",
@@ -38,12 +38,12 @@
 
     "hello": "Hello,",
     "titleDivision": "in division",
-    "titleAvailable": "available",
+    "titleAvailable": "available courses:",
 
     "chooseCourse": "Course",
 
     "favWarning": "There is no favorite data!",
-    "favAlertInfo": "Do you really want delete all favorites?",
+    "favAlertInfo": "Do you really want to delete all favorites courses?",
     "favAlertCancel": "Cancel",
     "favAlertDel": "Delete",
 
@@ -86,9 +86,11 @@
     "courseName": "Course name",
     "cardName": "Card name",
     "adminBlock": "Add to base",
+    "adminBlockUpdate": "Update in base",
+    "adminBlockDelete": "Delete from base",
 
     "dropdownDivisions": "Choose the division",
-    "dropdownModerator": "Choose a new moderator",
+    "dropdownModerator": "Choose moderator",
     "dropdownOldModerator": "Choose the old moderator",
     "emptyModUserInDiv": "In selected division no one user!",
     "emptyCoursesInDiv": "In selected division no one course!",
@@ -120,6 +122,16 @@
     "aboutApp5": "- adding courses to favorites;",
     "aboutApp6": "- deleting courses from favorites;",
     "aboutApp7": "- exit the application and then log in.",
-    "youAreAdmin": "You are admin. Choose the division for continue."
+    "youAreAdmin": "You are admin. Choose the division for continue.",
+
+    "breadDotsCourses": "List of courses",
+    "breadDotsFavorites": "List of favorites courses",
+    "breadDotsAbout": "About App",
+    "breadDotsCard": "Card",
+    "breadDotsPanel": "Remote panel",
+
+    "emptyCourse": "There is no cards in course yet!",
+    "developer1": "Developed by Kashtanov Alexander Andreevich, student group 171-331 of Moscow Polytech",
+    "developer2": "my Vk profile for support:"
 
 }

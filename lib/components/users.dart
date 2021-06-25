@@ -10,8 +10,9 @@ Users savedUser;
 
 class Divisions{
   String division;
+  String title;
 
-  Divisions({this.division});
+  Divisions({this.division, this.title});
 }
 
 class Courses{

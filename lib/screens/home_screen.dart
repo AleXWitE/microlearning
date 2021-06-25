@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/svg.dart'; //полезный импорт, без него не получится вставить svg картинку. Вставлять только с помощью assert
 import 'package:microlearning/api/youtube.dart';
+import 'package:microlearning/components/bread_dots.dart';
 import 'package:microlearning/components/event.dart';
-import 'package:microlearning/components/users.dart';
 import 'package:microlearning/models/drawer_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -369,47 +368,57 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
 
     Widget ScrollElement() {
-      return SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
+      return Column(children: [
+        Expanded(
+            flex: 1,
+            child: BreadDots(
+              title: AppLocalizations.of(context).breadDotsCard,
+            )),
+        Expanded(
+          flex: 9,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Container(
-                  alignment: Alignment.topCenter,
-                  child: TweenAnimationBuilder(
-                    // анимация которая вынесла весь мозг, работает через твины передвижения, без билдера не сработает
-                    tween: Tween<Offset>(
-                        begin: Offset(startPos, 0), end: Offset(endPos, 0)),
-                    duration: Duration(milliseconds: 250),
-                    curve: curve,
-                    builder: (context, offset, child) {
-                      return FractionalTranslation(
-                        // добавление виджета, который оборачивает в себя анимированные объекты
-                        translation: offset,
-                        child: Container(
-                          width: double.infinity,
-                          child: Center(
-                            child: child,
-                          ),
-                        ),
-                      );
-                    },
-                    onEnd: () {
-                      onEndAnimation(endPos);
-                    },
-                    child:
-                        ChooseType(question.type), // объект который анимируется
-                  ),
-                ),
-                SizedBox(
-                  height: 1,
+                Column(
+                  children: [
+                    Container(
+                      alignment: Alignment.topCenter,
+                      child: TweenAnimationBuilder(
+                        // анимация которая вынесла весь мозг, работает через твины передвижения, без билдера не сработает
+                        tween: Tween<Offset>(
+                            begin: Offset(startPos, 0), end: Offset(endPos, 0)),
+                        duration: Duration(milliseconds: 250),
+                        curve: curve,
+                        builder: (context, offset, child) {
+                          return FractionalTranslation(
+                            // добавление виджета, который оборачивает в себя анимированные объекты
+                            translation: offset,
+                            child: Container(
+                              width: double.infinity,
+                              child: Center(
+                                child: child,
+                              ),
+                            ),
+                          );
+                        },
+                        onEnd: () {
+                          onEndAnimation(endPos);
+                        },
+                        child: ChooseType(
+                            question.type), // объект который анимируется
+                      ),
+                    ),
+                    SizedBox(
+                      height: 1,
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
-      );
+      ]);
     }
 
     return Scaffold(
@@ -454,17 +463,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ],
                   )),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   //активная интерактивная кнопка справа внизу
-      //   child: Icon(
-      //     Icons.search,
-      //     size: 40.0,
-      //   ),
-      //   onPressed: () {
-      //     print("tap");
-      //     setState(() => count++);
-      //   },
-      // ),
       bottomNavigationBar: BottomAppBar(
         //наиболее лучшая реализация кнопок вперед назад чтобы они были прифлочены к нижней границе
         color: Theme.of(context).primaryColor,

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:microlearning/components/bread_dots.dart';
+import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/users.dart';
 import 'package:microlearning/models/drawer_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -10,8 +12,31 @@ class ModeratorRole extends StatefulWidget {
 }
 
 class _ModeratorRoleState extends State<ModeratorRole> {
-  final _keyAddCourse = GlobalKey<FormState>();
-  final _keyAddCourseCard = GlobalKey<FormState>();
+  final _keyAddCourseModer = GlobalKey<FormState>();
+  final _keyAddCourseModerUpdate = GlobalKey<FormState>();
+  final _keyAddCourseCardModer = GlobalKey<FormState>();
+  final _keyAddCourseCardModerUpdate = GlobalKey<FormState>();
+
+  TextEditingController _textControllerModCardName = TextEditingController();
+  TextEditingController _textControllerModCardQuestion =
+      TextEditingController();
+  TextEditingController _textControllerModCardUrl = TextEditingController();
+
+  TextEditingController _textControllerModCourse = TextEditingController();
+  TextEditingController _textControllerModAnswer1 = TextEditingController();
+  TextEditingController _textControllerModAnswer2 = TextEditingController();
+  TextEditingController _textControllerModAnswer3 = TextEditingController();
+  TextEditingController _textControllerModAnswerCorrect =
+      TextEditingController();
+
+  String _title = "";
+
+  final _controller = PageController(initialPage: 0);
+  int _selectedIndex = 0;
+
+  int _cardId;
+
+  Curve curve = Curves.decelerate;
 
   bool _visibleCourse = true;
   bool _visibleCard = false;
@@ -26,13 +51,20 @@ class _ModeratorRoleState extends State<ModeratorRole> {
   String _answer3;
   String _answerCurrent;
 
+  String _cardNameUpdate;
+  String _cardQuestionUpdate;
+  String _cardContentUrlUpdate;
+
   Courses selectedCourseInCard;
+  Courses selectedCourseUpdate;
   String selectedCardType;
+  String selectedCardTypeUpdate;
+  String selectedCardUpdate;
 
   List<Courses> _courses = [];
+  List<String> _cards = [];
 
   List<String> row = ['1', '2', '3', 'current'];
-
 
   List<String> _typeCard = ["radio", "checkbox", "lecture", "video"];
 
@@ -41,11 +73,17 @@ class _ModeratorRoleState extends State<ModeratorRole> {
       .doc(userDivision)
       .collection('courses');
 
+  int _lastId = 0;
+
   @override
   void initState() {
     super.initState();
     databaseRef.get().then((value) => value.docs.forEach((element) {
-          _courses.add(Courses(course: element.id));
+          setState(() {
+            // _courses.clear();
+            _courses.add(
+                Courses(course: element.id, division: element.data()['title']));
+          });
         }));
   }
 
@@ -118,6 +156,13 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               }
             });
         },
+        controller: _i == '1'
+            ? _textControllerModAnswer1
+            : _i == '2'
+                ? _textControllerModAnswer2
+                : _i == '3'
+                    ? _textControllerModAnswer3
+                    : _textControllerModAnswerCorrect,
         onSaved: (value) {
           setState(() {
             switch (_i) {
@@ -160,7 +205,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
 
     courseForm() {
       bool _courseValidate() {
-        final _formCourse = _keyAddCourse.currentState;
+        final _formCourse = _keyAddCourseModer.currentState;
         if (_formCourse.validate()) {
           _formCourse.save();
           return true;
@@ -183,7 +228,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
       return Container(
         padding: EdgeInsets.all(10.0),
         child: Form(
-            key: _keyAddCourse,
+            key: _keyAddCourseModer,
             child: ListView(
               children: [
                 TextFormField(
@@ -223,7 +268,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
 
     courseFormUpdate() {
       bool _courseValidate() {
-        final _formCourse = _keyAddCourse.currentState;
+        final _formCourse = _keyAddCourseModerUpdate.currentState;
         if (_formCourse.validate()) {
           _formCourse.save();
           return true;
@@ -233,9 +278,12 @@ class _ModeratorRoleState extends State<ModeratorRole> {
 
       void _onSavedCourse() {
         if (_courseValidate()) {
-          databaseRef.doc(_courseName).set({'title': _courseName});
+          databaseRef
+              .doc(selectedCourseUpdate.division)
+              .set({'title': _courseName});
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Course $_courseName added"),
+            content: Text(
+                "Course ${selectedCourseUpdate.division} updated to $_courseName"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -246,10 +294,30 @@ class _ModeratorRoleState extends State<ModeratorRole> {
       return Container(
         padding: EdgeInsets.all(10.0),
         child: Form(
-            key: _keyAddCourse,
+            key: _keyAddCourseModerUpdate,
             child: ListView(
               children: [
+                DropdownButton<Courses>(
+                    hint: _courses.isEmpty
+                        ? Text(AppLocalizations.of(context).emptyCoursesInDiv)
+                        : Text(AppLocalizations.of(context).dropdownCourse),
+                    value: selectedCourseUpdate,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedCourseUpdate = value;
+                        _textControllerModCourse.text =
+                            selectedCourseUpdate.course;
+                      });
+                    },
+                    items: _courses.map((item) {
+                      return DropdownMenuItem<Courses>(
+                          value: item, child: Text(item.course));
+                    }).toList()),
+                SizedBox(
+                  height: 20.0,
+                ),
                 TextFormField(
+                  controller: _textControllerModCourse,
                   validator: (value) {
                     if (value.isEmpty)
                       return AppLocalizations.of(context).courseError;
@@ -267,14 +335,14 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                 OutlinedButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ))),
-                  onPressed: () {
+                    borderRadius: BorderRadius.circular(50),
+                  ))),
+                  onPressed: () async {
                     _onSavedCourse();
                     print("click!");
                   },
                   child: Text(
-                    AppLocalizations.of(context).add,
+                    AppLocalizations.of(context).update,
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 22.0),
                   ),
@@ -286,7 +354,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
 
     cardForm() {
       bool _cardValidate() {
-        final _formCard = _keyAddCourseCard.currentState;
+        final _formCard = _keyAddCourseCardModer.currentState;
         if (_formCard.validate()) {
           _formCard.save();
           return true;
@@ -311,10 +379,11 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               'correct_answer': _answerCurrent,
             },
             'card_url': _cardContentUrl,
+            'id': _lastId,
           });
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-                "Card $_cardName in course ${selectedCourseInCard.course} added"),
+                "Card $_cardName in course ${selectedCourseInCard.course} added. Card id $_lastId"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -326,7 +395,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(10.0),
         child: Form(
-          key: _keyAddCourseCard,
+          key: _keyAddCourseCardModer,
           child: ListView(
             shrinkWrap: true,
             children: [
@@ -338,6 +407,12 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                   onChanged: (value) {
                     setState(() {
                       selectedCourseInCard = value;
+                      databaseRef
+                          .doc(selectedCourseInCard.course)
+                          .collection('cards')
+                          .orderBy('id')
+                          .get()
+                          .then((value) => _lastId = value.size);
                     });
                   },
                   items: _courses.map((item) {
@@ -385,6 +460,8 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                   else
                     _cardName = value;
                 },
+                minLines: 1,
+                maxLines: 15,
                 onSaved: (value) => _cardQuestion = value,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).cardQuestion,
@@ -414,6 +491,9 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                   borderRadius: BorderRadius.circular(50),
                 ))),
                 onPressed: () {
+                  setState(() {
+                    _lastId++;
+                  });
                   // _cardValidate();
                   _onSavedCard();
                   print("click!");
@@ -432,7 +512,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
 
     cardFormUpdate() {
       bool _cardValidate() {
-        final _formCard = _keyAddCourseCard.currentState;
+        final _formCard = _keyAddCourseCardModerUpdate.currentState;
         if (_formCard.validate()) {
           _formCard.save();
           return true;
@@ -440,39 +520,50 @@ class _ModeratorRoleState extends State<ModeratorRole> {
         return false;
       }
 
-      // void _onSavedCard() {
-      //   if (_cardValidate()) {
-      //     databaseRef
-      //         .doc(selectedCourseInCard.course)
-      //         .collection('cards')
-      //         .doc(selectedCard)
-      //         .set({
-      //       'card_title': _cardName,
-      //       'card_type': selectedCardType,
-      //       'card_question': _cardQuestion,
-      //       'card_answers': {
-      //         'answer_1': _answer1,
-      //         'answer_2': _answer2,
-      //         'answer_3': _answer3,
-      //         'correct_answer': _answerCurrent,
-      //       },
-      //       'card_url': _cardContentUrl,
-      //     });
-      //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      //       content: Text(
-      //           "Card $_cardName in course ${selectedCourseInCard.course} added"),
-      //     ));
-      //   } else
-      //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      //       content: Text("Something wrong"),
-      //     ));
-      // }
+      void _onSavedCard() async {
+        if (_cardValidate()) {
+          await databaseRef
+              .doc(selectedCourseInCard.division)
+              .collection('cards')
+              .doc(selectedCardUpdate)
+              .delete();
+
+          await databaseRef
+              .doc(selectedCourseInCard.division)
+              .collection('cards')
+              .doc(_cardNameUpdate)
+              .set(
+                  {
+                'card_title': _cardNameUpdate,
+                'card_type': selectedCardTypeUpdate,
+                'card_question': _cardQuestionUpdate,
+                'card_answers': {
+                  'answer_1': _answer1,
+                  'answer_2': _answer2,
+                  'answer_3': _answer3,
+                  'correct_answer': _answerCurrent,
+                },
+                'card_url': _cardContentUrlUpdate,
+                'id': _cardId,
+              },
+                  SetOptions(
+                    merge: true,
+                  ));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                "Card $_cardName in course ${selectedCourseInCard.course} added"),
+          ));
+        } else
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Something wrong"),
+          ));
+      }
 
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(10.0),
         child: Form(
-          key: _keyAddCourseCard,
+          key: _keyAddCourseCardModerUpdate,
           child: ListView(
             shrinkWrap: true,
             children: [
@@ -485,6 +576,18 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                     setState(() {
                       selectedCourseInCard = value;
                     });
+                    databaseRef
+                        .doc(selectedCourseInCard.division)
+                        .collection('cards')
+                        .get()
+                        .then((value) {
+                      setState(() {
+                        _cards.clear();
+                        value.docs.forEach((element) {
+                          _cards.add(element.data()['card_title']);
+                        });
+                      });
+                    });
                   },
                   items: _courses.map((item) {
                     return DropdownMenuItem<Courses>(
@@ -493,7 +596,50 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               SizedBox(
                 height: 20.0,
               ),
+              DropdownButton<String>(
+                  hint: _cards.isEmpty
+                      ? Text(AppLocalizations.of(context).emptyCardsInCourse)
+                      : Text(AppLocalizations.of(context).dropdownCard),
+                  value: selectedCardUpdate,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCardUpdate = value;
+                    });
+                    databaseRef
+                        .doc(selectedCourseInCard.division)
+                        .collection('cards')
+                        .doc(selectedCardUpdate)
+                        .get()
+                        .then((value) {
+                      setState(() {
+                        _textControllerModCardName.text =
+                            value.data()['card_title'];
+                        _textControllerModCardQuestion.text =
+                            value.data()['card_question'];
+                        selectedCardTypeUpdate = value.data()['card_type'];
+                        _textControllerModCardUrl.text =
+                            value.data()['card_url'];
+                        _textControllerModAnswer1.text =
+                            value.data()['card_answers']['answer_1'];
+                        _textControllerModAnswer2.text =
+                            value.data()['card_answers']['answer_2'];
+                        _textControllerModAnswer3.text =
+                            value.data()['card_answers']['answer_3'];
+                        _textControllerModAnswerCorrect.text =
+                            value.data()['card_answers']['correct_answer'];
+                        _cardId = value.data()['id'];
+                      });
+                    });
+                  },
+                  items: _cards.map((item) {
+                    return DropdownMenuItem<String>(
+                        value: item, child: Text(item));
+                  }).toList()),
+              SizedBox(
+                height: 20.0,
+              ),
               TextFormField(
+                controller: _textControllerModCardName,
                 validator: (value) {
                   if (value.isEmpty)
                     return AppLocalizations.of(context).cardNameError;
@@ -511,10 +657,10 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               ),
               DropdownButton<String>(
                   hint: Text(AppLocalizations.of(context).dropdownType),
-                  value: selectedCardType,
+                  value: selectedCardTypeUpdate,
                   onChanged: (value) {
                     setState(() {
-                      selectedCardType = value;
+                      selectedCardTypeUpdate = value;
                     });
                   },
                   items: _typeCard.map((item) {
@@ -525,6 +671,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                 height: 20.0,
               ),
               TextFormField(
+                controller: _textControllerModCardQuestion,
                 validator: (value) {
                   if (value.isEmpty)
                     return AppLocalizations.of(context).cardQuestionError;
@@ -545,6 +692,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                 height: 20.0,
               ),
               TextFormField(
+                controller: _textControllerModCardUrl,
                 onSaved: (value) => _cardContentUrl = value,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).cardContentUrl,
@@ -557,15 +705,15 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               OutlinedButton(
                 style: ButtonStyle(
                     shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ))),
+                  borderRadius: BorderRadius.circular(50),
+                ))),
                 onPressed: () {
                   // _cardValidate();
-                  // _onSavedCard();
+                  _onSavedCard();
                   print("click!");
                 },
                 child: Text(
-                  AppLocalizations.of(context).add,
+                  AppLocalizations.of(context).update,
                   style: TextStyle(
                       color: Theme.of(context).primaryColor, fontSize: 22.0),
                 ),
@@ -575,8 +723,6 @@ class _ModeratorRoleState extends State<ModeratorRole> {
         ),
       );
     }
-
-    Widget _formColumn;
 
     _formColumnCreate() {
       return Column(
@@ -615,7 +761,9 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               child: Container(
                   margin: EdgeInsets.all(10.0),
                   child: materialButList(_butListUpdate[1], 1))),
-          _visibleCard ? Expanded(flex: 13, child: cardFormUpdate()) : Container(),
+          _visibleCard
+              ? Expanded(flex: 13, child: cardFormUpdate())
+              : Container(),
         ],
       );
     }
@@ -625,42 +773,26 @@ class _ModeratorRoleState extends State<ModeratorRole> {
       AppLocalizations.of(context).update,
     ];
 
-    String selectedAction;
-
-    widgetActions(){
-      return DropdownButton<String>(
-          hint: Text(AppLocalizations.of(context).chooseAction),
-          value: selectedAction,
-          onChanged: (value) {
-            setState(() {
-              selectedAction = value;
-              // _divisions.clear();
-              // _courses.clear();
-              // _users.clear();
-              // _newUsersInDiv.clear();
-              // _oldUsersInDiv.clear();
-            });
-          },
-          items: _chooseActions.map((item) {
-            return DropdownMenuItem<String>(
-                value: item, child: Text(item));
-          }).toList());
+    void _onItemTapped(int index) {
+      setState(() {
+        _selectedIndex = index;
+        if (_selectedIndex == 0) {
+          _title = AppLocalizations.of(context).adminBlock;
+          _controller.animateToPage(0,
+              duration: Duration(milliseconds: 800), curve: curve);
+        } else {
+          _title = AppLocalizations.of(context).adminBlockUpdate;
+          _controller.animateToPage(1,
+              duration: Duration(milliseconds: 800), curve: curve);
+        }
+      });
     }
-
-    if(selectedAction == "Create" || selectedAction == "Создать")
-      setState(() {
-        _formColumn = _formColumnCreate();
-      });
-    else
-      setState(() {
-        _formColumn = _formColumnUpdate();
-      });
 
     return userRole != 'moderator'
         ? Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: Text(AppLocalizations.of(context).adminBlock),
+              title: Text(_title),
             ),
             drawer: MediaQuery.of(context).size.width > 600
                 ? null
@@ -668,9 +800,19 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                     child: DrawerItem(),
                   ),
             body: MediaQuery.of(context).size.width < 600
-                ? Center(
-                    child: Text(AppLocalizations.of(context).notModerator),
-                  )
+                ? Column(children: [
+                    Expanded(
+                        flex: 1,
+                        child: BreadDots(
+                          title: AppLocalizations.of(context).breadDotsPanel,
+                        )),
+                    Expanded(
+                      flex: 9,
+                      child: Center(
+                        child: Text(AppLocalizations.of(context).notModerator),
+                      ),
+                    ),
+                  ])
                 : Row(
                     children: [
                       Container(
@@ -679,10 +821,21 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                       ),
                       Container(
                         width: MediaQuery.of(context).size.width - 200,
-                        child: Center(
-                          child:
-                              Text(AppLocalizations.of(context).notModerator),
-                        ),
+                        child: Column(children: [
+                          Expanded(
+                              flex: 1,
+                              child: BreadDots(
+                                title:
+                                    AppLocalizations.of(context).breadDotsPanel,
+                              )),
+                          Expanded(
+                            flex: 9,
+                            child: Center(
+                              child: Text(
+                                  AppLocalizations.of(context).notModerator),
+                            ),
+                          ),
+                        ]),
                       )
                     ],
                   ),
@@ -691,7 +844,7 @@ class _ModeratorRoleState extends State<ModeratorRole> {
             appBar: AppBar(
               centerTitle: true,
               title: Text(AppLocalizations.of(context).adminBlock),
-              actions: [widgetActions()],
+              // actions: [widgetActions()],
             ),
             drawer: MediaQuery.of(context).size.width > 600
                 ? null
@@ -702,19 +855,79 @@ class _ModeratorRoleState extends State<ModeratorRole> {
               // child: ListView(
               //   shrinkWrap: true,
               child: MediaQuery.of(context).size.width < 600
-                  ? _formColumn
+                  ? Column(children: [
+                      Expanded(
+                          flex: 1,
+                          child: BreadDots(
+                            title: AppLocalizations.of(context).breadDotsPanel,
+                          )),
+                      Expanded(
+                        flex: 9,
+                        child: Container(
+                          child: PageView(
+                            controller: _controller,
+                            onPageChanged: _onItemTapped,
+                            children: [
+                              _formColumnCreate(),
+                              _formColumnUpdate()
+                            ],
+                          ),
+                        ),
+                      ),
+                    ])
                   : Row(
                       children: [
                         Container(
                           width: 200,
                           child: DrawerItem(),
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width - 200,
-                          child: _formColumn,
-                        )
+                        Column(children: [
+                          Expanded(
+                              flex: 1,
+                              child: BreadDots(
+                                title:
+                                    AppLocalizations.of(context).breadDotsPanel,
+                              )),
+                          Expanded(
+                            flex: 9,
+                            child: Container(
+                              width: MediaQuery.of(context).size.width - 200,
+                              child: Container(
+                                child: PageView(
+                                  controller: _controller,
+                                  onPageChanged: _onItemTapped,
+                                  children: [
+                                    _formColumnCreate(),
+                                    _formColumnUpdate()
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ])
                       ],
                     ),
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              selectedIconTheme: IconThemeData(
+                  color: Theme.of(context).accentColor, opacity: 1.0, size: 45),
+              unselectedIconTheme: IconThemeData(
+                  color: Colors.grey[500], opacity: 0.5, size: 25),
+              items: [
+                BottomNavigationBarItem(
+                    label: AppLocalizations.of(context).add,
+                    icon: Icon(Icons.add),
+                    tooltip: AppLocalizations.of(context).add),
+                BottomNavigationBarItem(
+                    label: AppLocalizations.of(context).update,
+                    icon: Icon(Icons.update),
+                    tooltip: AppLocalizations.of(context).update),
+              ],
+              currentIndex: _selectedIndex,
+              backgroundColor: Theme.of(context).primaryColor,
+              selectedItemColor: Theme.of(context).accentColor,
+              unselectedItemColor: Colors.grey[500],
+              onTap: _onItemTapped,
             ),
           );
   }

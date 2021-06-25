@@ -109,41 +109,6 @@ class DrawerItem extends StatelessWidget {
             onTap: () => Navigator.pushNamedAndRemoveUntil(
                 context, '/courses', ModalRoute.withName('/courses')),
           ),
-          // Divider(
-          //   height: 3.0,
-          //   color: Theme.of(context).accentColor,
-          // ),
-          // ListTile(
-          //   //и остальное тело элементов, использовать листтайл, т.к обернуты в обычный список
-          //   leading: Icon(
-          //     Icons.wysiwyg,
-          //     color: Theme.of(context).accentColor,
-          //   ),
-          //   title: Text(AppLocalizations.of(context).drawerToList,
-          //       style: TextStyle(
-          //         fontSize: 20.0,
-          //         color: Theme.of(context).accentColor,
-          //       )),
-          //   onTap: () => Navigator.pushNamedAndRemoveUntil(
-          //       context, '/list_events', ModalRoute.withName('/list_events')),
-          // ),
-          // Divider(
-          //   height: 3.0,
-          //   color: Theme.of(context).accentColor,
-          // ),
-          // ListTile(
-          //   leading: Icon(
-          //     Icons.add,
-          //     color: Theme.of(context).accentColor,
-          //   ),
-          //   title: Text(AppLocalizations.of(context).drawerAdd,
-          //       style: TextStyle(
-          //         fontSize: 20.0,
-          //         color: Theme.of(context).accentColor,
-          //       )),
-          //   onTap: () => Navigator.pushNamedAndRemoveUntil(
-          //       context, '/add', ModalRoute.withName('/list_events')),
-          // ),
           Divider(
             height: 3.0,
             color: Theme.of(context).accentColor,

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:microlearning/components/bread_dots.dart';
 import 'package:microlearning/components/event.dart';
 import 'package:microlearning/components/list_card.dart';
 import 'package:microlearning/components/users.dart';
@@ -48,27 +49,34 @@ class FavoriteScreenState extends State<FavoritesScreen> {
   }
 
   ListBuilder(Stream<List<Favor>> _check) {
-    return StreamBuilder<List<Favor>>(
-      stream: _check,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.hasError) {
-            return Text('${snapshot.error}');
-          }
-          return ListView.builder(
-            //возвращаем билд списка
-              physics: PageScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              itemCount: snapshot.data.length,
-              itemBuilder:
-                  (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
-              EventCard(courses: [], i: index, favs: snapshot.data));
-        } else {
-          _hasFav = false;
-          ifNoFavorite(_hasFav);
-          return _ifNoFavorite;
-        }
-      },
+    return Column(
+      children: [
+        Expanded(flex: 1,child: BreadDots(title: AppLocalizations.of(context).breadDotsFavorites,)),
+        Expanded(
+        flex: 9,
+        child: StreamBuilder<List<Favor>>(
+          stream: _check,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+              return ListView.builder(
+                //возвращаем билд списка
+                  physics: PageScrollPhysics(),
+                  padding: EdgeInsets.symmetric(horizontal: 40),
+                  itemCount: snapshot.data.length,
+                  itemBuilder:
+                      (_, index) => //самое интересное, т.к. у нас тут неопределенное количество повторений может быть, мы вызываем метод подстановки и отрисовки всех элементов списка
+                  EventCard(courses: [], i: index, favs: snapshot.data));
+            } else {
+              _hasFav = false;
+              ifNoFavorite(_hasFav);
+              return _ifNoFavorite;
+            }
+          },
+        ),
+      ),]
     );
   }
 

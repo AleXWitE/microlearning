@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:microlearning/components/bread_dots.dart';
 import 'package:microlearning/components/users.dart';
 import 'package:microlearning/models/drawer_item.dart';
 
@@ -27,6 +27,18 @@ class _AdminRoleState extends State<AdminRole> {
   final _keyAddCourseDelete = GlobalKey<FormState>();
   final _keyAddCourseCardDelete = GlobalKey<FormState>();
 
+  String _title = "";
+  TextEditingController _textControllerCardName = TextEditingController();
+  TextEditingController _textControllerCardQuestion = TextEditingController();
+  TextEditingController _textControllerCardAnswer1 = TextEditingController();
+  TextEditingController _textControllerCardAnswer2 = TextEditingController();
+  TextEditingController _textControllerCardAnswer3 = TextEditingController();
+  TextEditingController _textControllerCardAnswerCorrect =
+      TextEditingController();
+  TextEditingController _textControllerCardUrl = TextEditingController();
+  TextEditingController _textControllerCourse = TextEditingController();
+  TextEditingController _textControllerDiv = TextEditingController();
+
   final databaseRefUsers = FirebaseFirestore.instance.collection('users');
   final databaseRefDivs = FirebaseFirestore.instance.collection('divisions');
 
@@ -48,6 +60,7 @@ class _AdminRoleState extends State<AdminRole> {
   Users selectedModUser;
 
   Divisions selectedDivisionUpdate;
+  Divisions selectedDivModUpdate;
   Divisions selectedDivisionInCourseUpdate;
   Divisions selectedDivisionInCardUpdate;
   Courses selectedCourseUpdate;
@@ -67,30 +80,16 @@ class _AdminRoleState extends State<AdminRole> {
   String selectedCardDelete;
 
   String _divName;
-  String _divModName;
 
   String _divNameUpdate;
-  String _divNameDelete;
-
-
-  String _modName;
-  String _modDivName;
-
-  String _modNameUpdate;
-  String _modNameDelete;
 
   String _courseName;
-  String _courseDiv;
 
   String _courseNameUpdate;
-  String _courseDivUpdate;
 
   String _courseNameDelete;
-  String _courseDivDelete;
 
-  String _cardDiv;
   String _cardName;
-  String _cardCourse;
   String _cardQuestion;
   String _cardContentUrl;
   String _answer1;
@@ -98,48 +97,44 @@ class _AdminRoleState extends State<AdminRole> {
   String _answer3;
   String _answerCurrent;
 
-  String _cardDivUpdate;
   String _cardNameUpdate;
-  String _cardCourseUpdate;
   String _cardQuestionUpdate;
   String _cardContentUrlUpdate;
-  String _answer1Update;
-  String _answer2Update;
-  String _answer3Update;
-  String _answerCurrentUpdate;
 
   String initCardAnswer1 = "";
   String initCardAnswer2 = "";
   String initCardAnswer3 = "";
   String initCardAnswerCorrect = "";
 
-  String _cardDivDelete;
-  String _cardNameDelete;
-  String _cardCourseDelete;
-
   bool _visibleDiv = true;
   bool _visibleMod = false;
   bool _visibleCourse = false;
   bool _visibleCard = false;
 
-  String _cardType;
+  int _lastId = 0;
 
-  String _cardTypeUpdate;
+  final _controller = PageController(initialPage: 0);
+  int _selectedIndex = 0;
+
+  Curve curve = Curves.easeIn;
 
   Future clearList() async {
-    // setState(() {
     _users.clear();
     _divisions.clear();
-    // });
   }
 
   getData() async {
     await databaseRefUsers.get().then((value) => value.docs.forEach((element) {
-          _users.add(Users(email: element.id));
+          setState(() {
+            _users.add(Users(email: element.id));
+          });
           print(element.id);
         }));
     await databaseRefDivs.get().then((value) => value.docs.forEach((element) {
-          _divisions.add(Divisions(division: element.id));
+          setState(() {
+            _divisions.add(Divisions(
+                division: element.id, title: element.data()['title_division']));
+          });
           print(element.id);
         }));
     selectedDivision = _divisions.first;
@@ -182,31 +177,7 @@ class _AdminRoleState extends State<AdminRole> {
       AppLocalizations.of(context).del,
     ];
 
-
     List<String> row = ['1', '2', '3', 'current'];
-
-    String selectedAction = _chooseActions[1];
-    // String selectedAction;
-
-    widgetActions(){
-      return DropdownButton<String>(
-          hint: Text(AppLocalizations.of(context).chooseAction),
-          value: selectedAction,
-          onChanged: (value) {
-            setState(() {
-              selectedAction = value;
-              // _divisions.clear();
-              // _courses.clear();
-              // _users.clear();
-              // _newUsersInDiv.clear();
-              // _oldUsersInDiv.clear();
-            });
-          },
-          items: _chooseActions.map((item) {
-            return DropdownMenuItem<String>(
-                value: item, child: Text(item));
-          }).toList());
-    }
 
     Widget answInput(String _i) {
       return Container(
@@ -238,13 +209,13 @@ class _AdminRoleState extends State<AdminRole> {
                 }
               });
           },
-          initialValue: _i == '1'
-          ? _answer1 = initCardAnswer1
-          : _i == '2'
-          ? _answer2 = initCardAnswer2
-          : _i == '3'
-          ? _answer3 = initCardAnswer3
-          : _answerCurrent = initCardAnswerCorrect,
+          controller: _i == '1'
+              ? _textControllerCardAnswer1
+              : _i == '2'
+                  ? _textControllerCardAnswer2
+                  : _i == '3'
+                      ? _textControllerCardAnswer3
+                      : _textControllerCardAnswerCorrect,
           onSaved: (value) {
             setState(() {
               switch (_i) {
@@ -351,30 +322,23 @@ class _AdminRoleState extends State<AdminRole> {
       }
 
       void _saveDivision(String _div) {
-        databaseRefDivs.doc(_div)..set({
-          'title': _divNameUpdate,
+        databaseRefDivs.doc(_div).set({
+          'title_division': _divNameUpdate,
         }, SetOptions(merge: true));
-        databaseRefDivs.get().then((value) {
-          value.docs.where((element) {
-            element.data()['title'] == _div;
-          });
-
-        });
       }
 
       void _onSavedDivision() {
         if (_divValidate()) {
           _saveDivision(selectedDivisionUpdate.division);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("${AppLocalizations.of(context).division} $_divNameUpdate updated"),
+            content: Text(
+                "${AppLocalizations.of(context).division} $_divNameUpdate updated"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("false"),
           ));
       }
-
-      String initDivUpdate = AppLocalizations.of(context).dropdownDivisions;
 
       return Container(
         padding: EdgeInsets.all(10.0),
@@ -388,22 +352,21 @@ class _AdminRoleState extends State<AdminRole> {
                     onChanged: (value) {
                       setState(() {
                         selectedDivisionUpdate = value;
-                        initDivUpdate = value.division;
+                        _textControllerDiv.text = value.title;
                       });
                     },
                     items: _divisions.map((item) {
                       return DropdownMenuItem<Divisions>(
-                          value: item, child: Text(item.division));
+                          value: item, child: Text(item.title));
                     }).toList()),
-
                 TextFormField(
+                  controller: _textControllerDiv,
                   validator: (value) {
                     if (value.isEmpty)
                       return AppLocalizations.of(context).divisionError;
                     else
                       _divNameUpdate = value;
                   },
-                  initialValue: initDivUpdate,
                   onSaved: (value) => _divNameUpdate = value,
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context).division,
@@ -452,7 +415,8 @@ class _AdminRoleState extends State<AdminRole> {
         if (_divValidate()) {
           _saveDivision(selectedDivisionDelete.division);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("${AppLocalizations.of(context).division} ${selectedDivisionDelete.division} deleted"),
+            content: Text(
+                "${AppLocalizations.of(context).division} ${selectedDivisionDelete.division} deleted"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -468,7 +432,7 @@ class _AdminRoleState extends State<AdminRole> {
               children: [
                 DropdownButton<Divisions>(
                     hint: Text(AppLocalizations.of(context).dropdownDivisions),
-                    value: selectedDivisionUpdate,
+                    value: selectedDivisionDelete,
                     onChanged: (value) {
                       setState(() {
                         selectedDivisionDelete = value;
@@ -476,17 +440,16 @@ class _AdminRoleState extends State<AdminRole> {
                     },
                     items: _divisions.map((item) {
                       return DropdownMenuItem<Divisions>(
-                          value: item, child: Text(item.division));
+                          value: item, child: Text(item.title));
                     }).toList()),
-
                 SizedBox(
                   height: 25.0,
                 ),
                 OutlinedButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ))),
+                    borderRadius: BorderRadius.circular(50),
+                  ))),
                   onPressed: () {
                     _onSavedDivision();
                     print("click!");
@@ -514,7 +477,7 @@ class _AdminRoleState extends State<AdminRole> {
 
       void _saveDivision(String _div) {
         databaseRefDivs.doc(_div).set({
-          'title': _div,
+          'title_division': _div,
         }, SetOptions(merge: true));
       }
 
@@ -522,7 +485,8 @@ class _AdminRoleState extends State<AdminRole> {
         if (_divValidate()) {
           _saveDivision(_divName);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("${AppLocalizations.of(context).division} $_divName added"),
+            content: Text(
+                "${AppLocalizations.of(context).division} $_divName added"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -556,8 +520,8 @@ class _AdminRoleState extends State<AdminRole> {
                 OutlinedButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ))),
+                    borderRadius: BorderRadius.circular(50),
+                  ))),
                   onPressed: () {
                     _onSavedDivision();
                     print("click!");
@@ -608,25 +572,24 @@ class _AdminRoleState extends State<AdminRole> {
                     hint: Text(AppLocalizations.of(context).dropdownDivisions),
                     value: selectedDivision,
                     onChanged: (value) async {
-                       setState(() {
+                      setState(() {
                         selectedDivision = value;
                         if (_usersInDiv.isNotEmpty) _usersInDiv.clear();
-
                       });
 
-                       await databaseRefUsers.get().then((value) {
-                         value.docs.forEach((element) {
-                           if (element.data()['user_division'] ==
-                               selectedDivision.division)
-                             setState(() {
-                               _usersInDiv.add(Users(email: element.id));
-                             });
-                         });
-                       });
+                      await databaseRefUsers.get().then((value) {
+                        value.docs.forEach((element) {
+                          if (element.data()['user_division'] ==
+                              selectedDivision.division)
+                            setState(() {
+                              _usersInDiv.add(Users(email: element.id));
+                            });
+                        });
+                      });
                     },
                     items: _divisions.map((item) {
                       return DropdownMenuItem<Divisions>(
-                          value: item, child: Text(item.division));
+                          value: item, child: Text(item.title));
                     }).toList()),
                 SizedBox(height: 20.0),
                 DropdownButton<Users>(
@@ -686,7 +649,8 @@ class _AdminRoleState extends State<AdminRole> {
           });
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("User ${selectedNewModUserUpdate.email} updated to moderator"),
+            content: Text(
+                "User ${selectedNewModUserUpdate.email} updated to moderator"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -702,20 +666,25 @@ class _AdminRoleState extends State<AdminRole> {
               children: [
                 DropdownButton<Divisions>(
                     hint: Text(AppLocalizations.of(context).dropdownDivisions),
-                    value: selectedDivisionUpdate,
+                    value: selectedDivModUpdate,
                     onChanged: (value) async {
                       setState(() {
-                        selectedDivisionUpdate = value;
+                        selectedDivModUpdate = value;
                         if (_usersInDiv.isNotEmpty) _usersInDiv.clear();
-
                       });
 
                       await databaseRefUsers.get().then((value) {
                         value.docs.forEach((element) {
                           if (element.data()['user_division'] ==
-                              selectedDivisionUpdate.division)
+                                  selectedDivModUpdate.division &&
+                              element.data()['user_role'] == 'moderator')
                             setState(() {
                               _oldUsersInDiv.add(Users(email: element.id));
+                            });
+                          else if (element.data()['user_division'] ==
+                                  selectedDivModUpdate.division &&
+                              element.data()['user_role'] != 'moderator')
+                            setState(() {
                               _newUsersInDiv.add(Users(email: element.id));
                             });
                         });
@@ -723,13 +692,14 @@ class _AdminRoleState extends State<AdminRole> {
                     },
                     items: _divisions.map((item) {
                       return DropdownMenuItem<Divisions>(
-                          value: item, child: Text(item.division));
+                          value: item, child: Text(item.title));
                     }).toList()),
                 SizedBox(height: 20.0),
                 DropdownButton<Users>(
                     hint: _oldUsersInDiv.isEmpty
                         ? Text(AppLocalizations.of(context).emptyModUserInDiv)
-                        : Text(AppLocalizations.of(context).dropdownOldModerator),
+                        : Text(
+                            AppLocalizations.of(context).dropdownOldModerator),
                     value: selectedOldModUserUpdate,
                     onChanged: (value) {
                       setState(() {
@@ -761,8 +731,8 @@ class _AdminRoleState extends State<AdminRole> {
                 OutlinedButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ))),
+                    borderRadius: BorderRadius.circular(50),
+                  ))),
                   onPressed: () {
                     _onSavedModerator();
                     print("click!");
@@ -790,9 +760,13 @@ class _AdminRoleState extends State<AdminRole> {
 
       void _onSavedModerator() {
         if (_modValidate()) {
-          databaseRefUsers.doc(selectedModUser.email).set({
-            "user_role": "-",
-          }, SetOptions(merge: true,));
+          databaseRefUsers.doc(selectedModUser.email).set(
+              {
+                "user_role": "-",
+              },
+              SetOptions(
+                merge: true,
+              ));
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("User ${selectedModUser.email} deleted"),
@@ -816,13 +790,13 @@ class _AdminRoleState extends State<AdminRole> {
                       setState(() {
                         selectedDivisionDelete = value;
                         if (_usersInDiv.isNotEmpty) _usersInDiv.clear();
-
                       });
 
                       await databaseRefUsers.get().then((value) {
                         value.docs.forEach((element) {
                           if (element.data()['user_division'] ==
-                              selectedDivisionDelete.division)
+                                  selectedDivisionDelete.division &&
+                              element.data()['user_role'] == 'moderator')
                             setState(() {
                               _usersInDiv.add(Users(email: element.id));
                             });
@@ -831,11 +805,9 @@ class _AdminRoleState extends State<AdminRole> {
                     },
                     items: _divisions.map((item) {
                       return DropdownMenuItem<Divisions>(
-                          value: item, child: Text(item.division));
+                          value: item, child: Text(item.title));
                     }).toList()),
-
                 SizedBox(height: 20.0),
-
                 DropdownButton<Users>(
                     hint: _usersInDiv.isEmpty
                         ? Text(AppLocalizations.of(context).emptyModUserInDiv)
@@ -856,8 +828,8 @@ class _AdminRoleState extends State<AdminRole> {
                 OutlinedButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ))),
+                    borderRadius: BorderRadius.circular(50),
+                  ))),
                   onPressed: /*selectedModUser.email.isNotEmpty ? null :*/ () {
                     _onSavedModerator();
                     print("click!");
@@ -892,7 +864,8 @@ class _AdminRoleState extends State<AdminRole> {
               .set({'title': _courseName});
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("${AppLocalizations.of(context).courseName} $_courseName added"),
+            content: Text(
+                "${AppLocalizations.of(context).courseName} $_courseName added"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -931,7 +904,7 @@ class _AdminRoleState extends State<AdminRole> {
                     },
                     items: _divisions.map((item) {
                       return DropdownMenuItem<Divisions>(
-                          value: item, child: Text(item.division));
+                          value: item, child: Text(item.title));
                     }).toList()),
                 SizedBox(
                   height: 25.0,
@@ -965,16 +938,17 @@ class _AdminRoleState extends State<AdminRole> {
         return false;
       }
 
-      void _onSavedCourse() {
+      void _onSavedCourse() async {
         if (_courseValidate()) {
-          databaseRefDivs
+          await databaseRefDivs
               .doc(selectedDivisionInCourseUpdate.division)
               .collection('courses')
-              .doc(_courseNameUpdate)
+              .doc(selectedCourseUpdate.division)
               .update({'title': _courseNameUpdate});
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("${AppLocalizations.of(context).courseName} $_courseNameUpdate updated"),
+            content: Text(
+                "${AppLocalizations.of(context).courseName} $_courseNameUpdate updated"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -1002,16 +976,20 @@ class _AdminRoleState extends State<AdminRole> {
                           .collection('courses')
                           .get()
                           .then((value) {
-                        _courses.clear();
-                        value.docs.forEach((element) {
-                          _courses.add(Courses(course: element.id));
+                        setState(() {
+                          _courses.clear();
+                          value.docs.forEach((element) {
+                            _courses.add(Courses(
+                                division: element.id,
+                                course: element.data()['title']));
+                          });
                         });
                       });
                       // await getData();
                     },
                     items: _divisions.map((item) {
                       return DropdownMenuItem<Divisions>(
-                          value: item, child: Text(item.division));
+                          value: item, child: Text(item.title));
                     }).toList()),
                 SizedBox(height: 20.0),
                 DropdownButton<Courses>(
@@ -1020,7 +998,8 @@ class _AdminRoleState extends State<AdminRole> {
                     onChanged: (value) {
                       setState(() {
                         selectedCourseUpdate = value;
-                        initCourseUpdate = selectedCourseUpdate.course;
+                        _textControllerCourse.text =
+                            selectedCourseUpdate.course;
                       });
                     },
                     items: _courses.map((item) {
@@ -1029,7 +1008,7 @@ class _AdminRoleState extends State<AdminRole> {
                     }).toList()),
                 SizedBox(height: 20.0),
                 TextFormField(
-                  initialValue: initCourseUpdate,
+                  controller: _textControllerCourse,
                   validator: (value) {
                     if (value.isEmpty)
                       return AppLocalizations.of(context).courseError;
@@ -1049,8 +1028,8 @@ class _AdminRoleState extends State<AdminRole> {
                 OutlinedButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ))),
+                    borderRadius: BorderRadius.circular(50),
+                  ))),
                   onPressed: () {
                     _onSavedCourse();
                   },
@@ -1080,11 +1059,12 @@ class _AdminRoleState extends State<AdminRole> {
           databaseRefDivs
               .doc(selectedDivisionInCourseDelete.division)
               .collection('courses')
-              .doc(_courseNameDelete)
+              .doc(selectedCourseDelete.division)
               .delete();
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("${AppLocalizations.of(context).courseName} $_courseNameDelete deleted"),
+            content: Text(
+                "${AppLocalizations.of(context).courseName} $_courseNameDelete deleted"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -1106,19 +1086,23 @@ class _AdminRoleState extends State<AdminRole> {
                         selectedDivisionInCourseDelete = value;
                       });
                       await databaseRefDivs
-                          .doc(selectedDivisionInCardDelete.division)
+                          .doc(selectedDivisionInCourseDelete.division)
                           .collection('courses')
                           .get()
                           .then((value) {
-                        _courses.clear();
                         value.docs.forEach((element) {
-                          _courses.add(Courses(course: element.id));
+                          setState(() {
+                            _courses.clear();
+                            _courses.add(Courses(
+                                division: element.id,
+                                course: element.data()['title']));
+                          });
                         });
                       });
                     },
                     items: _divisions.map((item) {
                       return DropdownMenuItem<Divisions>(
-                          value: item, child: Text(item.division));
+                          value: item, child: Text(item.title));
                     }).toList()),
                 SizedBox(height: 20.0),
                 DropdownButton<Courses>(
@@ -1139,8 +1123,8 @@ class _AdminRoleState extends State<AdminRole> {
                 OutlinedButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ))),
+                    borderRadius: BorderRadius.circular(50),
+                  ))),
                   onPressed: () {
                     _onSavedCourse();
                   },
@@ -1156,7 +1140,6 @@ class _AdminRoleState extends State<AdminRole> {
     }
 
     cardForm() {
-
       bool _cardValidate() {
         final _formCard = _keyAddCourseCard.currentState;
         if (_formCard.validate()) {
@@ -1171,7 +1154,7 @@ class _AdminRoleState extends State<AdminRole> {
           databaseRefDivs
               .doc(selectedDivisionInCard.division)
               .collection('courses')
-              .doc(selectedCourseInCard.course)
+              .doc(selectedCourseInCard.division)
               .collection('cards')
               .doc(_cardName)
               .set({
@@ -1185,9 +1168,11 @@ class _AdminRoleState extends State<AdminRole> {
               'correct_answer': _answerCurrent,
             },
             'card_url': _cardContentUrl,
+            'id': _lastId,
           });
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Card $_cardName added to course ${selectedCourseInCard.course}"),
+            content: Text(
+                "Card $_cardName added to course ${selectedCourseInCard.course}"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -1211,20 +1196,22 @@ class _AdminRoleState extends State<AdminRole> {
                       selectedDivisionInCard = value;
                     });
 
-                      await databaseRefDivs
-                          .doc(selectedDivisionInCard.division)
-                          .collection('courses')
-                          .get()
-                          .then((value) {
-                            _courses.clear();
-                        value.docs.forEach((element) {
-                          _courses.add(Courses(course: element.id));
-                        });
+                    await databaseRefDivs
+                        .doc(selectedDivisionInCard.division)
+                        .collection('courses')
+                        .get()
+                        .then((value) {
+                      _courses.clear();
+                      value.docs.forEach((element) {
+                        _courses.add(Courses(
+                            division: element.id,
+                            course: element.data()['title']));
                       });
+                    });
                   },
                   items: _divisions.map((item) {
                     return DropdownMenuItem<Divisions>(
-                        value: item, child: Text(item.division));
+                        value: item, child: Text(item.title));
                   }).toList()),
               SizedBox(
                 height: 20.0,
@@ -1237,6 +1224,12 @@ class _AdminRoleState extends State<AdminRole> {
                   onChanged: (value) {
                     setState(() {
                       selectedCourseInCard = value;
+                      databaseRefDivs
+                          .doc(selectedCourseInCard.division)
+                          .collection('cards')
+                          .orderBy('id')
+                          .get()
+                          .then((value) => _lastId = value.size);
                     });
                   },
                   items: _courses.map((item) {
@@ -1313,6 +1306,9 @@ class _AdminRoleState extends State<AdminRole> {
                   borderRadius: BorderRadius.circular(50),
                 ))),
                 onPressed: () {
+                  setState(() {
+                    _lastId++;
+                  });
                   // _cardValidate();
                   _onSavedCard();
                   print("click!");
@@ -1330,6 +1326,8 @@ class _AdminRoleState extends State<AdminRole> {
     }
 
     cardFormUpdate() {
+      int _cardId;
+
       bool _cardValidate() {
         final _formCard = _keyAddCourseCardUpdate.currentState;
         if (_formCard.validate()) {
@@ -1339,38 +1337,48 @@ class _AdminRoleState extends State<AdminRole> {
         return false;
       }
 
-      void _onSavedCard() {
+      void _onSavedCard() async {
         if (_cardValidate()) {
-          databaseRefDivs
+          await databaseRefDivs
               .doc(selectedDivisionInCardUpdate.division)
               .collection('courses')
-              .doc(selectedCourseInCardUpdate.course)
+              .doc(selectedCourseInCardUpdate.division)
+              .collection('cards')
+              .doc(selectedCardUpdate)
+              .delete();
+
+          await databaseRefDivs
+              .doc(selectedDivisionInCardUpdate.division)
+              .collection('courses')
+              .doc(selectedCourseInCardUpdate.division)
               .collection('cards')
               .doc(_cardNameUpdate)
-              .set({
-            'card_title': _cardNameUpdate,
-            'card_type': selectedCardTypeUpdate,
-            'card_question': _cardQuestionUpdate,
-            'card_answers': {
-              'answer_1': _answer1,
-              'answer_2': _answer2,
-              'answer_3': _answer3,
-              'correct_answer': _answerCurrent,
-            },
-            'card_url': _cardContentUrlUpdate,
-          }, SetOptions(merge: true,));
+              .set(
+                  {
+                'card_title': _cardNameUpdate,
+                'card_type': selectedCardTypeUpdate,
+                'card_question': _cardQuestionUpdate,
+                'card_answers': {
+                  'answer_1': _answer1,
+                  'answer_2': _answer2,
+                  'answer_3': _answer3,
+                  'correct_answer': _answerCurrent,
+                },
+                'card_url': _cardContentUrlUpdate,
+                'id': _cardId,
+              },
+                  SetOptions(
+                    merge: true,
+                  ));
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Card $_cardNameUpdate update in course ${selectedCourseInCardUpdate.course}"),
+            content: Text(
+                "Card $_cardNameUpdate update in course ${selectedCourseInCardUpdate.course}"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("false"),
           ));
       }
-
-      String initCardName = "";
-      String initCardUrl = "";
-      String initCardQuestion = "";
 
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -1387,21 +1395,39 @@ class _AdminRoleState extends State<AdminRole> {
                     setState(() {
                       selectedDivisionInCardUpdate = value;
                     });
-
+                    if (_cards.isNotEmpty)
+                      setState(() {
+                        _courses.clear();
+                        _cards.clear();
+                        _textControllerCardName.clear();
+                        _textControllerCardQuestion.clear();
+                        _textControllerCardUrl.clear();
+                        _textControllerCardAnswer1.clear();
+                        _textControllerCardAnswer2.clear();
+                        _textControllerCardAnswer3.clear();
+                        selectedCardTypeUpdate = null;
+                        selectedCourseInCardUpdate = null;
+                        selectedCardUpdate = null;
+                        _textControllerCardAnswerCorrect.clear();
+                      });
                     await databaseRefDivs
                         .doc(selectedDivisionInCardUpdate.division)
                         .collection('courses')
                         .get()
                         .then((value) {
-                      _courses.clear();
-                      value.docs.forEach((element) {
-                        _courses.add(Courses(course: element.id));
+                      setState(() {
+                        _courses.clear();
+                        value.docs.forEach((element) {
+                          _courses.add(Courses(
+                              division: element.id,
+                              course: element.data()['title']));
+                        });
                       });
                     });
                   },
                   items: _divisions.map((item) {
                     return DropdownMenuItem<Divisions>(
-                        value: item, child: Text(item.division));
+                        value: item, child: Text(item.title));
                   }).toList()),
               SizedBox(
                 height: 20.0,
@@ -1419,13 +1445,15 @@ class _AdminRoleState extends State<AdminRole> {
                     await databaseRefDivs
                         .doc(selectedDivisionInCardUpdate.division)
                         .collection('courses')
-                        .doc(selectedCourseInCardUpdate.course)
+                        .doc(selectedCourseInCardUpdate.division)
                         .collection('cards')
                         .get()
                         .then((value) {
-                      _cards.clear();
-                      value.docs.forEach((element) {
-                        _cards.add(element.id);
+                      setState(() {
+                        _cards.clear();
+                        value.docs.forEach((element) {
+                          _cards.add(element.data()['card_title']);
+                        });
                       });
                     });
                   },
@@ -1449,20 +1477,28 @@ class _AdminRoleState extends State<AdminRole> {
                     await databaseRefDivs
                         .doc(selectedDivisionInCardUpdate.division)
                         .collection('courses')
-                        .doc(selectedCourseInCardUpdate.course)
+                        .doc(selectedCourseInCardUpdate.division)
                         .collection('cards')
                         .doc(selectedCardUpdate)
                         .get()
                         .then((value) {
-                      _cards.clear();
-                      initCardName = value.data()['card_title'];
-                      initCardQuestion = value.data()['card_question'];
-                      selectedCardTypeUpdate = value.data()['card_type'];
-                      initCardUrl = value.data()['card_url'];
-                      initCardAnswer1 = value.data()['card_answers']['answer_1'];
-                      initCardAnswer2 = value.data()['card_answers']['answer_2'];
-                      initCardAnswer3 = value.data()['card_answers']['answer_3'];
-                      initCardAnswerCorrect = value.data()['card_answers']['correct_answer'];
+                      setState(() {
+                        _textControllerCardName.text =
+                            value.data()['card_title'];
+                        _textControllerCardQuestion.text =
+                            value.data()['card_question'];
+                        selectedCardTypeUpdate = value.data()['card_type'];
+                        _textControllerCardUrl.text = value.data()['card_url'];
+                        _textControllerCardAnswer1.text =
+                            value.data()['card_answers']['answer_1'];
+                        _textControllerCardAnswer2.text =
+                            value.data()['card_answers']['answer_2'];
+                        _textControllerCardAnswer3.text =
+                            value.data()['card_answers']['answer_3'];
+                        _textControllerCardAnswerCorrect.text =
+                            value.data()['card_answers']['correct_answer'];
+                        _cardId = value.data()['id'];
+                      });
                     });
                   },
                   items: _cards.map((item) {
@@ -1470,7 +1506,7 @@ class _AdminRoleState extends State<AdminRole> {
                         value: item, child: Text(item));
                   }).toList()),
               TextFormField(
-                initialValue: initCardName,
+                controller: _textControllerCardName,
                 validator: (value) {
                   if (value.isEmpty)
                     return AppLocalizations.of(context).cardNameError;
@@ -1502,13 +1538,13 @@ class _AdminRoleState extends State<AdminRole> {
                 height: 20.0,
               ),
               TextFormField(
+                controller: _textControllerCardQuestion,
                 validator: (value) {
                   if (value.isEmpty)
                     return AppLocalizations.of(context).cardQuestionError;
                   else
                     _cardQuestionUpdate = value;
                 },
-                initialValue: initCardQuestion,
                 onSaved: (value) => _cardQuestionUpdate = value,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).cardQuestion,
@@ -1523,8 +1559,8 @@ class _AdminRoleState extends State<AdminRole> {
                 height: 20.0,
               ),
               TextFormField(
+                controller: _textControllerCardUrl,
                 onSaved: (value) => _cardContentUrlUpdate = value,
-                initialValue: initCardUrl,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).cardContentUrl,
                   focusColor: Theme.of(context).primaryColor,
@@ -1536,8 +1572,8 @@ class _AdminRoleState extends State<AdminRole> {
               OutlinedButton(
                 style: ButtonStyle(
                     shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ))),
+                  borderRadius: BorderRadius.circular(50),
+                ))),
                 onPressed: () {
                   // _cardValidate();
                   _onSavedCard();
@@ -1556,9 +1592,8 @@ class _AdminRoleState extends State<AdminRole> {
     }
 
     cardFormDelete() {
-
       bool _cardValidate() {
-        final _formCard = _keyAddCourseCard.currentState;
+        final _formCard = _keyAddCourseCardDelete.currentState;
         if (_formCard.validate()) {
           _formCard.save();
           return true;
@@ -1569,14 +1604,15 @@ class _AdminRoleState extends State<AdminRole> {
       void _onSavedCard() {
         if (_cardValidate()) {
           databaseRefDivs
-              .doc(selectedDivisionInCard.division)
+              .doc(selectedDivisionInCardDelete.division)
               .collection('courses')
-              .doc(selectedCourseInCard.course)
+              .doc(selectedCourseInCardDelete.course)
               .collection('cards')
               .doc(selectedCardDelete)
               .delete();
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Card $_cardName added to course ${selectedCourseInCard.course}"),
+            content: Text(
+                "Card $selectedCardDelete delete from course ${selectedCourseInCardDelete.course}"),
           ));
         } else
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -1600,6 +1636,15 @@ class _AdminRoleState extends State<AdminRole> {
                       selectedDivisionInCardDelete = value;
                     });
 
+                    if (_cards.isNotEmpty)
+                      setState(() {
+                        _courses.clear();
+                        _cards.clear();
+                        selectedCardTypeDelete = null;
+                        selectedCourseInCardDelete = null;
+                        selectedCardDelete = null;
+                      });
+
                     await databaseRefDivs
                         .doc(selectedDivisionInCardDelete.division)
                         .collection('courses')
@@ -1607,13 +1652,18 @@ class _AdminRoleState extends State<AdminRole> {
                         .then((value) {
                       _courses.clear();
                       value.docs.forEach((element) {
-                        _courses.add(Courses(course: element.id));
+                        setState(() {
+                          _courses.add(Courses(
+                              division: element.id,
+                              course: element.data()['title']));
+                        });
+                        print(_cards);
                       });
                     });
                   },
                   items: _divisions.map((item) {
                     return DropdownMenuItem<Divisions>(
-                        value: item, child: Text(item.division));
+                        value: item, child: Text(item.title));
                   }).toList()),
               SizedBox(
                 height: 20.0,
@@ -1622,22 +1672,27 @@ class _AdminRoleState extends State<AdminRole> {
                   hint: _courses.isEmpty
                       ? Text(AppLocalizations.of(context).emptyCoursesInDiv)
                       : Text(AppLocalizations.of(context).dropdownCourse),
-                  value: selectedCourseInCardUpdate,
+                  value: selectedCourseInCardDelete,
                   onChanged: (value) async {
                     setState(() {
-                      selectedCourseInCardUpdate = value;
+                      _cards.clear();
+                      selectedCourseInCardDelete = value;
+                      selectedCardDelete = null;
                     });
 
                     await databaseRefDivs
-                        .doc(selectedDivisionInCardUpdate.division)
+                        .doc(selectedDivisionInCardDelete.division)
                         .collection('courses')
-                        .doc(selectedCourseInCardUpdate.course)
+                        .doc(selectedCourseInCardDelete.division)
                         .collection('cards')
                         .get()
                         .then((value) {
                       _cards.clear();
                       value.docs.forEach((element) {
-                        _cards.add(element.id);
+                        var _titleCard = element.data()['card_title'];
+                        setState(() {
+                          _cards.add(_titleCard);
+                        });
                       });
                     });
                   },
@@ -1668,8 +1723,8 @@ class _AdminRoleState extends State<AdminRole> {
               OutlinedButton(
                 style: ButtonStyle(
                     shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ))),
+                  borderRadius: BorderRadius.circular(50),
+                ))),
                 onPressed: () {
                   // _cardValidate();
                   _onSavedCard();
@@ -1687,8 +1742,6 @@ class _AdminRoleState extends State<AdminRole> {
       );
     }
 
-    Widget _formColumn;
-
     Widget _formColumnCreate() {
       return Column(
         children: [
@@ -1697,17 +1750,13 @@ class _AdminRoleState extends State<AdminRole> {
               child: Container(
                   margin: EdgeInsets.all(10.0),
                   child: materialButList(_butListCreate[0], 0))),
-          _visibleDiv
-              ? Expanded(flex: 10, child: divForm())
-              : Container(),
+          _visibleDiv ? Expanded(flex: 10, child: divForm()) : Container(),
           Expanded(
               flex: 2,
               child: Container(
                   margin: EdgeInsets.all(10.0),
                   child: materialButList(_butListCreate[1], 1))),
-          _visibleMod
-              ? Expanded(flex: 10, child: modForm())
-              : Container(),
+          _visibleMod ? Expanded(flex: 10, child: modForm()) : Container(),
           Expanded(
               flex: 2,
               child: Container(
@@ -1721,9 +1770,7 @@ class _AdminRoleState extends State<AdminRole> {
               child: Container(
                   margin: EdgeInsets.all(10.0),
                   child: materialButList(_butListCreate[3], 3))),
-          _visibleCard
-              ? Expanded(flex: 10, child: cardForm())
-              : Container(),
+          _visibleCard ? Expanded(flex: 10, child: cardForm()) : Container(),
         ],
       );
     }
@@ -1806,23 +1853,33 @@ class _AdminRoleState extends State<AdminRole> {
       );
     }
 
-    if(selectedAction == "Create" || selectedAction == "Создать")
+    void _onItemTapped(int index) {
       setState(() {
-        _formColumn = _formColumnCreate();
+        _selectedIndex = index;
+        if (_selectedIndex == 0) {
+          _title = AppLocalizations.of(context).adminBlock;
+          _controller.animateToPage(0,
+              duration: Duration(milliseconds: 800), curve: curve);
+        } else if (_selectedIndex == 1) {
+          _title = AppLocalizations.of(context).adminBlockUpdate;
+          _controller.animateToPage(1,
+              duration: Duration(milliseconds: 800), curve: curve);
+        } else {
+          _title = AppLocalizations.of(context).adminBlockDelete;
+          _controller.animateToPage(2,
+              duration: Duration(milliseconds: 800), curve: curve);
+        }
       });
-    else if(selectedAction == "Update" || selectedAction == "Обновить")
-      setState(() {
-        _formColumn = _formColumnUpdate();
-      });
-    else setState(() {
-        _formColumn = _formColumnDelete();
-    });
+    }
 
     return userRole != 'admin'
         ? Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: Text(AppLocalizations.of(context).adminBlock, style: TextStyle(fontSize: 22.0),),
+              title: Text(
+                _title,
+                style: TextStyle(fontSize: 22.0),
+              ),
             ),
             drawer: MediaQuery.of(context).size.width > 600
                 ? null
@@ -1830,9 +1887,19 @@ class _AdminRoleState extends State<AdminRole> {
                     child: DrawerItem(),
                   ),
             body: MediaQuery.of(context).size.width < 600
-                ? Center(
-                    child: Text(AppLocalizations.of(context).notAdmin),
-                  )
+                ? Column(children: [
+                    Expanded(
+                        flex: 1,
+                        child: BreadDots(
+                          title: AppLocalizations.of(context).breadDotsPanel,
+                        )),
+                    Expanded(
+                      flex: 9,
+                      child: Center(
+                        child: Text(AppLocalizations.of(context).notAdmin),
+                      ),
+                    ),
+                  ])
                 : Row(
                     children: [
                       Container(
@@ -1841,9 +1908,21 @@ class _AdminRoleState extends State<AdminRole> {
                       ),
                       Container(
                         width: MediaQuery.of(context).size.width - 200,
-                        child: Center(
-                          child: Text(AppLocalizations.of(context).notAdmin),
-                        ),
+                        child: Column(children: [
+                          Expanded(
+                              flex: 1,
+                              child: BreadDots(
+                                title:
+                                    AppLocalizations.of(context).breadDotsPanel,
+                              )),
+                          Expanded(
+                            flex: 9,
+                            child: Center(
+                              child:
+                                  Text(AppLocalizations.of(context).notAdmin),
+                            ),
+                          ),
+                        ]),
                       )
                     ],
                   ),
@@ -1851,8 +1930,10 @@ class _AdminRoleState extends State<AdminRole> {
         : Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: Text(AppLocalizations.of(context).adminBlock),
-              actions: [widgetActions()],
+              title: Text(
+                _title,
+                style: TextStyle(fontSize: 22.0),
+              ),
             ),
             drawer: MediaQuery.of(context).size.width > 600
                 ? null
@@ -1863,19 +1944,85 @@ class _AdminRoleState extends State<AdminRole> {
               // child: ListView(
               //   shrinkWrap: true,
               child: MediaQuery.of(context).size.width < 600
-                  ? _formColumn
+                  ? Column(children: [
+                      Expanded(
+                          flex: 1,
+                          child: BreadDots(
+                            title: AppLocalizations.of(context).breadDotsPanel,
+                          )),
+                      Expanded(
+                        flex: 9,
+                        child: Container(
+                          child: PageView(
+                            controller: _controller,
+                            onPageChanged: _onItemTapped,
+                            children: [
+                              _formColumnCreate(),
+                              _formColumnUpdate(),
+                              _formColumnDelete(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ])
                   : Row(
                       children: [
                         Container(
                           width: 200,
                           child: DrawerItem(),
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width - 200,
-                          child: _formColumn,
-                        )
+                        Column(children: [
+                          Expanded(
+                              flex: 1,
+                              child: BreadDots(
+                                title:
+                                    AppLocalizations.of(context).breadDotsPanel,
+                              )),
+                          Expanded(
+                            flex: 9,
+                            child: Container(
+                              width: MediaQuery.of(context).size.width - 200,
+                              child: Container(
+                                child: PageView(
+                                  controller: _controller,
+                                  onPageChanged: _onItemTapped,
+                                  children: [
+                                    _formColumnCreate(),
+                                    _formColumnUpdate(),
+                                    _formColumnDelete(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ])
                       ],
                     ),
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              selectedIconTheme: IconThemeData(
+                  color: Theme.of(context).accentColor, opacity: 1.0, size: 45),
+              unselectedIconTheme: IconThemeData(
+                  color: Colors.grey[500], opacity: 0.5, size: 25),
+              items: [
+                BottomNavigationBarItem(
+                    label: AppLocalizations.of(context).add,
+                    icon: Icon(Icons.add),
+                    tooltip: AppLocalizations.of(context).add),
+                BottomNavigationBarItem(
+                    label: AppLocalizations.of(context).update,
+                    icon: Icon(Icons.update),
+                    tooltip: AppLocalizations.of(context).update),
+                BottomNavigationBarItem(
+                    label: AppLocalizations.of(context).del,
+                    icon: Icon(Icons.delete_forever),
+                    tooltip: AppLocalizations.of(context).del),
+              ],
+              currentIndex: _selectedIndex,
+              backgroundColor: Theme.of(context).primaryColor,
+              selectedItemColor: Theme.of(context).accentColor,
+              unselectedItemColor: Colors.grey[500],
+              onTap: _onItemTapped,
             ),
           );
   }
