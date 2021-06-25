@@ -863,36 +863,28 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                           )),
                       Expanded(
                         flex: 9,
-                        child: Container(
-                          child: PageView(
-                            controller: _controller,
-                            onPageChanged: _onItemTapped,
-                            children: [
-                              _formColumnCreate(),
-                              _formColumnUpdate()
-                            ],
-                          ),
+                        child: PageView(
+                          controller: _controller,
+                          onPageChanged: _onItemTapped,
+                          children: [_formColumnCreate(), _formColumnUpdate()],
                         ),
                       ),
                     ])
                   : Row(
                       children: [
-                        Container(
-                          width: 200,
-                          child: DrawerItem(),
-                        ),
-                        Column(children: [
-                          Expanded(
-                              flex: 1,
-                              child: BreadDots(
-                                title:
-                                    AppLocalizations.of(context).breadDotsPanel,
-                              )),
-                          Expanded(
-                            flex: 9,
-                            child: Container(
-                              width: MediaQuery.of(context).size.width - 200,
+                        Container(width: 200.0, child: DrawerItem()),
+                        Expanded(
+                          child: Column(children: [
+                            Expanded(
+                                flex: 1,
+                                child: BreadDots(
+                                  title: AppLocalizations.of(context)
+                                      .breadDotsPanel,
+                                )),
+                            Expanded(
+                              flex: 9,
                               child: Container(
+                                width: MediaQuery.of(context).size.width - 200,
                                 child: PageView(
                                   controller: _controller,
                                   onPageChanged: _onItemTapped,
@@ -903,8 +895,8 @@ class _ModeratorRoleState extends State<ModeratorRole> {
                                 ),
                               ),
                             ),
-                          ),
-                        ])
+                          ]),
+                        )
                       ],
                     ),
             ),

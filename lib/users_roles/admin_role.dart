@@ -1971,31 +1971,33 @@ class _AdminRoleState extends State<AdminRole> {
                           width: 200,
                           child: DrawerItem(),
                         ),
-                        Column(children: [
-                          Expanded(
-                              flex: 1,
-                              child: BreadDots(
-                                title:
-                                    AppLocalizations.of(context).breadDotsPanel,
-                              )),
-                          Expanded(
-                            flex: 9,
-                            child: Container(
-                              width: MediaQuery.of(context).size.width - 200,
+                        Expanded(
+                          child: Column(children: [
+                            Expanded(
+                                flex: 1,
+                                child: BreadDots(
+                                  title:
+                                      AppLocalizations.of(context).breadDotsPanel,
+                                )),
+                            Expanded(
+                              flex: 9,
                               child: Container(
-                                child: PageView(
-                                  controller: _controller,
-                                  onPageChanged: _onItemTapped,
-                                  children: [
-                                    _formColumnCreate(),
-                                    _formColumnUpdate(),
-                                    _formColumnDelete(),
-                                  ],
+                                width: MediaQuery.of(context).size.width - 200,
+                                child: Container(
+                                  child: PageView(
+                                    controller: _controller,
+                                    onPageChanged: _onItemTapped,
+                                    children: [
+                                      _formColumnCreate(),
+                                      _formColumnUpdate(),
+                                      _formColumnDelete(),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ])
+                          ]),
+                        )
                       ],
                     ),
             ),
